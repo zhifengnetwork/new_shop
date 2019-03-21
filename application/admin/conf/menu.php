@@ -145,17 +145,6 @@ return	array(
     	    )),
 	)),
 
-	'sales'=>array('name'=>'销售','child'=>array(
-			array('name' => '销售管理','child' => array(
-					array('name' => '级别利润', 'act'=>'profits', 'op'=>'Sales'),
-					array('name' => '同级奖励', 'act'=>'same_reward', 'op'=>'Sales'),
-					// array('name' => '分销商列表', 'act'=>'distributor_list', 'op'=>'Distribut'),
-					// array('name' => '分销关系', 'act'=>'tree', 'op'=>'Distribut'),
-					// array('name' => '分销商等级', 'act'=>'grade_list', 'op'=>'Distribut'),
-					// array('name' => '分销设置', 'act'=>'distribut', 'op'=>'System'),
-					// array('name' => '分成日志', 'act'=>'rebate_log', 'op'=>'Distribut'),
-			)),
-	)),
 
  	'member'=>array('name'=>'会员','child'=>array(
 		array('name' => '会员管理','child'=>array(
