@@ -834,9 +834,14 @@ class User extends Base
      */
     public function userSignList(){
         $us = new UserSign();
-        // dump($us);exit;
-
-
+        dump($us->sign(43));
+        
+        
+        
+        
+        
+        
+        exit;
         return $this->fetch();
     }
 

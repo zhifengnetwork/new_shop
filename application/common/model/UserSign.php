@@ -30,6 +30,8 @@ class UserSign extends Model{
     public $continued_on_off = 0;
     // 连续签到送佣金规则
     public $rule = [];
+    // 会员ID
+    public $userid = '';
 
     function __construct(){
         // 实例化时，初始化类
@@ -52,8 +54,31 @@ class UserSign extends Model{
         }
     }
 
-    function to(){
-        return $this->config;
+    // 签到是否开启
+    function check_sign(){
+        return $this->sign_on_off ? true : false;
+    }
+    
+    // 连续签到是否开启
+    function check_continued(){
+        return $this->continued_on_off ? true : false;
+    }
+
+    // 获取用户信息
+    function user_info($user_id){
+        $info = Db::name('users')->field('')
+    }
+    // 签到
+    function sign($pram = ''){
+        if(is_array($pram)){
+            $user_id = intval($pram['user_id']);
+        }else{
+            $user_id = intval($pram);
+        }
+        if(!intval($user_id)){
+            return '错误：请传入 user_id';
+        }
+        echo $user_id;
     }
 
 
