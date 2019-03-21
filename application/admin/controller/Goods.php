@@ -620,6 +620,7 @@ class Goods extends Base {
         $id = I('id');
         if (IS_POST) {
             $data = I('post.');
+            dump($data);die;
             $brandVilidate = Loader::validate('Brand');
             if (!$brandVilidate->batch()->check($data)) {
                 $return = ['status' => 0, 'msg' => '操作失败', 'result' => $brandVilidate->getError()];
@@ -633,6 +634,16 @@ class Goods extends Base {
             $this->ajaxReturn(['status' => 1, 'msg' => '操作成功', 'result' => '']);
         }
         $cat_list = M('goods_category')->where("parent_id = 0")->select(); // 已经改成联动菜单
+
+        $sales = array(
+            ['sal_name'=>"组长",'reward'=>58,'each_reward'=>12],
+            ['sal_name'=>"经理",'reward'=>58,'each_reward'=>10],
+            ['sal_name'=>"组长",'reward'=>58,'each_reward'=>8],
+            ['sal_name'=>"组长",'reward'=>58,'each_reward'=>6],
+            ['sal_name'=>"合伙人",'reward'=>58,'each_reward'=>4]
+        );
+        $this->assign('sales',$sales);
+        $this->assign('bouns',['name'=>"合伙人",'bouns'=>2]);
         $this->assign('cat_list', $cat_list);
         $brand = M("Brand")->find($id);
         $this->assign('brand', $brand);

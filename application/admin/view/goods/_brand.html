@@ -1,5 +1,13 @@
 <include file="public/layout" />
 <body style="background-color: #FFF; overflow: auto;"> 
+<style>
+  .sal_tit{
+    text-align: center;
+  }
+  .sal_bod{
+    width: 50px;
+  }
+</style>
 <div class="page">
   <div class="fixed-bar">
     <div class="item-title"><a class="back" href="javascript:history.back();" title="返回列表"><i class="fa fa-arrow-circle-o-left"></i></a>
@@ -86,6 +94,35 @@
             <p class="notic"></p>
         </dd>
       </dl>
+      <dl class="row">
+        <dt class="tit">
+          <label for="ac_sort">销售级别</label>
+        </dt>
+        <dd class="opt">
+          <table class="table">
+            <tr>
+              <th class="sal_tit">名称</th>
+              <th class="sal_tit">基本奖励</th>
+              <th class="sal_tit">每台奖励</th>
+            </tr>
+            <foreach name="sales" item="vo">
+              <tr>
+                <td class="sal_bod">
+                  <label for="ac_sort">{$vo.sal_name}</label>
+                </td>
+                <td>
+                  <input type="text" name="reward{$key+1}" value="{$vo.reward}" class="input-txt" style="">
+                  <span class="err" id="err_reward{$key+1}" style="color:#F00; display:none;"></span>
+                </td>
+                <td>
+                  <input type="text" name="each_reward{$key+1}" value="{$vo.each_reward}" class="input-txt" style="">
+                  <span class="err" id="err_each_reward{$key+1}" style="color:#F00; display:none;"></span>
+                </td>
+              </tr>
+            </foreach>
+          </table>
+        </dd>
+      </dl>
 	  <dl class="row">
         <dt class="tit">
           <label for="ac_sort">品牌描述</label>
@@ -104,6 +141,7 @@
         <input type="hidden" name="p" value="{$_GET[p]}">   
   </form>
 </div>
+
 <script>
 function verifyForm(){
     var name = $("#brand_name").val();
