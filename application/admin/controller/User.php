@@ -27,11 +27,11 @@ use app\common\logic\MessageTemplateLogic;
 use app\common\logic\MessageFactory;
 use app\common\model\Withdrawals;
 use app\common\model\Users;
+use app\common\model\UserSign;
 use think\Loader;
 
 class User extends Base
 {
-
     public function index()
     {
         return $this->fetch();
@@ -87,8 +87,9 @@ class User extends Base
     {
         $uid = I('get.id');
         $user = D('users')->where(array('user_id' => $uid))->find();
-        if (!$user)
+        if (!$user) {
             exit($this->error('会员不存在'));
+        }
         if (IS_POST) {
             //  会员信息编辑
             $password = I('post.password');
@@ -117,8 +118,9 @@ class User extends Base
             $userLevel = D('user_level')->where('level_id=' . $_POST['level'])->value('discount');
             $_POST['discount'] = $userLevel / 100;
             $row = M('users')->where(array('user_id' => $uid))->save($_POST);
-            if ($row)
+            if ($row) {
                 exit($this->success('修改成功'));
+            }
             exit($this->error('未作内容修改或修改失败'));
         }
 
@@ -175,7 +177,7 @@ class User extends Base
         for ($i = 0; $i < $p; $i++) {
             $start = $i * 5000;
             $end = ($i + 1) * 5000;
-            $userList = M('users')->where($condition)->order('user_id')->limit($start,5000)->select();
+            $userList = M('users')->where($condition)->order('user_id')->limit($start, 5000)->select();
             if (is_array($userList)) {
                 foreach ($userList as $k => $val) {
                     $strTable .= '<tr>';
@@ -274,12 +276,15 @@ class User extends Base
     public function account_edit()
     {
         $user_id = I('user_id');
-        if (!$user_id > 0) $this->ajaxReturn(['status' => 0, 'msg' => "参数有误"]);
+        if (!$user_id > 0) {
+            $this->ajaxReturn(['status' => 0, 'msg' => "参数有误"]);
+        }
         $user = M('users')->field('user_id,user_money,frozen_money,pay_points,is_lock')->where('user_id', $user_id)->find();
         if (IS_POST) {
             $desc = I('post.desc');
-            if (!$desc)
+            if (!$desc) {
                 $this->ajaxReturn(['status' => 0, 'msg' => "请填写操作说明"]);
+            }
             //加减用户资金
             $m_op_type = I('post.money_act_type');
             $user_money = I('post.user_money/f');
@@ -428,7 +433,9 @@ class User extends Base
     public function search_user()
     {
         $search_key = trim(I('search_key'));
-        if ($search_key == '') $this->ajaxReturn(['status' => -1, 'msg' => '请按要求输入！！']);
+        if ($search_key == '') {
+            $this->ajaxReturn(['status' => -1, 'msg' => '请按要求输入！！']);
+        }
         $list = M('users')->where(['nickname' => ['like', "%$search_key%"]])->select();
         if ($list) {
             $this->ajaxReturn(['status' => 1, 'msg' => '获取成功', 'result' => $list]);
@@ -730,12 +737,13 @@ class User extends Base
         $id = I('id');
         $withdrawals = Db::name("withdrawals")->find($id);
         $user = M('users')->where(['user_id' => $withdrawals['user_id']])->find();
-        if ($user['nickname'])
+        if ($user['nickname']) {
             $withdrawals['user_name'] = $user['nickname'];
-        elseif ($user['email'])
+        } elseif ($user['email']) {
             $withdrawals['user_name'] = $user['email'];
-        elseif ($user['mobile'])
+        } elseif ($user['mobile']) {
             $withdrawals['user_name'] = $user['mobile'];
+        }
         $status = $withdrawals['status'];
         $withdrawals['status_code'] = C('WITHDRAW_STATUS')["$status"];
         $this->assign('user', $user);
@@ -751,8 +759,12 @@ class User extends Base
         $id_arr = I('id/a');
         $data['status'] = $status = I('status');
         $data['remark'] = I('remark');
-        if ($status == 1) $data['check_time'] = time();
-        if ($status != 1) $data['refuse_time'] = time();
+        if ($status == 1) {
+            $data['check_time'] = time();
+        }
+        if ($status != 1) {
+            $data['refuse_time'] = time();
+        }
         $ids = implode(',', $id_arr);
         $r = Db::name('withdrawals')->whereIn('id', $ids)->update($data);
         if ($r !== false) {
@@ -766,7 +778,9 @@ class User extends Base
     public function transfer()
     {
         $id = I('selected/a');
-        if (empty($id)) $this->error('请至少选择一条记录');
+        if (empty($id)) {
+            $this->error('请至少选择一条记录');
+        }
         $atype = I('atype');
         if (is_array($id)) {
             $withdrawals = M('withdrawals')->where('id in (' . implode(',', $id) . ')')->select();
@@ -794,14 +808,13 @@ class User extends Base
                 $rdata = array('type' => 1, 'money' => $val['money'], 'log_type_id' => $val['id'], 'user_id' => $val['user_id']);
                 if ($atype == 'online') {
                     header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+                    exit("请联系TPshop官网客服购买高级版支持此功能");
                 } else {
                     accountLog($val['user_id'], ($val['money'] * -1), 0, "管理员处理用户提现申请");//手动转账，默认视为已通过线下转方式处理了该笔提现申请
                     $r = M('withdrawals')->where(array('id' => $val['id']))->save(array('status' => 2, 'pay_time' => time()));
                     expenseLog($rdata);//支出记录日志
                     // 提现通知
                     $messageLogic->withdrawalsNotice($val['id'], $val['user_id'], $val['money'] - $val['taxfee']);
-
                 }
             }
         }
@@ -814,6 +827,106 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
         $this->success("操作成功!", U('remittance'), 3);
     }
 
+    /**
+     * 会员签到记录
+     * @author Rock
+     * @data 2019/03/21
+     */
+    public function userSignList(){
+        $us = new UserSign();
+        // dump($us);exit;
+
+
+        return $this->fetch();
+    }
+
+    /**
+     * 会员签到规则
+     * @author Rock
+     * @data 2019/03/21
+     */
+    public function userSignRule(){
+        if(IS_POST){
+            $data = input('post.');
+            if($data['inc_type'] != 'user_sign_rule'){
+                $this->error('未知的来源');
+            }
+            $pram['sign_on_off'] = intval($data['sign_on_off']);
+            $pram['sign_integral'] = intval($data['sign_integral'] * 100) / 100;
+            $pram['continued_on_off'] = intval($data['continued_on_off']);
+            if($pram['sign_on_off'] == 0 &&  $pram['continued_on_off'] == 1){
+                $pram['continued_on_off'] = 0;
+            }
+            if($data['continuedk']){
+                foreach($data['continuedk'] as $k => $v){
+                    $key = intval($v);
+                    $val = intval($data['continuedv'][$k] * 100) / 100;
+                    if($key && ($val > 0)){
+                        $pram['rule'][$key] = $val;
+                    }
+                }
+            }
+            
+            $name = $data['inc_type'];
+            $value = json_encode($pram);
+            $inc_type = $data['inc_type'];
+            $desc = "用户登录签到送佣金";
+            # 插入或更新设置
+            $info = Db::name('config')->where('inc_type',$inc_type)->find();
+            if($info){
+                Db::execute("update `tp_config` set `value` = '$value' where `name` = '$name' and `inc_type` = '$inc_type'");
+            }else{
+                Db::execute("insert into `tp_config` (`name`,`value`,`inc_type`,`desc`) values ('$name','$value','$inc_type','$desc')");
+            }
+            $this->success('操作成功');
+            exit;
+        }
+
+        # 获取设置信息
+        $info = Db::name('config')->where('inc_type','user_sign_rule')->find();
+        if($info){
+            $config = json_decode($info['value'],true);
+            if($config['rule']){
+                ksort($config['rule']);
+                $first_key = each($config['rule'])['key'];
+                $this->assign('first_key',$first_key);
+            }
+            // dump($config);exit;
+            $this->assign('config',$config);
+        }
+
+
+        return $this->fetch();
+    }
+
+    /**
+     * 会员邀新记录
+     * @author Rock
+     * @data 2019/03/21
+     */
+    public function userInvitationList(){
+
+
+        header("Content-type: text/html; charset=utf-8");
+        exit("功能开发中......");
+    }
+
+    /**
+     * 会员邀新规则
+     * @author Rock
+     * @data 2019/03/21
+     */
+    public function userInvitationRule(){
+
+
+
+        header("Content-type: text/html; charset=utf-8");
+        exit("功能开发中......");
+    }
+
+
+
+
 
     /**
      * 签到列表
@@ -822,7 +935,7 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
     public function signList()
     {
         header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        exit("请联系TPshop官网客服购买高级版支持此功能");
     }
 
 
@@ -833,7 +946,7 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
     public function ajaxsignList()
     {
         header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        exit("请联系TPshop官网客服购买高级版支持此功能");
     }
 
     /**
@@ -843,7 +956,7 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
     public function signRule()
     {
         header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        exit("请联系TPshop官网客服购买高级版支持此功能");
     }
 
     /**
@@ -887,11 +1000,11 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
             if ($label_info['label_id']) {
                 if (!$userLabelValidate->scene('edit')->batch()->check($label_info)) {
                     $return = ['status' => 0, 'msg' => '编辑失败', 'result' => $userLabelValidate->getError()];
-                }else {
+                } else {
                     $UserLabel->where('id', $label_info['label_id'])->save($label_info);
                     $return = ['status' => 1, 'msg' => '编辑成功', 'result' => ''];
                 }
-            }else{
+            } else {
                 if (!$userLabelValidate->batch()->check($label_info)) {
                     $return = ['status' => 0, 'msg' => '添加失败', 'result' => $userLabelValidate->getError()];
                 } else {

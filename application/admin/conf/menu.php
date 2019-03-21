@@ -156,8 +156,12 @@ return	array(
 			array('name'=>'提现设置','act'=>'cash','op'=>'System'),
 		)),
 		array('name' => '签到管理','child'=>array(
-			array('name'=>'签到记录','act'=>'signList','op'=>'User'),
-			array('name'=>'签到规则','act'=>'signRule','op'=>'User'),
+			// array('name'=>'签到记录','act'=>'signList','op'=>'User'),
+			// array('name'=>'签到规则','act'=>'signRule','op'=>'User'),
+			array('name'=>'签到记录','act'=>'userSignList','op'=>'User'),
+			array('name'=>'签到规则','act'=>'userSignRule','op'=>'User'),
+			array('name'=>'邀请注册记录','act'=>'userInvitationList','op'=>'User'),
+			array('name'=>'邀请注册规则','act'=>'userInvitationRule','op'=>'User'),
 		)),
 	)),
 
