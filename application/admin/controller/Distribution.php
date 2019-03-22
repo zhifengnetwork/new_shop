@@ -1,7 +1,7 @@
 <?php
 namespace app\admin\controller;
 
-use app\common\LevelLogic;
+use app\common\logic\LevelLogic;
 use think\Db;
 use think\Page;
 use think\Loader;
@@ -17,6 +17,9 @@ class Distribution extends Base
     {
         $Ad = M('agent_level');
         $p = $this->request->param('p');
+        $level = new LevelLogic();
+        $num = $level->get_team_num(2);
+        dump($num);die;
         $res = $Ad->order('level_id')->page($p . ',10')->select();
         if ($res) {
             foreach ($res as $val) {
