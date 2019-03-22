@@ -323,11 +323,16 @@ class Goods extends Base {
         $GoodsLogic = new GoodsLogic();
         $Goods = new \app\common\model\Goods();
         $goods_id = input('id');
+        $basic_reward = array();
+        $each_reward = array();
         if($goods_id){
             $goods = $Goods->where('goods_id', $goods_id)->find();
             $level_cat = $GoodsLogic->find_parent_cat($goods['cat_id']); // 获取分类默认选中的下拉框
             $level_cat2 = $GoodsLogic->find_parent_cat($goods['extend_cat_id']); // 获取分类默认选中的下拉框
             $brandList = $GoodsLogic->getSortBrands($goods['cat_id']);   //获取三级分类下的全部品牌
+            $basic_reward = json_decode($goods['basic_reward'],true);
+            $each_reward = json_decode($goods['each_reward'],true);
+
             $this->assign('goods', $goods);
             $this->assign('level_cat', $level_cat);
             $this->assign('level_cat2', $level_cat2);
@@ -337,6 +342,31 @@ class Goods extends Base {
         $goodsType = Db::name("GoodsType")->select();
         $suppliersList = Db::name("suppliers")->where(['is_check'=>1])->select();
         $freight_template = Db::name('freight_template')->where('')->select();
+        $level_name = $this->get_level_name();
+        $level_name = array_map(function($level){
+            return array('level_id'=>$level['level_id'],'level_name'=>$level['level_name']);
+        },$level_name);
+
+        $sales = array();
+        $num = 0;
+        if ($basic_reward) {
+            foreach ($basic_reward as $k1 => $v1) {
+                $sales[$num]['level_id'] = $k1;
+                $sales[$num]['level_name'] = $level_name[$num]['level_name'];
+                $sales[$num]['reward'] = $v1;
+                $sales[$num]['each_reward'] = $each_reward[$k1];
+                $num ++;
+            }
+        } else {
+            foreach ($level_name as $key => $value) {
+                $sales[$num]['level_id'] = $value['level_id'];
+                $sales[$num]['level_name'] = $value['level_name'];
+                $sales[$num]['reward'] = 0;
+                $sales[$num]['each_reward'] = 0;
+                $num ++;
+            }           
+        }
+        $this->assign('sales',$sales);
         $this->assign('freight_template',$freight_template);
         $this->assign('suppliersList', $suppliersList);
         $this->assign('cat_list', $cat_list);
@@ -344,9 +374,18 @@ class Goods extends Base {
         return $this->fetch('_goods');
     }
 
+    //获取等级名称
+    public function get_level_name()
+    {
+        $level_name = Db::name('agent_level')->field('level_id,level_name')->select();
+
+        return $level_name;
+    }
+
     //商品保存
     public function save(){
         $data = input('post.');
+        
         $spec_item = input('item/a');
         $validate = Loader::validate('Goods');// 数据验证
         if (!$validate->batch()->check($data)) {
@@ -366,10 +405,28 @@ class Goods extends Base {
             $goods = new \app\common\model\Goods();
             $store_count_change_num = $data['store_count'];
         }
+        $level_name = $this->get_level_name();
+        $num = 0;
+        $sal = array();
+        $each_reward = array();
+        foreach ($level_name as $key => $value) {
+            $num ++;
+            foreach ($data as $k2 => $v2) {
+                if ($value['level_id'] == $data[$k2]) {
+                    $sal[$data['level_id_'.$num]] = $data['reward_'.$num];
+                    $each_reward[$data['level_id_'.$num]] = $data['each_reward_'.$num];
+                }
+            }
+        }
+        $sal= json_encode($sal);
+        $each_reward= json_encode($each_reward);
         $goods->data($data, true);
         $goods->last_update = time();
         $goods->price_ladder = true;
+        $goods->basic_reward = $sal;
+        $goods->each_reward = $each_reward;
         $goods->save();
+
         if(empty($spec_item)){
             update_stock_log(session('admin_id'), $store_count_change_num, ['goods_id' => $goods['goods_id'], 'goods_name' => $goods['goods_name']]);//库存日志
         }
@@ -377,6 +434,7 @@ class Goods extends Base {
         $GoodsLogic->afterSave($goods['goods_id']);
         $GoodsLogic->saveGoodsAttr($goods['goods_id'], $goods['goods_type']); // 处理商品 属性
         $return_arr = ['status' => 1, 'msg' => '操作成功'];
+
         $this->ajaxReturn($return_arr);
     }
 
@@ -620,7 +678,6 @@ class Goods extends Base {
         $id = I('id');
         if (IS_POST) {
             $data = I('post.');
-            dump($data);die;
             $brandVilidate = Loader::validate('Brand');
             if (!$brandVilidate->batch()->check($data)) {
                 $return = ['status' => 0, 'msg' => '操作失败', 'result' => $brandVilidate->getError()];
@@ -635,15 +692,7 @@ class Goods extends Base {
         }
         $cat_list = M('goods_category')->where("parent_id = 0")->select(); // 已经改成联动菜单
 
-        $sales = array(
-            ['sal_name'=>"组长",'reward'=>58,'each_reward'=>12],
-            ['sal_name'=>"经理",'reward'=>58,'each_reward'=>10],
-            ['sal_name'=>"组长",'reward'=>58,'each_reward'=>8],
-            ['sal_name'=>"组长",'reward'=>58,'each_reward'=>6],
-            ['sal_name'=>"合伙人",'reward'=>58,'each_reward'=>4]
-        );
-        $this->assign('sales',$sales);
-        $this->assign('bouns',['name'=>"合伙人",'bouns'=>2]);
+        
         $this->assign('cat_list', $cat_list);
         $brand = M("Brand")->find($id);
         $this->assign('brand', $brand);

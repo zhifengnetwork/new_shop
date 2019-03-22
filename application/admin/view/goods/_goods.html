@@ -86,6 +86,9 @@
     padding: 0px 10px;
 }
     .err{color:#F00; display:none;}
+    .sal_tit{text-align: center;}
+    .sal_bod{width: 100px; margin-right: 6px;}
+    .level_name{margin-right: 6px;}
 </style>
 <!--物流配置 css -end-->
 <!--以下是在线编辑器 代码 -->
@@ -257,6 +260,36 @@
                     <input type="text" value="{$goods.cost_price}" name="cost_price" class="t_mane"
                            onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')" onpaste="this.value=this.value.replace(/[^\d.]/g,'')"/>
                     <span class="err" id="err_cost_price"></span>
+                </dd>
+            </dl>
+            <dl class="row">
+              <dt class="tit">
+                <label for="ac_sort">奖励级别</label>
+              </dt>
+              <dd class="opt">
+                  <table class="table">
+                    <tr>
+                      <th class="sal_tit">名称</th>
+                      <th class="sal_tit">基本奖励</th>
+                      <th class="sal_tit">每台奖励</th>
+                    </tr>
+                    <foreach name="sales" item="vo">
+                      <tr>
+                        <td>
+                            <input type="hidden" name="level_id_{$key+1}" value="{$vo.level_id}"style="">
+                          <label for="ac_sort" class="level_name">{$vo.level_name}</label>
+                      </td>
+                      <td>
+                          <input type="text" name="reward_{$key+1}" value="{$vo.reward}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
+                          <span class="err" id="err_reward_{$key+1}" style="color:#F00; display:none;" ></span>
+                      </td>
+                      <td>
+                          <input type="text" name="each_reward_{$key+1}" value="{$vo.each_reward}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
+                          <span class="err" id="err_each_reward_{$key+1}" style="color:#F00; display:none;"></span>
+                      </td>
+                      </tr>
+                    </foreach>
+                  </table>
                 </dd>
             </dl>
             <!--<dl class="row">-->
