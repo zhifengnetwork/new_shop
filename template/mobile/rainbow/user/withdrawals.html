@@ -135,6 +135,9 @@
 
 					<dd>3.手续费在到账金额中扣除；</dd>
 					<dd>4.提现审核一般3 - 5个工作日到账。</dd>
+					<if condition="$cash_config.goods_id">
+						<dd>5.需推广 <a style="color:blue;" href="/Mobile/Goods/goodsInfo/id/{$cash_config.goods_id}.html">报单产品</a> 。</dd>
+					</if>
 				</dl>
 				</div>
 			</div>

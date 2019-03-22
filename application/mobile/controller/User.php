@@ -1135,6 +1135,9 @@ class User extends MobileBase
             if($cash_open!=1){
                 $this->ajaxReturn(['status'=>0, 'msg'=>'提现功能已关闭,请联系商家']);
             }
+            if($this->user['is_cash'] < 1){
+                $this->ajaxReturn(['status'=>0, 'msg'=>'需完成推广报单产品后解锁提现']);
+            }
 
             $data = I('post.');
             $data['user_id'] = $this->user_id;
@@ -1211,6 +1214,10 @@ class User extends MobileBase
                 $this->ajaxReturn(['status'=>0,'msg'=>'提交失败,联系客服!']);
             }
         }
+
+
+
+
         $user_extend=Db::name('user_extend')->where('user_id='.$this->user_id)->find();
 
         //获取用户绑定openId
@@ -1220,6 +1227,7 @@ class User extends MobileBase
             $openid = Db::name('oauth_users')->where(['user_id'=>$this->user_id, 'oauth'=>'weixin'])->value('openid');
         }
 
+        
         $this->assign('user_extend',$user_extend);
         $this->assign('cash_config', tpCache('cash'));//提现配置项
         $this->assign('user_money', $this->user['user_money']);    //用户余额

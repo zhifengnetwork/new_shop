@@ -65,6 +65,7 @@
                     <span class="err" id="err_goods_name"></span>
                     <p class="notic">
                         <a onclick="selectGoods()" class="ncap-btn" id="select_goods_button"><i class="fa fa-search"></i>选择商品</a>
+                        <a onclick="dleGoods()" style="margin-left:20px;" class="ncap-btn" id="select_goods_button">清除商品</a>
                     </p>
                     <p class="notic">注：设置商品后，用户必须购买或推广购买此商品后才能解锁提现，商品更改后已解锁的用户不作改变</p>
                 </dd>
@@ -157,6 +158,11 @@
     </form>
 </div>
 <script type="text/javascript">
+    function dleGoods(){
+        $('#goods_id').val('');
+        $('#goods_name').val('');
+        $('#selected_group_goods div').remove();
+    }
 
     function fromsubmit(){
         var min_cash    =   parseInt($('#min_cash').val());   //每次最低提现额
