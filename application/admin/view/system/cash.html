@@ -42,7 +42,33 @@
                     <p class="notic">是否开启提现功能</p>
                 </dd>
             </dl>
-
+            <dl class="row">
+                <dt class="tit">
+                    <label>购买商品</label>
+                </dt>
+                <dd class="opt">
+                    <input type="hidden" id="goods_id" name="goods_id" value="$config['goods_id']">
+                    <input type="text" id="goods_name" readonly name="goods_name" value="{$goods.goods_name}" class="input-txt">
+                    <div style="overflow: hidden" id="selected_group_goods">
+                        <if condition="$goods">
+                            <div style="float: left;margin-right: 10px" class="selected-group-goods">
+                                <div class="goods-thumb"><img style="width: 162px;height: 162px"  <notempty name="info['specGoodsPrice']">src="{$goods['original_img']}"<else/>src="{$config['goods_id']|goods_thum_images=162,162}"</notempty>/></div>
+                                <div class="goods-name">
+                                    <a target="_blank" href="{:U('Home/Goods/goodsInfo',array('id'=>$info['goods_id']))}">{$info.goods_name}</a>
+                                </div>
+                                <div class="goods-price">
+                                        商城价：￥{$goods['shop_price']}库存:{$goods['store_count']}
+                                </div>
+                            </div>
+                        </if>
+                    </div>
+                    <span class="err" id="err_goods_name"></span>
+                    <p class="notic">
+                        <a onclick="selectGoods()" class="ncap-btn" id="select_goods_button"><i class="fa fa-search"></i>选择商品</a>
+                    </p>
+                    <p class="notic">注：设置商品后，用户必须购买或推广购买此商品后才能解锁提现，商品更改后已解锁的用户不作改变</p>
+                </dd>
+            </dl>
             <dl class="row">
                 <dt class="tit">
                     <label for="reg_integral">手续费比例</label>
@@ -202,6 +228,43 @@
         document.form1.submit();
     }
 
+</script>
+<script type="text/javascript">
+    function selectGoods(){
+        var url = "{:U('Promotion/search_goods',array('tpl'=>'select_goods','prom_type'=>1,'prom_id'=>$info[id]))}";
+        layer.open({
+            type: 2,
+            title: '选择商品',
+            shadeClose: true,
+            shade: 0.2,
+            area: ['75%', '75%'],
+            content: url,
+        });
+    }
+    function call_back(goodsItem){
+        $('#goods_id').val(goodsItem.goods_id);
+        $('input[name=item_id]').val(''); //将规格ID重置一下
+        var html = '';
+        if(goodsItem.spec != null){
+            //有规格
+            html = '<div style="float: left;margin: 10px auto;" class="selected-group-goods"><div class="goods-thumb">' +
+                    '<img style="width: 162px;height: 162px" src="'+goodsItem.spec.spec_img+'"/></div> <div class="goods-name"> ' +
+                    '<a target="_blank" href="/index.php?m=Home&c=Goods&a=goodsInfo&id='+goodsItem.goods_id+'">'+goodsItem.goods_name+goodsItem.spec.key_name+'</a> </div>' +
+                    ' <div class="goods-price">商城价：￥'+goodsItem.spec.price+'库存:'+goodsItem.spec.store_count+'</div> </div>';
+            $('input[name=item_id]').val(goodsItem.spec.item_id)
+            $('input[name=goods_name]').val(goodsItem.goods_name + goodsItem.spec.key_name);
+        }else{
+            html = '<div style="float: left;margin: 10px auto;" class="selected-group-goods"><div class="goods-thumb">' +
+                    '<img style="width: 162px;height: 162px" src="'+goodsItem.goods_image+'"/></div> <div class="goods-name"> ' +
+                    '<a target="_blank" href="/index.php?m=Home&c=Goods&a=goodsInfo&id='+goodsItem.goods_id+'">'+goodsItem.goods_name+'</a> </div>' +
+                    ' <div class="goods-price">商城价：￥'+goodsItem.goods_price+'库存:'+goodsItem.store_count+'</div> </div>';
+            $('input[name=goods_name]').val(goodsItem.goods_name);
+        }
+        $('#select_goods_button').attr('data-goods-id',goodsItem.goods_id);
+        $('#selected_group_goods').empty().html(html);
+        $('.selected-group-goods').show();
+        layer.closeAll('iframe');
+    }
 </script>
 <div id="goTop">
     <a href="JavaScript:void(0);" id="btntop">

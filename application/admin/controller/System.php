@@ -62,6 +62,10 @@ class System extends Base
     public function cash()
     {
         $config = tpCache('cash');
+        if($config['goods_id'] > 0){
+            $goods_info = Db::name('goods')->field('`goods_name`,`shop_price`,`store_count`,`original_img`')->where('goods_id',$config['goods_id'])->find();
+            $this->assign('goods',$goods_info);
+        }
         $this->assign('config',$config);//当前配置项
         return $this->fetch();
     }
@@ -100,20 +104,21 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
 	 */
 	public function handle()
 	{
-		$param = I('post.');
-		$inc_type = $param['inc_type'];
+        $param = I('post.');
+        $inc_type = $param['inc_type'];
 		//unset($param['__hash__']);
-		unset($param['inc_type']);
+        unset($param['inc_type']);
+        unset($param['goods_name']);
 		tpCache($inc_type,$param);                
                 
-                // 设置短信商接口
-                if($param['sms_platform'] == 2 &&  !empty($param['sms_appkey'])  && !empty($param['sms_secretKey']))
-                {                     
-                    $sms_appkey = trim($param['sms_appkey']);
-                    $sms_secretKey = trim($param['sms_secretKey']);
-                    $url = 'http://open.1cloudsp.com:8090/api/admin/setParentId?parentId=14257&accesskey='.urlencode($sms_appkey).'&secret='.urlencode($sms_secretKey);
-                    httpRequest($url);                    
-                }
+        // 设置短信商接口
+        if($param['sms_platform'] == 2 &&  !empty($param['sms_appkey'])  && !empty($param['sms_secretKey']))
+        {                     
+            $sms_appkey = trim($param['sms_appkey']);
+            $sms_secretKey = trim($param['sms_secretKey']);
+            $url = 'http://open.1cloudsp.com:8090/api/admin/setParentId?parentId=14257&accesskey='.urlencode($sms_appkey).'&secret='.urlencode($sms_secretKey);
+            httpRequest($url);                    
+        }
         switch ($inc_type){
             case 'cash':
                 $this->success("操作成功",U('System/cash'));
