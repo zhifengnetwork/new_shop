@@ -12,6 +12,7 @@
  */
 use think\Log;
 use think\Db;
+use app\common\logic\Sales;
 define('EXTEND_MODULE', 1);
 define('EXTEND_ANDROID', 2);
 define('EXTEND_IOS', 3);
@@ -19,6 +20,28 @@ define('EXTEND_ENTRUST', 4); //委托服务
 define('EXTEND_MINIAPP', 5);
 define("EXTEND_H5",6);//添加终端h5
 define('TIME_MOUTH', 4);
+
+/**
+ * 销售奖励
+ * @param $order_id
+ */
+function sales($order_id){
+
+    $order = M('order')->where(['order_id'=>$order_id])->find();
+
+    $user_id = $order['user_id'];
+
+    $goods_list = M('order_goods')->where(['order_id'=>$order_id])->select();
+   
+    // agent_performance($order_id);
+    foreach($goods_list as $k => $v){
+        $model = new Sales($user_id,$order_id,$v['goods_id']);
+        $res = $model->sales();
+    }
+
+    return $res;
+}
+
 /**
  * tpshop检验登陆
  * @param

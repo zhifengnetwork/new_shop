@@ -173,7 +173,10 @@ class Goods extends Base {
     /**
      *  商品列表
      */
-    public function goodsList(){      
+    public function goodsList(){
+        $data = sales(81);
+        dump($data);
+        die;      
         $GoodsLogic = new GoodsLogic();        
         $brandList = $GoodsLogic->getSortBrands();
         $categoryList = $GoodsLogic->getSortCategory();
