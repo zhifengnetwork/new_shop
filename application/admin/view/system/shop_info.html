@@ -345,6 +345,16 @@
                     <p class="notic">客户端显示，方便买家遇到问题时咨询</p>
                 </dd>
             </dl>
+            <dl class="row">
+                <dt class="tit">
+                    <label for="today_ratio">合伙人当日分红比例</label>
+                </dt>
+                <dd class="opt">
+                    <input id="today_ratio"  name="today_ratio" value="{$config.today_ratio}" class="input-txt" type="text">
+                    <span class="err"></span>
+                    <p class="notic">合伙人当日分红比例  单位：%</p>
+                </dd>
+            </dl>
             <div class="bot">
                 <input type="hidden" name="inc_type" value="{$inc_type}">
                 <a href="JavaScript:void(0);" class="ncap-btn-big ncap-btn-green" onclick="submit()">确认提交</a>
