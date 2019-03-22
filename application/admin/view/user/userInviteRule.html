@@ -48,7 +48,7 @@
     </ul>
   </div>
     <form method="post" enctype="multipart/form-data" id="form1" name="form1" action="{:U('User/userInviteRule')}">
-        <input type="hidden" name="inc_type" value="user_invite">
+        <input type="hidden" name="inc_type" value="user_invite_rule">
         <div class="ncap-form-default">
             
             <dl class="row">
@@ -57,9 +57,9 @@
                 </dt>
                 <dd class="opt">
                     <div class="onoff">
-                        <label for="switchs1" item='1' class="con-lab cb-enable  <if condition="$config['intvite_on_off'] eq 1">selected</if>">开启</label>
-                        <label for="switchs0" item='0' class="con-lab cb-disable <if condition="$config['intvite_on_off'] eq 0">selected</if>">关闭</label>
-                        <input type="hidden" name="intvite_on_off" id="intvite_on_off" value="<if condition="$config['intvite_on_off'] eq 1">1</else>0</if>"" />
+                        <label for="switchs1" item='1' class="con-lab cb-enable  <if condition="$config['invite_on_off'] eq 1">selected</if>">开启</label>
+                        <label for="switchs0" item='0' class="con-lab cb-disable <if condition="$config['invite_on_off'] eq 0">selected</if>">关闭</label>
+                        <input type="hidden" name="invite_on_off" id="invite_on_off" value="<if condition="$config['invite_on_off'] eq 1">1</else>0</if>"" />
                     </div>
                 </dd>
             </dl>
@@ -109,7 +109,7 @@
     $(function(){
         $('.con-lab').on('click',function(){
             var item = $(this).attr('item');
-            $('#intvite_on_off').val(item);
+            $('#invite_on_off').val(item);
         });
 
 

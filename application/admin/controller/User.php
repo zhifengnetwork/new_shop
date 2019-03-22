@@ -27,7 +27,7 @@ use app\common\logic\MessageTemplateLogic;
 use app\common\logic\MessageFactory;
 use app\common\model\Withdrawals;
 use app\common\model\Users;
-use app\common\model\UserSign;
+use app\common\model\UserInvite;
 use think\Loader;
 
 class User extends Base
@@ -957,7 +957,7 @@ class User extends Base
      * @data 2019/03/21
      */
     public function userInviteList(){
-
+        
         return $this->fetch();
     }
 
@@ -1027,10 +1027,10 @@ class User extends Base
     public function userInviteRule(){
         if(IS_POST){
             $data = input('post.');
-            if($data['inc_type'] != 'user_invite'){
+            if($data['inc_type'] != 'user_invite_rule'){
                 $this->error('未知的来源');
             }
-            $pram['intvite_on_off'] = intval($data['intvite_on_off']);
+            $pram['invite_on_off'] = intval($data['invite_on_off']);
             if($data['rulek']){
                 foreach($data['rulek'] as $k => $v){
                     $key = intval($v);
@@ -1057,7 +1057,7 @@ class User extends Base
         }
 
          # 获取设置信息
-         $info = Db::name('config')->where('inc_type','user_invite')->find();
+         $info = Db::name('config')->where('inc_type','user_invite_rule')->find();
          if($info){
              $config = json_decode($info['value'],true);
              if($config['rule']){

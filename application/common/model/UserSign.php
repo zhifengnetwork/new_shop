@@ -9,7 +9,6 @@ namespace app\common\model;
 
 use think\Db;
 use think\Model;
-use think\Exception;
 
 class UserSign extends Model{
 
