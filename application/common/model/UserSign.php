@@ -50,7 +50,7 @@ class UserSign extends Model{
             $this->rule = $config['value']['rule'];
             $this->config = $config;
         }else{
-            echo "错误：请检查系统管理后台是否已经设置了相关信息";exit;
+            return false;
         }
     }
 
@@ -64,10 +64,84 @@ class UserSign extends Model{
         return $this->continued_on_off ? true : false;
     }
 
-    // 获取用户信息
-    function user_info($user_id){
-        $info = Db::name('users')->field('')
+    // 检索用户佣金记录
+    function check_commission_log($user_id = 0, $date = '', $re = true){
+        if(!$date){
+            $date = date('Ymd');
+        }
+        $log = Db::name('commission_log')->where(['user_id'=>$user_id,'identification'=>1,'date'=>$date])->order('id desc')->find();
+        if($re){
+            return $log;
+        }else{
+            return $log ? true : false;
+        }
     }
+
+    
+    // 签到记录信息
+    function getInfo($id = 0){
+        if(intval($id)){
+            return Db::name('commission_log')->where(['id'=>$id, 'identification'=>1])->find();
+        }
+        return false;
+    }
+
+    // 最后一条签到信息
+    function getLastInfo($user_id = 0, $re = true){
+        if(!intval($user_id)){
+            return false;
+        }
+        $info = Db::name('commission_log')->where(['identification'=>1])->order('date desc')->find();
+        if($re){
+            return $info;
+        }else{
+            return $info ? true : false;
+        }
+    }
+
+
+    // 拼装 运行 签到数据
+    function _sql($user_id){
+        if(!intval($user_id)) return false;
+        $yesterday = date('Ymd',strtotime('-1 day'));
+        $date = date('Ymd');
+        $time = time();
+
+        $log = Db::name('commission_log')->where(['user_id' => $user_id, 'identification'=>1, 'date' => $date])->count();
+        if($log) return false;
+
+        $money = $this->sign_integral;
+        $num = 1;
+        $desc = '签到奖励：'.$money;
+        
+        $lastInfo = Db::name('commission_log')->where(['identification'=>1])->order('date desc')->find();
+        if($lastInfo){
+            if($lastInfo['date'] == $yesterday){
+                $num += $lastInfo['num'];
+            }
+        }
+        if($this->continued_on_off){
+            $rule = $this->rule;
+            $extra_money = $rule[$num];
+            if($extra_money){
+                $desc .= '，连续签到'.$num.'天奖励：'.$extra_money;
+                $money += $extra_money;
+            } 
+        }
+
+        $insql = "insert into `tp_commission_log` (`user_id`,`identification`,`num`,`money`,`addtime`,`desc`,`date`) values ";
+        $insql .= "('$user_id','1','$num','$money','$time','$desc','$date')";
+        // echo $insql;exit;
+        $inr = Db::execute($insql);
+        if($inr){
+            Db::execute("update `tp_users` set `user_money` = `user_money` + '$money', `distribut_money` = `distribut_money` + '$money' where `user_id` = '$user_id'");
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+
     // 签到
     function sign($pram = ''){
         if(is_array($pram)){
@@ -76,9 +150,12 @@ class UserSign extends Model{
             $user_id = intval($pram);
         }
         if(!intval($user_id)){
-            return '错误：请传入 user_id';
+            return false;
         }
-        echo $user_id;
+        if(!$this->sign_on_off){
+            return false;
+        }
+        return $this->_sql($user_id);
     }
 
 
