@@ -68,8 +68,7 @@
                     <label for="sign_integral">签到送</label>
                 </dt>
                 <dd class="opt">
-                    <input onKeyUp="this.value=this.value.replace(/[^\d]/g,'')" onpaste="this.value=this.value.replace(/[^\d]/g,'')" pattern="^\d{1,}$" id="reg_integral" name="sign_integral" value="{$config.sign_integral}" class="input-txt" type="text"> 佣金
-                    <span class="err">只能输入整数</span>
+                    <input onKeyUp="preval(this)" onpaste="preval(this)" pattern="preval(this)" id="reg_integral" name="sign_integral" value="{$config.sign_integral}" class="input-txt" type="text"> 佣金
 
                     <p class="notic">会员每次签到赠送的佣金</p>
                 </dd>
@@ -99,7 +98,7 @@
                                 <label for="sign_signcount">连续签到：</label>
                                 <input pattern="^\d{1,}$" id="sign_signcount" name="continuedk[]" value="{$key}" class="input-txt continued-input" type="text"> 天，
                                 <label for="sign_signcount">额外赠送：</label>
-                                <input pattern="^\d{1,}$" id="sign_signcount" name="continuedv[]" value="{$v}" class="input-txt continued-input" type="text"> 佣金；
+                                <input onKeyUp="preval(this)" onpaste="preval(this)" pattern="preval(this)" id="sign_signcount" name="continuedv[]" value="{$v}" class="input-txt continued-input" type="text"> 佣金；
                                 <if condition="$key eq $first_key">
                                     <a class="addR">增加</a>
                                 <p class="notic" style="color:red;">注意：只有同时设置了 连续签到天数 和 奖励佣金 方有效</p>
@@ -118,7 +117,7 @@
                             <label for="sign_signcount">连续签到：</label>
                             <input pattern="^\d{1,}$" id="sign_signcount" name="continuedk[]" value="" class="input-txt continued-input" type="text"> 天，
                             <label for="sign_signcount">额外赠送：</label>
-                            <input pattern="^\d{1,}$" id="sign_signcount" name="continuedv[]" value="" class="input-txt continued-input" type="text"> 佣金；
+                            <input onKeyUp="preval(this)" onpaste="preval(this)" pattern="preval(this)" id="sign_signcount" name="continuedv[]" value="" class="input-txt continued-input" type="text"> 佣金；
                             <a class="addR">增加</a>
                             <p class="notic" style="color:red;">注意：只有同时设置了 连续签到天数 和 奖励佣金 方有效</p>
                         </dd>
@@ -161,7 +160,7 @@
         });
 
         $('.continued-input').on('keyup',function(){
-            $(this).val($(this).val().replace(/[^\d]/g,''));
+            $(this).val($(this).val().replace(/[^\d\.]/g,''));
         });
 
         $('.con-lab').on('click',function(){
@@ -183,7 +182,7 @@
                                 '<label for="sign_signcount">连续签到：</label>'+
                                 '<input pattern="^\d{1,}$" name="continuedk[]" class="input-txt continued-input" type="text"> 天，'+
                                 '<label for="sign_signcount">额外赠送：</label>'+
-                                '<input pattern="^\d{1,}$" name="continuedv[]" class="input-txt continued-input" type="text"> 佣金；'+
+                                '<input onKeyUp="preval(this)" onpaste="preval(this)" pattern="preval(this)" name="continuedv[]" class="input-txt continued-input" type="text"> 佣金；'+
                                 '<a class="delR" onclick="delR(this);">删除</a>'+
                             '</dd>'+
                         '</dl>';
@@ -192,6 +191,17 @@
 
 
     })
+
+    function preval(obj){
+        var val = $(obj).val();
+        var reg = /^\d+(\.\d{0,2})?$/;
+        if(!reg.test(val)){
+            $(obj).val('');
+            layer.open({content:'只能输入整数和两位小数'});
+            return false;
+        }
+    }
+
 
     function delR(obj){
         $(obj).parents('.row').remove();

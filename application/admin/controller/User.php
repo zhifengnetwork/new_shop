@@ -833,18 +833,65 @@ class User extends Base
      * @data 2019/03/21
      */
     public function userSignList(){
-        $us = new UserSign();
-        dump($us->sign(43));
+
         
-        
-        
-        
-        
-        
-        exit;
         return $this->fetch();
     }
 
+    public function ajaxUserSignList()
+    {
+        
+        $where['identification'] = ['=', 1];
+        $count = Db::name('commission_log')->where($where)->count();
+        $Page = new AjaxPage($count, 15);
+       
+        if(input('post.mobile')){
+            $mobile = input('post.mobile');
+            $seach = Db::query("select `user_id` from `tp_users` where `mobile` like '%$mobile%'");
+            if($seach){
+                foreach($seach as $v){
+                    $seachid[] = $v['user_id'];
+                }
+                $seachid = implode("','",$seachid);
+                $where['user_id'] = ['in', $seachid];
+                
+            }else{
+                $where['user_id'] = ['<',0];
+            }
+        }
+        
+        $list = Db::name('commission_log')
+            ->field('id,user_id,num,money,addtime,desc')
+            ->where($where)
+            ->order('id desc')
+            ->limit($Page->firstRow . ',' . $Page->listRows)
+            ->select();
+
+        if($list){
+            foreach($list as $k => $v){
+                $user_id_arr[] = $v['user_id'];
+                $list[$k]['addtime'] = date('Y-m-d H:i:s',$v['addtime']);
+            }
+            $user_id_str = implode("','",$user_id_arr);
+            $user = Db::query("select `user_id`,`nickname`,`mobile` from `tp_users` where `user_id` in ('$user_id_str')");
+            if($user){
+                foreach($user as $v){
+                    $userinfo[$v['user_id']] = $v; 
+                }
+                foreach($list as $k => $v){
+                    $list[$k]['nickname'] = $userinfo[$v['user_id']]['nickname'];
+                    $list[$k]['mobile'] = $userinfo[$v['user_id']]['mobile'];
+                }
+            }
+        }
+        // dump($list);exit;
+        $show = $Page->show();
+
+        $this->assign('list', $list);
+        $this->assign('page', $show);// 赋值分页输出
+        $this->assign('pager', $Page);
+        return $this->fetch();
+    }
     /**
      * 会员签到规则
      * @author Rock
@@ -909,11 +956,67 @@ class User extends Base
      * @author Rock
      * @data 2019/03/21
      */
-    public function userInvitationList(){
+    public function userInviteList(){
 
+        return $this->fetch();
+    }
 
-        header("Content-type: text/html; charset=utf-8");
-        exit("功能开发中......");
+    public function ajaxUserInviteList(){
+
+        $where['identification'] = ['=', 2];
+        $count = Db::name('commission_log')->where($where)->count();
+        $Page = new AjaxPage($count, 15);
+       
+        if(input('post.mobile')){
+            $mobile = input('post.mobile');
+            $seach = Db::query("select `user_id` from `tp_users` where `mobile` like '%$mobile%'");
+            if($seach){
+                foreach($seach as $v){
+                    $seachid[] = $v['user_id'];
+                }
+                $seachid = implode("','",$seachid);
+                $where['user_id'] = ['in', $seachid];
+                
+            }else{
+                $where['user_id'] = ['<',0];
+            }
+        }
+        
+        $list = Db::name('commission_log')
+            ->field('id,user_id,add_user_id,num,money,addtime,desc')
+            ->where($where)
+            ->order('id desc')
+            ->limit($Page->firstRow . ',' . $Page->listRows)
+            ->select();
+
+        if($list){
+            foreach($list as $k => $v){
+                $user_id_arr[] = $v['user_id'];
+                $user_id_arr[] = $v['add_user_id'];
+                $list[$k]['addtime'] = date('Y-m-d H:i:s',$v['addtime']);
+            }
+            $user_id_str = implode("','",$user_id_arr);
+            $user = Db::query("select `user_id`,`nickname`,`mobile` from `tp_users` where `user_id` in ('$user_id_str')");
+            if($user){
+                foreach($user as $v){
+                    $userinfo[$v['user_id']] = $v; 
+                }
+                foreach($list as $k => $v){
+                    $lisk[$k]['addnickname'] = $userinfo[$v['add_user_id']]['nickname'];
+                    $list[$k]['addmobile'] = $userinfo[$v['add_user_id']]['mobile'];
+                    $list[$k]['nickname'] = $userinfo[$v['user_id']]['nickname'];
+                    $list[$k]['mobile'] = $userinfo[$v['user_id']]['mobile'];
+                }
+            }
+        }
+        // dump($list);exit;
+        $show = $Page->show();
+
+        $this->assign('list', $list);
+        $this->assign('page', $show);// 赋值分页输出
+        $this->assign('pager', $Page);
+
+        return $this->fetch();
     }
 
     /**
@@ -921,12 +1024,52 @@ class User extends Base
      * @author Rock
      * @data 2019/03/21
      */
-    public function userInvitationRule(){
+    public function userInviteRule(){
+        if(IS_POST){
+            $data = input('post.');
+            if($data['inc_type'] != 'user_invite'){
+                $this->error('未知的来源');
+            }
+            $pram['intvite_on_off'] = intval($data['intvite_on_off']);
+            if($data['rulek']){
+                foreach($data['rulek'] as $k => $v){
+                    $key = intval($v);
+                    $val = intval($data['rulev'][$k] * 100) / 100;
+                    if($key && ($val > 0)){
+                        $pram['rule'][$key] = $val;
+                    }
+                }
+            }
+            $name = $data['inc_type'];
+            $value = json_encode($pram);
+            $inc_type = $data['inc_type'];
+            $desc = "邀请注册送佣金";
 
+            # 插入或更新设置
+            $info = Db::name('config')->where('inc_type',$inc_type)->find();
+            if($info){
+                Db::execute("update `tp_config` set `value` = '$value' where `name` = '$name' and `inc_type` = '$inc_type'");
+            }else{
+                Db::execute("insert into `tp_config` (`name`,`value`,`inc_type`,`desc`) values ('$name','$value','$inc_type','$desc')");
+            }
+            $this->success('操作成功');
+            exit;
+        }
 
-
-        header("Content-type: text/html; charset=utf-8");
-        exit("功能开发中......");
+         # 获取设置信息
+         $info = Db::name('config')->where('inc_type','user_invite')->find();
+         if($info){
+             $config = json_decode($info['value'],true);
+             if($config['rule']){
+                 ksort($config['rule']);
+                 $first_key = each($config['rule'])['key'];
+                 $this->assign('first_key',$first_key);
+             }
+            //  dump($config);exit;
+             $this->assign('config',$config);
+         }
+    
+        return $this->fetch();
     }
 
 

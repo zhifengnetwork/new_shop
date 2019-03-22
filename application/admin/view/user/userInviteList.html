@@ -6,12 +6,12 @@
         <div class="fixed-bar">
             <div class="item-title">
                 <div class="subject">
-                    <h3>签到管理</h3>
-                    <h5>会员签到及管理设置</h5>
+                    <h3>邀新管理</h3>
+                    <h5>会员邀新及管理设置</h5>
                 </div>
                 <ul class="tab-base nc-row">
-                    <li><a class="current" href="{:U('user/userSignList')}" data-state="" ><span>签到列表</span></a></li>
-                    <li><a href="{:U('user/userSignRule')}" data-state="0"  ><span>签到规则</span></a></li>      
+                    <li><a class="current" href="{:U('user/userInviteList')}" data-state="" ><span>邀新列表</span></a></li>
+                    <li><a href="{:U('user/userInviteRule')}" data-state="0"  ><span>邀新奖励规则</span></a></li>      
                 </ul>
             </div>
         </div>
@@ -22,8 +22,9 @@
                 <span title="收起提示" id="explanationZoom" style="display: block;"></span>
             </div>
             <ul>
-                <li>签到列表：签到人员记录，签到记录可无限持续</li>
-                <li>签到规则：可设置功能开启关闭，签到积分和连续签到额外奖励</li>
+                <li>会员邀请新会员注册，可获得佣金奖励</li>
+                <li>邀新规则：可设置功能开启关闭，邀请人数及佣金奖励额度</li>
+                <li style="color:red;">注意：邀请人数只能填写整数，奖励佣金只能填写整数或小数，只保留2位小数</li>
 
             </ul>
         </div>
@@ -33,7 +34,7 @@
                     <h3>签到列表</h3>
                     <h5></h5>
                 </div>
-                <form action="" id="search-form2" class="navbar-form form-inline" method="get" onsubmit="return false">
+                <form action="" id="search-form2" class="navbar-form form-inline" method="post" onsubmit="return false">
                     <div class="sDiv">
                         <div class="sDiv2">          
                             <input type="text" size="30" name="mobile" class="qsbox" placeholder="搜索用户手机号...">
@@ -48,7 +49,7 @@
                         <thead>
                             <tr>
                                 <th align="left" abbr="article_title" axis="col6" class="">
-                        <div style="text-align: left; width:50px;" class="" >签到id</div>
+                        <div style="text-align: left; width:50px;" class="" >id</div>
                         </th>
                         <th align="left" abbr="ac_id" axis="col4" class="">
                         <div style="text-align: left; width: 150px;" class="" >用户名称</div>
@@ -56,18 +57,22 @@
                         <th align="left" abbr="ac_id" axis="col4" class="">
                         <div style="text-align: left; width: 150px;" class="" >手机号码</div>
                         </th>
+                        <th align="left" abbr="ac_id" axis="col4" class="">
+                        <div style="text-align: left; width: 150px;" class="" >新用户名称</div>
+                        </th>
+                        <th align="left" abbr="ac_id" axis="col4" class="">
+                        <div style="text-align: left; width: 150px;" class="" >新用户手机号码</div>
+                        </th>
                         <th align="center" abbr="article_show" axis="col6" class="">
-                        <div style="text-align: center; width: 100px;" class="" >签到天数</div>
+                        <div style="text-align: center; width: 100px;" class="" >奖励佣金</div>
                         </th>
                         <th align="center" abbr="article_time" axis="col6" class="">
-                        <div style="text-align: center; width: 100px;" class="" >佣金</div>
-                        </th>
+                        <div style="text-align: center; width: 100px;" class="" >记录时间</div>
+                        </th> 
                         <th align="center" abbr="article_time" axis="col6" class="">
-                        <div style="text-align: center; width: 100px;" class="">签到时间</div>
-                        </th>  
-                        <th align="center" abbr="article_time" axis="col6" class="">
-                        <div style="text-align: center; width: auto;" class="">备注说明</div>
-                        </th>     
+                        <div style="text-align: center; width: 100px;" class="" >备注说明</div>
+                        </th>       
+
                         <th style="width:100%" axis="col7">
                         <div></div>
                         </th>
@@ -125,7 +130,7 @@
             cur_page = page; //当前页面 保存为全局变量
             $.ajax({
                 type: "POST",
-                url: "/index.php?m=Admin&c=user&a=ajaxUserSignList&p=" + page + '&type=1', //+tab,
+                url: "/index.php?m=Admin&c=user&a=ajaxUserInviteList&p=" + page, //+tab,
                 data: $('#' + form).serialize(), // 你的formid
                 success: function(data) {
                     $("#ajax_return").html('');
