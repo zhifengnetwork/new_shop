@@ -12,6 +12,14 @@
  * Date: 2015-09-09
  */
 
+function user_name($user_id){
+	$user_name = M('users')->where('user_id',$user_id)->value('nickname');
+
+	$user_name = $user_name ? $user_name : "暂无";
+
+	return $user_name;
+}
+
 /**
  * 管理员操作记录
  * @param $log_info string 记录信息

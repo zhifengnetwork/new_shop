@@ -90,4 +90,22 @@ class Distribution extends Base
         }
         $this->ajaxReturn($return);
     }
+
+    public function per_list()
+    {
+        $Ad = M('agent_performance');
+        $p = input('p/d');
+        $res = $Ad->order('performance_id','asc')->page($p . ',10')->select();
+        if ($res) {
+            foreach ($res as $val) {
+                $list[] = $val;
+            }
+        }
+        $this->assign('list', $list);
+        $count = $Ad->count();
+        $Page = new Page($count, 10);
+        $show = $Page->show();
+        $this->assign('page', $show);
+        return $this->fetch();
+    }
 }

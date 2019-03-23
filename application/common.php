@@ -67,7 +67,7 @@ function sales($order_id){
     
     foreach($goods_list as $k => $v){
         $model = new Sales($user_id,$order_id,$v['goods_id']);
-        $result = $model->sales();
+        $result = $model->sales();  //销售奖励
     }
 
     return $result;

@@ -78,7 +78,7 @@ class PerformanceLogic extends Model
 			if ($is_team) {
 				$team_per = array(
 					'agent_per'=>$is_team['ind_per']+$price,
-					'ind_goods_sum'=>$is_team['ind_goods_sum']+$goods_num,
+					'agent_goods_sum'=>$is_team['ind_goods_sum']+$goods_num,
 					'update_time'=>Date('Y-m-d H:m:s')
 				);
 
@@ -87,7 +87,7 @@ class PerformanceLogic extends Model
 				$team_per = array(
 					'user_id'=>$value,
 					'agent_per'=>$price,
-					'ind_goods_sum'=>$goods_num,
+					'agent_goods_sum'=>$goods_num,
 					'create_time'=>Date('Y-m-d H:m:s'),
 					'update_time'=>Date('Y-m-d H:m:s')
 				);

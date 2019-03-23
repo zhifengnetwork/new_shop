@@ -125,14 +125,16 @@ return	array(
 			)),
 	)),
 		
-	'distribution'=>array('name'=>'分销','child'=>array(
-			array('name' => '分销管理','child' => array(
-					array('name' => '分销商品', 'act'=>'goods_list', 'op'=>'Distribut'),
-					array('name' => '分销商列表', 'act'=>'distributor_list', 'op'=>'Distribut'),
-					array('name' => '分销关系', 'act'=>'tree', 'op'=>'Distribut'),
-					array('name' => '分销商等级', 'act'=>'agent_level', 'op'=>'Distribution'),
-					array('name' => '分销设置', 'act'=>'distribut', 'op'=>'System'),
-					array('name' => '分成日志', 'act'=>'rebate_log', 'op'=>'Distribut'),
+	'distribution'=>array('name'=>'销售','child'=>array(
+			array('name' => '销售管理','child' => array(
+
+					// array('name' => '分销商品', 'act'=>'goods_list', 'op'=>'Distribut'),
+					// array('name' => '分销商列表', 'act'=>'distributor_list', 'op'=>'Distribut'),
+					// array('name' => '分销关系', 'act'=>'tree', 'op'=>'Distribut'),
+					array('name' => '销售业绩', 'act'=>'per_list', 'op'=>'Distribution'),
+					array('name' => '销售等级列表', 'act'=>'agent_level', 'op'=>'Distribution'),
+					// array('name' => '分销设置', 'act'=>'distribut', 'op'=>'System'),
+					// array('name' => '销售日志', 'act'=>'sales_log', 'op'=>'Distribut'),
 			)),
 	     
     	    array('name' => '微信接入','child' => array(
