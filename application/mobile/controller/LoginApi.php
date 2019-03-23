@@ -24,21 +24,56 @@ class LoginApi extends MobileBase{
         parent::__construct();    
         $this->oauth = I('get.oauth');
         //获取配置
-        $data = M('Plugin')->where("code=:code and  type = 'login' ")->bind(['code'=>$this->oauth])->find();
-        $this->config = unserialize($data['config_value']); // 配置反序列化
-        if(!$this->oauth)
-            $this->error('非法操作',U('Mobile/User/login'));
-        include_once  "plugins/login/{$this->oauth}/{$this->oauth}.class.php";
-        $class = '\\'.$this->oauth; //
-        $login = new $class($this->config); //实例化对应的登陆插件
-        $this->class_obj = $login;
+        // $data = M('Plugin')->where("code=:code and  type = 'login' ")->bind(['code'=>$this->oauth])->find();
+        // $this->config = unserialize($data['config_value']); // 配置反序列化
+        // if(!$this->oauth)
+        //     $this->error('非法操作',U('Mobile/User/login'));
+        // include_once  "plugins/login/{$this->oauth}/{$this->oauth}.class.php";
+        // $class = '\\'.$this->oauth; //
+        // $login = new $class($this->config); //实例化对应的登陆插件
+        // $this->class_obj = $login;
+
+        $this->weixin_config = M('wx_user')->find(); //取微获信配置
     }
 
     public function login(){
-        if(!$this->oauth)
+        if(!$this->oauth){
             $this->error('非法操作',U('Mobile/User/login'));
-        include_once  "plugins/login/{$this->oauth}/{$this->oauth}.class.php";
-        $this->class_obj->login();
+        }
+        
+        // include_once  "plugins/login/{$this->oauth}/{$this->oauth}.class.php";
+        // $this->class_obj->login();
+
+        $d = $this->GetOpenid();
+        
+
+        $logic = new UsersLogic(); 
+        $data = $logic->thirdLogin($d);
+
+        //直接去登录，空 就注册
+        if($data['status'] == 1){
+            session('user',$data['result']);
+            setcookie('user_id',$data['result']['user_id'],null,'/');
+            setcookie('is_distribut',$data['result']['is_distribut'],null,'/');
+            setcookie('uname',$data['result']['nickname'],null,'/');
+            // 登录后将购物车的商品的 user_id 改为当前登录的id
+            M('cart')->where("session_id" ,$this->session_id)->save(array('user_id'=>$data['result']['user_id']));
+            $cartLogic = new CartLogic();
+            $cartLogic->setUserId($data['result']['user_id']);
+            $cartLogic->doUserLoginHandle();  //用户登录后 需要对购物车 一些操作
+        }
+
+        
+        $first_leader = session('first_leader');
+        if((int)$first_leader > 0){
+            $user_id = session('user.user_id');
+            share_deal_after($user_id,(int)$first_leader);
+        }
+
+        header("Location:".U('Mobile/User/index'));
+        //登录成功跳转
+
+
     }
 
     public function callback(){

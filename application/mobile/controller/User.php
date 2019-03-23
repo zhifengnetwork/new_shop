@@ -84,6 +84,22 @@ class User extends MobileBase
         return $this->fetch();
     }
 
+    /**
+     * 我的分享
+     * @author Rock
+     * @date 2019/03/23
+     */
+    public function sharePoster(){
+
+
+
+
+        echo '我的分享';
+        exit;
+    }
+
+
+
     public function logout()
     {
         session_unset();
@@ -173,7 +189,7 @@ class User extends MobileBase
     public function login()
     {
         if ($this->user_id > 0) {
-//            header("Location: " . U('Mobile/User/index'));
+            // header("Location: " . U('Mobile/User/index'));
             $this->redirect('Mobile/User/index');
         }
         $referurl = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : U("Mobile/User/index");
