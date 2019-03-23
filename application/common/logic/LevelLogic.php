@@ -25,8 +25,6 @@ class LevelLogic extends Model
                 }
             }
 
-        }else{
-            return false;
         }
 
     }
@@ -47,47 +45,37 @@ class LevelLogic extends Model
     {
         //用户等级
         $agent_level = Db::name('users')->where('user_id',$agent_id)->value('distribut_level');
-        
+        //最大等级
+        $max_level = Db::name('agent_level')->max('level');
+        // dump($max_level);
         $agent_info = $this->up_condition($agent_id);
         $ind_per = $agent_info['ind_per'];   //个人业绩
         $agent_per = $agent_info['in_per'] + $agent_info['agent_per'];  //团队业绩
         $agent_nums = $this->get_team_num($agent_id); //团队人数
-        // dump($ind_per);
-        // dump($agent_per);
-        // dump($agent_nums);
         switch($agent_level)
         {
             case 0: if(($ind_per>=5) && ($agent_per>=50) ){
                         Db::name('users')->where('user_id',$agent_id)->update(['distribut_level'=>1]);
-                    }else{
-                        dump(000); 
-                        return false;
-                    };break;
+                        // dump(111);
+                     };
+                    break;
             case 1: if(($ind_per>=10) && ($agent_per>=200) && ($agent_nums > 2)){
                         Db::name('users')->where('user_id',$agent_id)->update(['distribut_level'=>2]);
-                    }else{
-                        dump(111);
-                        return false;
+                        // dump(222);
                     };break;
             case 2: if(($ind_per>=15) && ($agent_per>=1000) && ($agent_nums > 2)){
                         Db::name('users')->where('user_id',$agent_id)->update(['distribut_level'=>3]);
-                    }else{
-                        dump(222);
-                        return false;
+                        // dump(333);
                     };break;
             case 3: if(($ind_per>=20) && ($agent_per>=5000) && ($agent_nums > 2)){
                         Db::name('users')->where('user_id',$agent_id)->update(['distribut_level'=>4]);
-                    }else{
-                        dump(333);
-                        return false;
+                        // dump(444);
                     };break;
             case 4: if(($ind_per>=30) && ($agent_per>=12000) && ($agent_nums > 2)){
                         Db::name('users')->where('user_id',$agent_id)->update(['distribut_level'=>5]);
-                    }else{
-                        dump(444);
-                        return false;
+                        // dump(555);
                     };break;
-            case 5: return false;
+            case 5: break;
             
         }
         
@@ -98,9 +86,6 @@ class LevelLogic extends Model
      */
     public function user_info_agent($data)
     {
-        // $frist_leader_id = Db::name('users')->where('user_id',$agent_id)->value('first_leader');
-        // $frist_leader_info = DB::name('users')->where('user_id',$frist_leader_id)->find();
-        // return $frist_leader_info?$frist_leader_info:false;
         $recUser  = $this->getAllUp($data);
         $list = array_column($recUser,'user_id');
         return array('recUser'=>$list);
@@ -116,12 +101,11 @@ class LevelLogic extends Model
         if($UpInfo)  //有上级
         {
             $userList[] = $UpInfo;
-            // dump($us);die;
+
             $this->getAllUp($UpInfo['first_leader'],$userList);
         }
-        // dump($userList);
+        
         $list = array_column($userList,'user_id');
-        // dump($list);
         
         return $userList;
     }
@@ -132,24 +116,15 @@ class LevelLogic extends Model
     public function get_team_num($user_id){
         ini_set('max_execution_time', '0');
 
-        // $user_id = I('user_id');
         $user_level = M('users')->where('user_id',$user_id)->value('distribut_level');
-        // dump($user_id);die;
         $all = M('users')->field('user_id,first_leader,distribut_level')->select();
 
         $values = [];
         foreach ($all as $item) {
             $values[$item['first_leader']][] = $item;
         }
-        // dump($values);die;
-        //foreach ($all as $k => $v) {
+
         $coumun = $this->membercount($user_id, $values,$user_level);
-            // dump($values);die;
-            //M('users')->where(['user_id'=>$v['user_id']])->update(['underling_number'=>$coumun]);
-            //$coumun += $coumun;
-       // }
-        
-    //    M('users')->where(['user_id'=>$user_id])->update(['underling_number'=>$coumun]);
         
        return $coumun;
        
@@ -158,7 +133,7 @@ class LevelLogic extends Model
     public function membercount($id, $data, $user_level)
     {
         $count = 0;
-        // $num = count($data[$id]);
+
         foreach($data as $key => $value){
             if($key == 0){
                 $list = $value;
@@ -167,14 +142,13 @@ class LevelLogic extends Model
             }
         }
         foreach($list as $k=>$v){
-            if($v['distribut_level'] == $user_level){
+            if($v['distribut_level'] >= $user_level){
                 $count += 1;
             }else{
                 unset($list[$k]);
             }
         }
-        // dump($list);
-        // dump($count);
+
         return $count;
         
     }
