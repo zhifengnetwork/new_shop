@@ -37,12 +37,12 @@ class Sales extends Model
 	public function sales()
 	{
 		$user = M('users')->where('user_id',$this->user_id)->find();
-		
 		if ($user['parents']) {
 			$parents_id = explode(',', $user['parents']);
-			$parents_id = array_filter($parents_id);  //去除0
-
+			$parents_id = array_filter($parents_id);  //去除0,倒序排列
+			
 			$reward = $this->reward($parents_id);
+			return $reward;
 		} else {
 			return array('msg'=>"该用户没有上级",'code'=>0);
 		}
@@ -65,27 +65,93 @@ class Sales extends Model
 
 		$all_user = $this->all_user($parents_id);
 		$level = $this->get_level();
-		
+
 		$basic_reward = json_decode($goods['goods']['basic_reward'],true);
 		$each_reward = json_decode($goods['goods']['each_reward'],true);
 		
-		$conditon = array('level'=>0,'layer'=>0);
+		if(is_array($basic_reward)){
+			ksort($basic_reward );
+		} else {
+			$basic_reward = array();
+		}
+		if (is_array($each_reward)) {
+			ksort($each_reward);
+		} else {
+			$each_reward = array();
+		}
+		
+		$user_level = 0;
+		$layer = 0;
+		$msg = "";
 		
 		foreach ($all_user as $key => $value) {
-			if ($condition['level'] < $value['distribut_level']) {
-				$condition = $value['distribut_level'];
+			if ($value['distribut_level'] <= 0) {
+				continue;
+			}
+			if ($value['is_lock'] == 1) {
+				continue;
+			}
+			if ($user_level > $value['distribut_level']) {
+				continue;
+			}
+			
+			if ($user_level == $value['distribut_level']) {
+				$layer ++;
+				if ($layer > $level[$user_level]['layer']) {
+					continue;
+				}
+				
+				$money = $level[$user_level]['same_reword'];
+				$msg = "同级奖励 ".$money."(元)";
+			}
+			if ($user_level < $value['distribut_level']) {
+				$layer = 0;
+				$user_level = $value['distribut_level'];
+				$money = $basic_reward[$value['distribut_level']];
+				
+				while(list($k1,$v1) = each($each_reward)){
+					if ($k1 <= $value['distribut_level']) {
+						$money += $v1 * $order['goods_num'];
+						continue;
+					}
+					break;
+				}
+
+				$msg = "级别利润 ".$money."(元),商品:".$order['goods_num']."件";
+			}
+			
+			$bool = M('users')->where('user_id',$value['user_id'])->setInc('user_money',$money);
+			
+			if ($bool) {
+				$this->writeLog($value['user_id'],$money,$order['order_sn'],$msg);
+			} else {
+				$data = array(
+					'user_id'=>$value['user_id'],
+					'user_money'=>$money,
+					'change_time'=>time(),
+					'desc'=>"用户表更新失败 ".$msg,
+					'order_sn'=>$order['order_sn'],
+					'order_id'=>$this->order_id
+				);
+
+				M('account_log')->insert($data);
 			}
 		}
-
+		
 		return array('code'=>1);
+
 	}
 
 	//获取所有用户信息
 	public function all_user($parents_id)
 	{
-		$all = M('users')->field('user_id,first_leader,distribut_level')->select($parents_id);
+		$all = M('users')->where('user_id','in',$parents_id)->column('user_id,first_leader,distribut_level,is_lock');
+		$result = array();
 
-		return $all;
+		foreach ($parents_id as $key => $value) {
+			array_push($result, $all[$value]);
+		}
+		return $result;
 	}
 
 	//获取等级信息
@@ -100,11 +166,16 @@ class Sales extends Model
 	public function order()
 	{
 		$order = M('order')->where('order_id',$this->order_id)->find();
+		if (!$order) {
+			return array('msg'=>"没有该商品的订单信息",'code'=>0);
+		}
+		
 		$order_goods = M('order_goods')
 						->where('order_id',$this->order_id)
 						->where('order_sn',$order['order_sn'])
 						->where('goods_id',$this->goods_id)
 						->find();
+		
 		if (!$order_goods) {
 			return array('msg'=>"没有该商品的订单信息",'code'=>0);
 		}
@@ -128,16 +199,15 @@ class Sales extends Model
 	}
 
 	//记录日志
-	public function writeLog($user_id,$money,$desc,$states)
+	public function writeLog($user_id,$money,$order_sn,$desc)
 	{
 		$data = array(
 			'user_id'=>$user_id,
 			'user_money'=>$money,
 			'change_time'=>time(),
 			'desc'=>$desc,
-			'order_sn'=>$this->orderSn,
-			'order_id'=>$this->order_id,
-			'states'=>$states
+			'order_sn'=>$order_sn,
+			'order_id'=>$this->order_id
 		);
 
 		$bool = M('account_log')->insert($data);
@@ -148,7 +218,7 @@ class Sales extends Model
 				'order_id'=>$this->order_id,
 				'user_id'=>$user_id,
 				'status'=>1,
-				'goods_id'=>$this->goodId,
+				'goods_id'=>$this->goods_id,
 				'money'=>$money
 			);
 			M('order_divide')->add($data);

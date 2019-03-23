@@ -18,9 +18,9 @@ class Distribution extends Base
         $Ad = M('agent_level');
         $p = $this->request->param('p');
         $level = new LevelLogic();
-        $num = $level->user_in(34);
-        // $list = array_column($num,'user_id');
-        dump($num);//die;
+        // $num = $level->get_team_num(2);
+        // // $list = array_column($num,'user_id');
+        // dump($num);die;
         $res = $Ad->order('level_id')->page($p . ',10')->select();
         if ($res) {
             foreach ($res as $val) {
