@@ -5,7 +5,10 @@ use app\common\logic\LevelLogic;
 use think\Db;
 use think\Page;
 use think\Loader;
-
+use app\common\logic\PerformanceLogic;
+/**
+*  销售设置
+**/
 class Distribution extends Base
 {
     public function _initialize()

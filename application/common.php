@@ -13,6 +13,7 @@
 use think\Log;
 use think\Db;
 use app\common\logic\Sales;
+use app\common\logic\PerformanceLogic;
 define('EXTEND_MODULE', 1);
 define('EXTEND_ANDROID', 2);
 define('EXTEND_IOS', 3);
@@ -57,11 +58,13 @@ function sales($order_id){
     }
 
     $order = M('order')->where(['order_id'=>$order_id])->find();
-
     $user_id = $order['user_id'];
 
+    $perfor = new PerformanceLogic;
+    $add_perfor = $perfor->per($order_id);  //添加业绩
+
     $goods_list = M('order_goods')->where(['order_id'=>$order_id])->select();
-    // agent_performance($order_id);
+    
     foreach($goods_list as $k => $v){
         $model = new Sales($user_id,$order_id,$v['goods_id']);
         $result = $model->sales();
