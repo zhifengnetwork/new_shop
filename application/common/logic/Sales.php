@@ -111,22 +111,33 @@ class Sales extends Model
 				
 				while(list($k1,$v1) = each($each_reward)){
 					if ($k1 <= $value['distribut_level']) {
-						$money += $v1;
+						$money += $v1 * $order['goods_num'];
 						continue;
 					}
 					break;
 				}
 
-				$msg = "级别利润 ".$money."(元)";
+				$msg = "级别利润 ".$money."(元),商品:".$order['goods_num']."件";
 			}
 			
 			$bool = M('users')->where('user_id',$value['user_id'])->setInc('user_money',$money);
 			
 			if ($bool) {
 				$this->writeLog($value['user_id'],$money,$order['order_sn'],$msg);
+			} else {
+				$data = array(
+					'user_id'=>$value['user_id'],
+					'user_money'=>$money,
+					'change_time'=>time(),
+					'desc'=>"用户表更新失败 ".$msg,
+					'order_sn'=>$order['order_sn'],
+					'order_id'=>$this->order_id
+				);
+
+				M('account_log')->insert($data);
 			}
 		}
-		return $money;
+		
 		return array('code'=>1);
 
 	}
