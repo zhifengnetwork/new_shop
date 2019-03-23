@@ -18,6 +18,8 @@ use think\Db;
 use app\common\logic\CartLogic;
 use app\common\logic\UsersLogic;
 use app\common\logic\wechat\WechatUtil;
+use app\common\model\UserSign;
+use app\common\model\UserInvite;
 
 class MobileBase extends Controller {
     public $session_id;
@@ -93,6 +95,18 @@ class MobileBase extends Controller {
         }
         
         $this->public_assign();
+        $this->assemble_parens();
+        if($user['user_id']){
+            // 邀请注册送佣金
+            $UserInvite = new UserInvite();
+            $UserInvite->user_invite($user['user_id']);
+
+
+            // 签到送佣金
+            $UserSign = new UserSign();
+            $UserSign->sign();
+        }
+        
     }
     
     /**

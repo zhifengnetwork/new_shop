@@ -45,6 +45,20 @@ class UserInvite extends Model{
         }
     }
 
+
+    /**
+     * 当前用户主动调用程序
+     */
+    public function user_invite($user_id = 0){
+        $user_id = intval($user_id);
+        $info = Db::name('users')->field('first_leader')->where('user_id',$user_id)->find();
+        if($info && $info['first_leader']){
+            $this->invite($info['first_leader'],$user_id);
+        }
+    }
+
+
+
     /**
      * @param $user_id  邀请人用户ID
      * @param $adduser_id   被邀请的新用户ID
