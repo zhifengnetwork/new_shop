@@ -344,14 +344,14 @@ class Goods extends Base {
         $freight_template = Db::name('freight_template')->where('')->select();
         $level_name = $this->get_level_name();
         $level_name = array_map(function($level){
-            return array('level_id'=>$level['level_id'],'level_name'=>$level['level_name']);
+            return array('level'=>$level['level'],'level_name'=>$level['level_name']);
         },$level_name);
 
         $sales = array();
         $num = 0;
         if ($basic_reward) {
             foreach ($basic_reward as $k1 => $v1) {
-                $sales[$num]['level_id'] = $k1;
+                $sales[$num]['level'] = $k1;
                 $sales[$num]['level_name'] = $level_name[$num]['level_name'];
                 $sales[$num]['reward'] = $v1;
                 $sales[$num]['each_reward'] = $each_reward[$k1];
@@ -359,13 +359,15 @@ class Goods extends Base {
             }
         } else {
             foreach ($level_name as $key => $value) {
-                $sales[$num]['level_id'] = $value['level_id'];
+                
+                $sales[$num]['level'] = $value['level'];
                 $sales[$num]['level_name'] = $value['level_name'];
                 $sales[$num]['reward'] = 0;
                 $sales[$num]['each_reward'] = 0;
                 $num ++;
             }           
         }
+
         $this->assign('sales',$sales);
         $this->assign('freight_template',$freight_template);
         $this->assign('suppliersList', $suppliersList);
@@ -377,7 +379,7 @@ class Goods extends Base {
     //获取等级名称
     public function get_level_name()
     {
-        $level_name = Db::name('agent_level')->field('level_id,level_name')->select();
+        $level_name = Db::name('agent_level')->field('level,level_name')->select();
 
         return $level_name;
     }
@@ -405,19 +407,23 @@ class Goods extends Base {
             $goods = new \app\common\model\Goods();
             $store_count_change_num = $data['store_count'];
         }
+
         $level_name = $this->get_level_name();
         $num = 0;
         $sal = array();
         $each_reward = array();
+
         foreach ($level_name as $key => $value) {
             $num ++;
             foreach ($data as $k2 => $v2) {
-                if ($value['level_id'] == $data[$k2]) {
-                    $sal[$data['level_id_'.$num]] = $data['reward_'.$num];
-                    $each_reward[$data['level_id_'.$num]] = $data['each_reward_'.$num];
+                $str = 'level_'.$num;
+                if ($str == $k2) {
+                    $sal[$data[$str]] = $data['reward_'.$num];
+                    $each_reward[$data['level_'.$num]] = $data['each_reward_'.$num];
                 }
             }
         }
+        
         $sal= json_encode($sal);
         $each_reward= json_encode($each_reward);
         $goods->data($data, true);

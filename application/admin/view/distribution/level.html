@@ -68,6 +68,26 @@
             </dl>
             <dl class="row">
                 <dt class="tit">
+                    <label for="level_name"><em>*</em>同级奖励(元)</label>
+                </dt>
+                <dd class="opt">
+                    <input type="text" name="same_reword" value="{$info.same_reword}" id="same_reword" class="input-txt">
+                    <span class="err" id="err_same_reword"></span>
+                    <p class="notic">上下级同等级时的奖励</p>
+                </dd>
+            </dl>
+            <dl class="row">
+                <dt class="tit">
+                    <label for="level_name"><em>*</em>同级奖励层数</label>
+                </dt>
+                <dd class="opt">
+                    <input type="text" name="layer" value="{$info.layer}" id="layer" class="input-txt">
+                    <span class="err" id="err_layer"></span>
+                    <p class="notic">上下级同等级时,奖励同级层数</p>
+                </dd>
+            </dl>
+            <dl class="row">
+                <dt class="tit">
                     等级描述
                 </dt>
                 <dd class="opt">
