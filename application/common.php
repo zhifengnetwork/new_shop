@@ -26,20 +26,29 @@ define('TIME_MOUTH', 4);
  * @param $order_id
  */
 function sales($order_id){
+    $order_id = intval($order_id);
+    if(!$order_id){
+        return false;
+    }
+
+    $is_reward = M('order_divide')->where('order_id',$order_id)->find();
+
+    if ($is_reward) {
+       return false;
+    }
 
     $order = M('order')->where(['order_id'=>$order_id])->find();
 
     $user_id = $order['user_id'];
 
     $goods_list = M('order_goods')->where(['order_id'=>$order_id])->select();
-   
     // agent_performance($order_id);
     foreach($goods_list as $k => $v){
         $model = new Sales($user_id,$order_id,$v['goods_id']);
-        $res = $model->sales();
+        $result = $model->sales();
     }
 
-    return $res;
+    return $result;
 }
 
 /**
