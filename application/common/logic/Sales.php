@@ -78,6 +78,7 @@ class Sales extends Model
 		$user_level = 0;
 		$layer = 0;
 		$msg = "";
+		$user = M('users');
 		
 		foreach ($all_user as $key => $value) {
 			if ($value['distribut_level'] <= 0) {
@@ -114,10 +115,11 @@ class Sales extends Model
 
 				$msg = "级别利润 ".$money."(元),商品:".$order['goods_num']."件";
 			}
+
+			$user->user_money = $money;
+			$user->distribut_money = $money;
 			
-			$bool = M('users')->where('user_id',$value['user_id'])->setInc('user_money',$money);
-			
-			if ($bool) {
+			if ($user->save()) {
 				$this->writeLog($value['user_id'],$money,$order['order_sn'],$msg);
 			} else {
 				$data = array(
