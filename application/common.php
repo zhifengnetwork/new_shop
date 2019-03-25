@@ -54,14 +54,17 @@ function sales($order_id){
     if(!$order_id){
         return array('msg'=>"没有该商品的订单id",'code'=>0);
     }
-
-    $is_reward = M('order_divide')->where('order_id',$order_id)->where('pay_status',1)->find();
-
+    
+    $is_reward = M('order_divide')->where('order_id',$order_id)->find();
+    
     if ($is_reward) {
-       return array('msg'=>"该商品还没有付款",'code'=>0);
+       return array('msg'=>"该商品已奖励",'code'=>0);
     }
 
-    $order = M('order')->where(['order_id'=>$order_id])->find();
+    $order = M('order')->where(['order_id'=>$order_id])->where('pay_status',1)->find();
+    if (!$order) {
+        return array('msg'=>"该商品还没付款",'code'=>0);
+    }
     $user_id = $order['user_id'];
 
     $perfor = new PerformanceLogic;
@@ -73,7 +76,7 @@ function sales($order_id){
         $model = new Sales($user_id,$order_id,$v['goods_id']);
         $result = $model->sales();  //销售奖励
     }
-
+    
     return $result;
 }
 

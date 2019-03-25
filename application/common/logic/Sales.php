@@ -57,7 +57,8 @@ class Sales extends Model
 		if ($goods['code'] != 1) {
 			return $goods;
 		}
-
+		
+		$parents_id = array_reverse($parents_id);
 		$all_user = $this->all_user($parents_id);
 		$level = $this->get_level();
 
@@ -78,9 +79,9 @@ class Sales extends Model
 		$user_level = 0;
 		$layer = 0;
 		$msg = "";
-		$user = M('users');
 		
 		foreach ($all_user as $key => $value) {
+			$money = 0;
 			if ($value['distribut_level'] <= 0) {
 				continue;
 			}
@@ -90,7 +91,7 @@ class Sales extends Model
 			if ($user_level > $value['distribut_level']) {
 				continue;
 			}
-			
+			$value['distribut_level']
 			if ($user_level == $value['distribut_level']) {
 				$layer ++;
 				if ($layer > $level[$user_level]['layer']) {
@@ -104,22 +105,27 @@ class Sales extends Model
 				$layer = 0;
 				$user_level = $value['distribut_level'];
 				$money = $basic_reward[$value['distribut_level']];
-				
+				if (!$money) {
+					continue;
+				}
 				while(list($k1,$v1) = each($each_reward)){
 					if ($k1 <= $value['distribut_level']) {
+						$v1 = $v1 ? $v1 : 0;
 						$money += $v1 * $order['goods_num'];
 						continue;
 					}
 					break;
 				}
-
+				
 				$msg = "级别利润 ".$money."(元),商品:".$order['goods_num']."件";
 			}
 
-			$user->user_money = $money;
-			$user->distribut_money = $money;
+			$user_money = $money+$value['user_money'];
+			$distribut_money = $money+$value['distribut_money'];
 			
-			if ($user->save()) {
+			$bool = M('users')->where('user_id',$value['user_id'])->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
+			
+			if ($bool) {
 				$this->writeLog($value['user_id'],$money,$order['order_sn'],$msg);
 			} else {
 				$data = array(
@@ -142,7 +148,7 @@ class Sales extends Model
 	//获取所有用户信息
 	public function all_user($parents_id)
 	{
-		$all = M('users')->where('user_id','in',$parents_id)->column('user_id,first_leader,distribut_level,is_lock');
+		$all = M('users')->where('user_id','in',$parents_id)->column('user_id,first_leader,distribut_level,is_lock,user_money,distribut_money');
 		$result = array();
 
 		foreach ($parents_id as $key => $value) {
@@ -178,7 +184,7 @@ class Sales extends Model
 		}
 
 		$data = array('goods_id'=>
-			$order['goods_id'],'goods_num'=>$order_goods['goods_num'],'order_sn'=>$order['order_sn']);
+			$this->goods_id,'goods_num'=>$order_goods['goods_num'],'order_sn'=>$order['order_sn']);
 
 		return array('data'=>$data,'code'=>1);
 	}
@@ -216,7 +222,8 @@ class Sales extends Model
 				'user_id'=>$user_id,
 				'status'=>1,
 				'goods_id'=>$this->goods_id,
-				'money'=>$money
+				'money'=>$money,
+				'add_time'=>Date('Y-m-d H:m:s')
 			);
 			M('order_divide')->add($data);
 		}
