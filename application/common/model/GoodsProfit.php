@@ -32,4 +32,25 @@ class GoodsProfit extends Model
     public function get_all_partners($level){
         return M('users')->where(['distribut_level'=>$level,'is_lock'=>0])->column('user_id');
     }
+    public function get_config($name){
+        // 获取配置表
+        $configs = Db::name('config')->field('name,value')->select();
+        // 把配置项name转换成$configs['price_min1']['value']
+        $configs = $this->arr2name($configs);
+        return $configs[$name]['value'];
+    }
+//数组转换成[配置项名称]获取数据
+    public function arr2name($data,$key=''){
+        $return_data=array();
+        if(!$data||!is_array($data)){
+            return $return_data;
+        }
+        if(!$key){
+            $key='name';
+        }
+        foreach($data as $dv){
+            $return_data[$dv[$key]]=$dv;
+        }
+        return $return_data;
+    }
 }
