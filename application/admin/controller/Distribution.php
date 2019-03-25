@@ -1,4 +1,12 @@
 <?php
+
+/**
+ * tpshop
+ * 销售设置控制器
+ * ----------------------------------------------
+ * @author wu
+ * Date 2019-3-25
+ */
 namespace app\admin\controller;
 
 use app\common\logic\LevelLogic;
@@ -16,6 +24,9 @@ class Distribution extends Base
         parent::_initialize();
     }
 
+    /**
+     * 销售等级列表
+     */
     public function agent_level()
     {
         $Ad = M('agent_level');
@@ -34,6 +45,9 @@ class Distribution extends Base
         return $this->fetch();
     }
 
+    /**
+     * 分销商等级
+     */
     public function level()
     {
         $act = I('get.act', 'add');

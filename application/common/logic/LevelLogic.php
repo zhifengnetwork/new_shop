@@ -1,13 +1,16 @@
 <?php
-
+/**
+ * tpshop
+ * 级别升级逻辑
+ * ----------------------------------------------
+ * @author wu
+ * Date 2019-3-25
+ */
 namespace app\common\logic;
 
 use think\Model;
 use think\Db;
 
-/**
- * 级别逻辑类
- */
 class LevelLogic extends Model
 {
     
@@ -134,7 +137,8 @@ class LevelLogic extends Model
         $test = $this->get_team_id($agent_id);
         $down_level = [];
         $count = 0;
-        $agent_level = $user_level = M('users')->where('user_id',$agent_id)->value('distribut_level');
+        $agent_level = M('users')->where('user_id',$agent_id)->value('distribut_level');
+        dump($list_downid);
         //获取下级等级
         if($list_downid){
             foreach($list_downid as $k=>$v){
