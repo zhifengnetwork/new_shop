@@ -90,14 +90,9 @@ class User extends MobileBase
      * @date 2019/03/23
      */
     public function sharePoster(){
-        $file = input('img');
-        if ($file) {
-            dump($file);
-        }
+        
         return $this->fetch();
     }
-
-
 
     public function logout()
     {

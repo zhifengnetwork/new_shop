@@ -38,7 +38,8 @@ class System extends Base
             'push'      => '推送设置',
             'oss'       => '对象存储',
             'express'	=> '物流设置',
-            'poster'	=> '海报设置'
+            'poster'	=> '海报设置',
+            'background'=> '二维码背景图设置'
         ];		
 		$this->assign('group_list',$group_list);
 		$inc_type =  I('get.inc_type','shop_info');
@@ -58,6 +59,14 @@ class System extends Base
 		$this->assign('config',$config);//当前配置项
 		return $this->fetch($inc_type);
 	}
+
+    //二维码背景图
+    public function background()
+    {
+        $config = tpCache('background');
+        $this->assign('config',$config);
+        return $this->fetch();
+    }
 
     public function cash()
     {
@@ -125,6 +134,9 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
                 break;
             case 'distribut':
                 $this->success("操作成功",U('System/distribut'));
+                break;
+            case 'background':
+                $this->success("操作成功",U('System/background'));
                 break;
             default:
                 $this->success("操作成功",U('System/index',array('inc_type'=>$inc_type)));
