@@ -96,6 +96,10 @@ class MobileBase extends Controller {
         
         $this->public_assign();
 
+        // 主动刷新全局 Access_Token
+        $this->Auto_Refresh_Access_Token();
+
+
         /**
          * 组装 【users -> parens】字段
          */
@@ -256,7 +260,33 @@ class MobileBase extends Controller {
        $this->assign('user_id',$user_id);
        $this->assign('uname',$uname);
       
-    }      
+    }     
+
+    /**
+     * 主动刷新微信全局 ACCESS_TOKEN
+     * @author Rock
+     * @date 2019/03/25
+     */
+    public function Auto_Refresh_Access_Token($auto = false){
+        $conf = Db::name('wx_user')->field('id,appid,appsecret,web_access_token,web_expires')->where('wait_access',1)->find();
+        if($conf['appid']){
+            if($conf['web_expires'] < time() || $auto){
+				$appid = $conf['appid'];
+				$appsecret = $conf['appsecret'];
+                $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$appid&secret=$appsecret";
+                $res = httpRequest($url,'GET');
+                $res = json_decode($res,true);
+                if($res['access_token']){
+					$access_token = $res['access_token'];
+					$expires_in = time() + ($res['expires_in'] - 200);
+					Db::execute("update `tp_wx_user` set `web_access_token` = '$access_token',`web_expires` = '$expires_in' where `id` = '$conf[id]'");
+				}
+            }
+        }
+    }
+
+
+
 
     // 网页授权登录获取 OpendId
     public function GetOpenid()
