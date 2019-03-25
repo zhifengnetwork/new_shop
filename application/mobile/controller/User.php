@@ -90,12 +90,11 @@ class User extends MobileBase
      * @date 2019/03/23
      */
     public function sharePoster(){
-
-
-
-
-        echo '我的分享';
-        exit;
+        $file = input('img');
+        if ($file) {
+            dump($file);
+        }
+        return $this->fetch();
     }
 
 

@@ -1,0 +1,102 @@
+<include file="public/header" title="我的分享" body=""/>
+<include file="public/header_nav" title="我的分享" href="javascript:history.back(-1)"/>
+<link rel="stylesheet" type="text/css" href="__PUBLIC__/bootstrap/css/bootstrap.min.css"/>
+<link rel="stylesheet" type="text/css" href="__PUBLIC__/bootstrap/css/bootstrap-colorpicker.css"/>
+<style>
+	#show-image-preview {
+	　　border: 1px solid #ccc;
+	   	width: 100%;
+	   	height: 200px;
+	   	background-size: contain;
+	   	background-repeat: no-repeat;
+	   	background-position: center center;
+	}
+	.fileinput-button {
+        position: relative;
+        display: inline-block;
+        overflow: hidden;
+        width:200px;
+    }
+    .fileinput-button input{
+        position: absolute;
+        margin-left: 50%
+        left: 50%;
+        top: 0px;
+        opacity: 0;
+        -ms-filter: 'alpha(opacity=0)';
+        font-size: 200px;
+    }
+    .sub-btn{
+    	width: 100%;
+    	height: 200px;
+    }
+</style>
+<div>
+	<p>图片预览：</p>
+　　　　<div id="show-image-preview"></div>
+　　<p>
+		<span class="btn btn-success fileinput-button" >
+            <span>选择图片</span>
+            <input type="file" id="show-image-file" accept="image/gif, image/jpeg, image/png, image/jpg">
+        </span>
+        <div id="sub" class="btn sub-btn">上传</div>
+<!-- 　　　　<input type="file" id="test-image-file" name="test" accept="image/gif, image/jpeg, image/png, image/jpg"> -->
+　　</p>
+</div>
+
+<script type="text/javascript">
+　　var
+　　　　fileInput = document.getElementById('show-image-file'),
+	   // info = document.getElementById('test-file-info'),
+	   preview = document.getElementById('show-image-preview');
+	   // 监听change事件:
+	   fileInput.addEventListener('change', function() {
+   　　 // 清除背景图片:
+      	preview.style.backgroundImage = '';
+        // 检查文件是否选择:
+        if(!fileInput.value) {
+           info.innerHTML = '没有选择图片';
+               return;
+        }                    
+        // 获取File引用:
+      	var file = fileInput.files[0];
+        //判断文件大小
+      	var size = file.size;
+      	if(size >= 5*1024*1024){
+            alert('图片过大!');
+            return false;
+      	}
+      	// // 获取File信息:
+      	// info.innerHTML = '文件: ' + file.name + '<br>' +
+       //                 '大小: ' + file.size + '<br>' +
+       //                 '修改: ' + file.lastModifiedDate;
+      	if(file.type !== 'image/jpeg' && file.type !== 'image/png' && file.type !== 'image/gif') {
+          	alert('图片格式不正确!');
+          	return;
+      	}
+                
+      	// 读取文件:
+      	var reader = new FileReader();
+        reader.onload = function(e) {
+        　　var　data = e.target.result; // 'data:image/jpeg;base64,/9j/4AAQSk...(base64编码)...}'            
+             　　preview.style.backgroundImage = 'url(' + data + ')';
+        };
+        // 以DataURL的形式读取文件:
+        reader.readAsDataURL(file);
+        $("#sub").click(function (){
+        	$.ajax({
+        		type:"post",
+        		url:"mobile/user/sharePoster",
+        		data: {"img":file},
+
+        		success:function(data){
+        			console.log(1);
+        		}
+        	});
+        });
+        // console.log(preview);
+        console.log(file);
+    });
+</script>
+</body>
+</html>
