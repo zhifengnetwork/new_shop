@@ -106,7 +106,6 @@ class MobileBase extends Controller {
             $UserInvite = new UserInvite();
             $UserInvite->user_invite($user['user_id']);
 
-
             // 签到送佣金
             $UserSign = new UserSign();
             $UserSign->sign();
