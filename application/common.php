@@ -44,6 +44,10 @@ function share_deal_after($xiaji,$shangji){
 /**
  * 销售奖励
  * @param $order_id
+ * @return $result
+ * -------------------
+ * @author: pc
+ * @date: 2019-3-25
  */
 function sales($order_id){
     $order_id = intval($order_id);

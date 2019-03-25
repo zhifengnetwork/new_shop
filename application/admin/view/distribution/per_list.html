@@ -37,13 +37,13 @@
 						<th class="sign" axis="col8">
 							<div style="width: 24px;"><i class="ico-check"></i></div>
 						</th>
-						<th align="left" abbr="article_title" axis="col3" class="">
-							<div style="text-align: left; width: 50px;" class="">序列号</div>
+						<th align="center" abbr="ac_id" axis="col3" class="">
+							<div style="text-align: center; width: 50px;" class="">序列号</div>
 						</th>
-						<th align="left" abbr="article_show" axis="col4" class="">
-							<div style="text-align: left; width: 100px;" class="">用户名称</div>
+						<th align="center" abbr="article_time" axis="col4" class="">
+							<div style="text-align: center; width: 100px;" class="">用户名称</div>
 						</th>
-						<th align="center" abbr="article_show" axis="col5" class="">
+						<th align="center" abbr="article_time" axis="col5" class="">
 							<div style="text-align: center; width: 100px;" class="">个人业绩</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col6" class="">
@@ -74,18 +74,18 @@
 		</div>
 		<div class="bDiv" style="height: auto;">
 			<div id="flexigrid" cellpadding="0" cellspacing="0" border="0">
-				<table cellspacing="0" cellpadding="0">
+				<table>
 					<tbody>
 					<foreach name="list" item="vo" key="k" >
 						<tr>
 							<td class="sign">
-								<div style="width: 10px;"><i class="ico-check"></i></div>
+								<div style="width: 24px;"><i class="ico-check"></i></div>
 							</td>
-							<td align="left" class="">
-								<div style="text-align: left; width: 50px;">{$k+1}</div>
+							<td align="center" class="">
+								<div style="text-align: center; width: 50px;">{$k+1}</div>
 							</td>
-							<td align="left" class="">
-								<div style="text-align: left; width: 100px;">{$vo.user_id|user_name}</div>
+							<td align="center" class="">
+								<div style="text-align: center; width: 100px;">{$vo.user_id|user_name}</div>
 							</td>
 							<td align="center" class="">
 								<div style="text-align: center; width: 100px;">{$vo.ind_per|default='0'}</div>
@@ -107,6 +107,9 @@
 							</td>
 							<td align="center" class="">
 								<div style="text-align: center; width: 100px;">{$vo.note}</div>
+							</td>
+							<td align="" class="" style="width: 100%;">
+								<div>&nbsp;</div>
 							</td>
 						</tr>
 					</foreach>
