@@ -48,13 +48,13 @@ function share_deal_after($xiaji,$shangji){
 function sales($order_id){
     $order_id = intval($order_id);
     if(!$order_id){
-        return false;
+        return array('msg'=>"没有该商品的订单id",'code'=>0);
     }
 
-    $is_reward = M('order_divide')->where('order_id',$order_id)->find();
+    $is_reward = M('order_divide')->where('order_id',$order_id)->where('pay_status',1)->find();
 
     if ($is_reward) {
-       return false;
+       return array('msg'=>"该商品还没有付款",'code'=>0);
     }
 
     $order = M('order')->where(['order_id'=>$order_id])->find();
@@ -902,6 +902,8 @@ function update_pay_status($order_sn,$ext=array())
         $User =new \app\common\logic\User();
         $User->setUserById($order['user_id']);
         $User->updateUserLevel();
+
+        sales($order['order_id']);  //销售奖励
         // 记录订单操作日志
         $commonOrder = new \app\common\logic\Order();
         $commonOrder->setOrderById($order['order_id']);
