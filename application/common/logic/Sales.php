@@ -82,18 +82,22 @@ class Sales extends Model
 		
 		foreach ($all_user as $key => $value) {
 			$money = 0;
+			//没有等级没有奖励
 			if ($value['distribut_level'] <= 0) {
 				continue;
 			}
+			//账号冻结了没有奖励
 			if ($value['is_lock'] == 1) {
 				continue;
 			}
+			//等级比下级低没有奖励
 			if ($user_level > $value['distribut_level']) {
 				continue;
 			}
-			
+			//平级奖
 			if ($user_level == $value['distribut_level']) {
 				$layer ++;
+				//超过设定层数没有奖励
 				if ($layer > $level[$user_level]['layer']) {
 					continue;
 				}
