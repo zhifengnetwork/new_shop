@@ -87,7 +87,7 @@ class PerformanceLogic extends Model
 					'update_time'=>Date('Y-m-d H:m:s')
 				);
 				
-				$bool1 = M('agent_performance')->where('user_id',$value)->save($team_per);
+				$bool1 = M('agent_performance')->where('user_id',$value)->update($team_per);
 			} else {
 				$team_per = array(
 					'user_id'=>$value,

@@ -58,15 +58,15 @@ class Sales extends Model
 			return $goods;
 		}
 		
-		$parents_id = array_reverse($parents_id);
-		$all_user = $this->all_user($parents_id);
-		$level = $this->get_level();
+		$parents_id = array_reverse($parents_id);	//按原数组倒序排列
+		$all_user = $this->all_user($parents_id);	//获取所有用户信息
+		$level = $this->get_level();				//获取等级信息
 
 		$basic_reward = json_decode($goods['goods']['basic_reward'],true);
 		$each_reward = json_decode($goods['goods']['each_reward'],true);
 		
 		if(is_array($basic_reward)){
-			ksort($basic_reward );
+			ksort($basic_reward );	//按键值升序排列
 		} else {
 			$basic_reward = array();
 		}
@@ -108,6 +108,8 @@ class Sales extends Model
 				if (!$money) {
 					continue;
 				}
+
+				//计算奖金
 				while(list($k1,$v1) = each($each_reward)){
 					if ($k1 <= $value['distribut_level']) {
 						$v1 = $v1 ? $v1 : 0;
