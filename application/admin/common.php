@@ -12,6 +12,18 @@
  * Date: 2015-09-09
  */
 
+/**
+ * 订单编号
+ */
+function order_sn($order_id){
+	$order_sn = M('order')->where('order_id',$order_id)->value('order_sn');
+	$order_sn = $order_sn ? $order_sn : "无";
+	return $order_sn;
+}
+
+ /**
+  * 用户名
+  */
 function user_name($user_id){
 	$user_name = M('users')->where('user_id',$user_id)->value('nickname');
 

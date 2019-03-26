@@ -133,6 +133,7 @@ return	array(
 					// array('name' => '分销关系', 'act'=>'tree', 'op'=>'Distribut'),
 					array('name' => '销售业绩', 'act'=>'per_list', 'op'=>'Distribution'),
 					array('name' => '销售等级列表', 'act'=>'agent_level', 'op'=>'Distribution'),
+					array('name' => '日志', 'act'=>'per_log', 'op'=>'Distribution'),
 					// array('name' => '分销设置', 'act'=>'distribut', 'op'=>'System'),
 					// array('name' => '销售日志', 'act'=>'sales_log', 'op'=>'Distribut'),
 			)),

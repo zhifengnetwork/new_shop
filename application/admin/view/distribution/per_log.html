@@ -6,8 +6,8 @@
 	<div class="fixed-bar">
 		<div class="item-title">
 			<div class="subject">
-				<h3>销售业绩</h3>
-				<h5>销售业绩</h5>
+				<h3>业绩日志</h3>
+				<h5>业绩日志</h5>
 			</div>
 		</div>
 	</div>
@@ -18,13 +18,13 @@
 			<span title="收起提示" id="explanationZoom" style="display: block;"></span>
 		</div>
 		<ul>
-			<li>销售业绩，显示所有人的销售业绩</li>
+			<li>业绩日志，显示所有人的业绩日志,不可更改</li>
 		</ul>
 	</div>
 	<div class="flexigrid">
 		<div class="mDiv">
 			<div class="ftitle">
-				<h3>销售业绩列表</h3>
+				<h3>业绩日志</h3>
 				<h5>(共{$list|count}条记录)</h5>
 			</div>
 			<div title="刷新数据" class="pReload"><i class="fa fa-refresh"></i></div>
@@ -44,25 +44,22 @@
 							<div style="text-align: center; width: 100px;" class="">用户名称</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col5" class="">
-							<div style="text-align: center; width: 100px;" class="">个人业绩</div>
+							<div style="text-align: center; width: 100px;" class="">业绩(元)</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col6" class="">
-							<div style="text-align: center; width: 100px;" class="">团队业绩</div>
+							<div style="text-align: center; width: 150px;" class="">订单编号</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col6" class="">
-							<div style="text-align: center; width: 100px;" class="">个人销售数量</div>
+							<div style="text-align: center; width: 100px;" class="">数量</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col6" class="">
-							<div style="text-align: center; width: 100px;" class="">团队销售数量</div>
+							<div style="text-align: center; width: 100px;" class="">时间</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col6" class="">
-							<div style="text-align: center; width: 100px;" class="">创建时间</div>
-						</th>
-						<th align="center" abbr="article_time" axis="col6" class="">
-							<div style="text-align: center; width: 100px;" class="">更新时间</div>
-						</th>
-						<th align="center" abbr="article_time" axis="col6" class="">
-							<div style="text-align: center; width: 100px;" class="">描述</div>
+							<div style="text-align: center; width: 200px;" class="">描述</div>
+                        </th>
+                        <th align="center" abbr="article_time" axis="col6" class="">
+							<div style="text-align: center; width: 200px;" class="">操作</div>
 						</th>
 						<th style="width:100%" axis="col7">
 							<div></div>
@@ -88,25 +85,24 @@
 								<div style="text-align: center; width: 100px;">{$vo.user_id|user_name}</div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 100px;">{$vo.ind_per|default='0'}</div>
+								<div style="text-align: center; width: 100px;">{$vo.money|default='0'}</div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 100px;">{$vo.agent_per|default='0'}</div>
+								<div style="text-align: center; width: 150px;">{$vo.order_id|order_sn}</div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 100px;">{$vo.ind_goods_sum}</div>
+								<div style="text-align: center; width: 100px;">{$vo.goods_num}</div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 100px;">{$vo.agent_goods_sum}</div>
+								<div style="text-align: center; width: 100px;">{$vo.create_time}</div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 100px;">{$vo.create_time|date="Y-m-d", ###}</div>
-							</td>
-							<td align="center" class="">
-								<div style="text-align: center; width: 100px;">{$vo.update_time|date="Y-m-d", ###}</div>
-							</td>
-							<td align="center" class="">
-								<div style="text-align: center; width: 100px;">{$vo.note}</div>
+								<div style="text-align: center; width: 200px;">{$vo.note}</div>
+                            </td>
+                            <td align="center" class="handle">
+								<div style="text-align: center; width: 200px; max-width:200px;">
+									<a class="btn blue" href="{:U('Distribution/log_detail',array('id'=>$vo['performance_id']))}"><i class="fa fa-search"></i>查看</a>
+								</div>
 							</td>
 							<td align="" class="" style="width: 100%;">
 								<div>&nbsp;</div>
@@ -134,32 +130,6 @@
 		});
 
 	});
-
-
-	// function delfun(obj) {
-	// 	// 删除按钮
-	// 	layer.confirm('确认删除？', {
-	// 		btn: ['确定', '取消'] //按钮
-	// 	}, function () {
-	// 		$.ajax({
-	// 			type: 'post',
-	// 			url: $(obj).attr('data-url'),
-	// 			data : {act:'del',level_id:$(obj).attr('data-id')},
-	// 			dataType: 'json',
-	// 			success: function (data) {
-	// 				layer.closeAll();
-	// 				if (data.status == 1) {
-	// 					layer.msg(data.msg, {icon: 1});
-	// 					$(obj).parent().parent().parent().remove();
-	// 				} else {
-	// 					layer.alert(data.msg, {icon: 2});
-	// 				}
-	// 			}
-	// 		})
-	// 	}, function () {
-	// 		layer.closeAll();
-	// 	});
-	// }
 </script>
 </body>
 </html>
