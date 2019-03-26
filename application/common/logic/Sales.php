@@ -91,7 +91,7 @@ class Sales extends Model
 			if ($user_level > $value['distribut_level']) {
 				continue;
 			}
-			$value['distribut_level']
+			
 			if ($user_level == $value['distribut_level']) {
 				$layer ++;
 				if ($layer > $level[$user_level]['layer']) {

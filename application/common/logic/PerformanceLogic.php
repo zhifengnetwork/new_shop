@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @author: pc
+ * Date: 2019-3-25
+ */
+
 namespace app\common\logic;
 
 use think\Model;
@@ -73,16 +78,16 @@ class PerformanceLogic extends Model
 		
 		foreach ($new_list as $key => $value) {
 			$is_team = M('agent_performance')->where('user_id',$value)->find();
-
+			
 			//团队者添加业绩
 			if ($is_team) {
 				$team_per = array(
-					'agent_per'=>$is_team['ind_per']+$price,
-					'agent_goods_sum'=>$is_team['ind_goods_sum']+$goods_num,
+					'agent_per'=>$is_team['agent_per']+$price,
+					'agent_goods_sum'=>$is_team['agent_goods_sum']+$goods_num,
 					'update_time'=>Date('Y-m-d H:m:s')
 				);
-
-				$bool1 = M('agent_performance')->where('user_id',$value)->update($team_per);
+				
+				$bool1 = M('agent_performance')->where('user_id',$value)->save($team_per);
 			} else {
 				$team_per = array(
 					'user_id'=>$value,
@@ -91,7 +96,7 @@ class PerformanceLogic extends Model
 					'create_time'=>Date('Y-m-d H:m:s'),
 					'update_time'=>Date('Y-m-d H:m:s')
 				);
-
+				
 				$bool1 = M('agent_performance')->insert($team_per);
 			}
 

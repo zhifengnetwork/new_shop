@@ -105,6 +105,7 @@ class Distribution extends Base
         $this->ajaxReturn($return);
     }
 
+    //业绩列表
     public function per_list()
     {
         $Ad = M('agent_performance');
