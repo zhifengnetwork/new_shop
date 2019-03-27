@@ -910,7 +910,13 @@ function update_pay_status($order_sn,$ext=array())
         $User->setUserById($order['user_id']);
         $User->updateUserLevel();
 
+        
         sales($order['order_id']);  //销售奖励
+
+        // 分销商升级, 根据order表查看消费id 达到条件就给他分销商等级升级
+        $Level =new \app\common\logic\LevelLogic();
+        $Level->user_in($order['user_id']);
+        
         // 记录订单操作日志
         $commonOrder = new \app\common\logic\Order();
         $commonOrder->setOrderById($order['order_id']);

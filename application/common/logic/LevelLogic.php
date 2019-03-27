@@ -16,28 +16,18 @@ class LevelLogic extends Model
     public function user_in($leaderId)
     {
         $frist_leader_info = $this->user_info_agent($leaderId);
+        dump($frist_leader_info);
         //判断是否有上级,有就升级
         if($frist_leader_info){
-            $leader_list = $this->user_info_agent($leaderId);
-            foreach($leader_list as $k=>$v){
-                foreach($v as $ $k1 => $v1){                  
+            foreach($frist_leader_info as $k=>$v){
+                foreach($v as $ $k1 => $v1){                
                     $this->upgrade_agent($v1);
                 }
             }
         }
 
     }
-    
-    /**
-     * 获取用户升级条件
-     */
-    private function up_condition($agent_id)
-    {
-        $agent_info = Db::name('agent_performance')->where(['user_id'=>$agent_id])->find();
-        return $agent_info;
-    }
-
-    
+  
     /**
      * 升级条件
      */
