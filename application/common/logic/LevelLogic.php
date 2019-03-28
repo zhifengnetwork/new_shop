@@ -16,16 +16,12 @@ class LevelLogic extends Model
     public function user_in($leaderId)
     {
         $frist_leader_info = $this->user_info_agent($leaderId);
-        dump($frist_leader_info);
         //判断是否有上级,有就升级
         if($frist_leader_info){
-            foreach($frist_leader_info as $k=>$v){
-                foreach($v as $ $k1 => $v1){                
-                    $this->upgrade_agent($v1);
-                }
+            foreach($frist_leader_info as $k=>$v){               
+                    $this->upgrade_agent($v);
             }
         }
-
     }
   
     /**
@@ -77,7 +73,7 @@ class LevelLogic extends Model
     {
         $recUser  = $this->getAllUp($data);
         $list = array_column($recUser,'user_id');
-        return array('recUser'=>$list);
+        return $list;
     }
     
     /**

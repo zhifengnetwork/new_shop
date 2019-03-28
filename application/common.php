@@ -69,7 +69,7 @@ function sales($order_id){
 
     $perfor = new PerformanceLogic;
     $add_perfor = $perfor->per($order_id);  //添加业绩
-    
+
     $goods_list = M('order_goods')->where(['order_id'=>$order_id])->select();
     
     foreach($goods_list as $k => $v){
@@ -911,8 +911,8 @@ function update_pay_status($order_sn,$ext=array())
         $User->updateUserLevel();
 
         
-        sales($order['order_id']);  //销售奖励
-
+        $sales = sales($order['order_id']);  //销售奖励
+        
         // 分销商升级, 根据order表查看消费id 达到条件就给他分销商等级升级
         $Level =new \app\common\logic\LevelLogic();
         $Level->user_in($order['user_id']);

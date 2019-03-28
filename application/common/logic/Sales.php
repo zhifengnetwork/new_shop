@@ -112,6 +112,8 @@ class Sales extends Model
 				if (!$money) {
 					continue;
 				}
+				
+				reset($each_reward);	//重置数组指针
 
 				//计算奖金
 				while(list($k1,$v1) = each($each_reward)){
@@ -125,7 +127,7 @@ class Sales extends Model
 				
 				$msg = "级别利润 ".$money."(元),商品:".$order['goods_num']."件";
 			}
-
+			
 			$user_money = $money+$value['user_money'];
 			$distribut_money = $money+$value['distribut_money'];
 			
