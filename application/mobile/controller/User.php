@@ -28,6 +28,7 @@ use think\Verify;
 use think\Loader;
 use think\db;
 use think\Image;
+use think\Session;
 
 class User extends MobileBase
 {
@@ -1073,6 +1074,7 @@ class User extends MobileBase
             $data = $userLogic->password($this->user_id, I('post.old_password'), I('post.new_password'), I('post.confirm_password'));
             if ($data['status'] == -1)
                 $this->ajaxReturn(['status'=>-1,'msg'=>$data['msg']]);
+            Session::delete('user');
             $this->ajaxReturn(['status'=>1,'msg'=>$data['msg'],'url'=>U('/Mobile/User/index')]);
             exit;
         }
