@@ -107,6 +107,9 @@ class MobileBase extends Controller {
          */
         $this->assemble_parents();
         $this->assemble_parents_exe();
+
+        if(!isset($user)) $user = session('user');
+        
         if($user['user_id']){
             // 邀请注册送佣金
             $UserInvite = new UserInvite();
