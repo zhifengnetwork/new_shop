@@ -131,7 +131,7 @@ class User extends MobileBase
 		}
         $imgUrl = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=".UrlEncode($ticket);
        
-        // $this->poster_qr($imgUrl);  //合成图片
+        $this->poster_qr($imgUrl);  //合成图片
         // define('IMGROOT_PATH', str_replace("\\","/",realpath(dirname(dirname(__FILE__)).'/../../'))); //图片根目录（绝对路径）
 
         // $qr_code_path = UPLOAD_PATH.'qr_code/';
