@@ -130,13 +130,13 @@ class User extends MobileBase
 			}
 		}
         $imgUrl = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=".UrlEncode($ticket);
-        
+    
         $this->poster_qr($imgUrl);  //合成图片
-        
+     
         return $this->fetch();
     }
 
-    public function poster_qr($qr_url)
+    public function posterQr($qr_url)
     {
         if (!$qr_url) {
             return false;
@@ -165,7 +165,7 @@ class User extends MobileBase
             @unlink($qr_code_file);
             return false;
         }
-        
+
         $back_info = getimagesize($back_img);    //获取图片信息
         $im = checkPosterImagesType($back_info,$back_img);
         
@@ -174,7 +174,7 @@ class User extends MobileBase
         $canvas = imagecreatetruecolor($back_width,$back_height);  //创建画布
         
         imagecopyresized($canvas,$im,0,0,0,0,$back_width,$back_height,$back_width,$back_height);   //缩放
-        $new_QR = $qr_code_path.createImagesName().".png";    //获得缩小后新的二维码路径
+        $new_QR = $QR_path."/".createImagesName().".png";    //获得缩小后新的二维码路径
         
         inputPosterImages($back_info,$canvas,$new_QR);  //输出到png即为一个缩放后的文件
         
@@ -182,8 +182,7 @@ class User extends MobileBase
         $background_img = imagecreatefromstring(file_get_contents($new_QR));
         imagecopyresampled($background_img,$QR,$back_width-130,$back_height-150,0,0,110,110,102,102);  //合成图片
         $result_png = createImagesName().".png";
-        $file = $qr_code_path.$result_png;
-        
+        $file = $QR_path.$result_png;
         imagepng ($background_img,$file);  //输出合成海报图片
         
         $final_poster = imagecreatefromstring(file_get_contents($file)); //获得该图片资源显示图片
