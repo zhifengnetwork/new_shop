@@ -51,3 +51,27 @@
         </div>
     
     </if>
+
+    <if condition="$t eq 3">
+        <!----------- t = 3,分销返利 ------------>
+        <div class="application-record">
+            <div class="maleri30">
+                <ul class="re_tit">
+                    
+                    <li class="li2" style="width:50%"><span>时间</span></li>
+                    <li class="li2" style="width:30%"><span>返利佣金</span></li>
+                    
+                </ul>
+                <foreach name="log" item="v">
+                    <ul>
+                        <li class="li3" style="width:50%"><span>{$v[add_time]}</span></li>
+                        <li class="li3" style="width:30%"><span>{$v[money]}</span></li>  
+                    </ul>
+                </foreach>
+            </div>
+            <div id="getmore"  style="font-size:.32rem;text-align: center;color:#888;padding:.25rem .24rem .4rem; clear:both;">
+                <a >只显示最近50条记录</a>
+            </div>
+        </div>
+    
+    </if>

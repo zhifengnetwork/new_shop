@@ -119,7 +119,7 @@ class User extends Base
             $_POST['discount'] = $userLevel / 100;
             $row = M('users')->where(array('user_id' => $uid))->save($_POST);
             if ($row) {
-                exit($this->success('修改成功'));
+                exit($this->success('修改成功','User/index'));
             }
             exit($this->error('未作内容修改或修改失败'));
         }

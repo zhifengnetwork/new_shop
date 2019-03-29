@@ -95,6 +95,7 @@ class User extends MobileBase
         # 登录签到佣金
         $data['sign_money'] = Db::name('commission_log')->where(['user_id'=>$user_id,'identification'=>1])->sum('money');
         $data['invite_money'] = Db::name('commission_log')->where(['user_id'=>$user_id,'identification'=>2])->sum('money');
+        $data['distribution_rebate'] = Db::name('order_divide')->where(['user_id'=>$user_id])->sum('money');
 
         
         $this->assign('data',$data);
@@ -103,7 +104,7 @@ class User extends MobileBase
 
     /**
      * 佣金明细
-     * @param int t 明细类型[1=>登录签到，2=>邀请注册，...]
+     * @param int t 明细类型[1=>登录签到，2=>邀请注册，3=>分销返利]
      * 
      */
     public function commission_log(){
@@ -122,6 +123,10 @@ class User extends MobileBase
             case '2':
                 # 邀请注册
                 $log = Db::query("select a.`add_user_id`,b.`mobile`,b.`nickname`,`money`,`addtime` from `tp_commission_log` as a left join `tp_users` as b on a.`add_user_id` = b.`user_id` where a.`user_id` = '$user_id' and a.`identification` = 2 order by a.`addtime` desc limit 50");
+                break;
+            case '3':
+                #分销返利
+                $log = DB::query("select `add_time`, `money` from `tp_order_divide` where `user_id` = '$user_id' order by `add_time` desc limit 50");
                 break;
 
             default:
