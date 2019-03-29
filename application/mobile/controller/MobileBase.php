@@ -100,7 +100,7 @@ class MobileBase extends Controller {
         $this->Auto_Refresh_Access_Token();
 
 		// 扫码上下级缓存
-		$this->sharePoster();
+		$this->share_poster();
 
         /**
          * 组装 【users -> parens】字段
@@ -125,7 +125,7 @@ class MobileBase extends Controller {
 	* @author rock
 	* @date 219/3/29
 	*/
-	public function sharePoster(){
+	public function share_poster(){
 		# 删除长时间的缓存
 		$del_time = time() - 600;
 		Db::execute("delete from `tp_wxshare_cache` where `time` <= '$del_time'");
