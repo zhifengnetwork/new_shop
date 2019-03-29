@@ -130,7 +130,7 @@ class User extends MobileBase
 			}
 		}
         $imgUrl = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=".UrlEncode($ticket);
-       
+
         $this->poster_qr($imgUrl);  //合成图片
         // define('IMGROOT_PATH', str_replace("\\","/",realpath(dirname(dirname(__FILE__)).'/../../'))); //图片根目录（绝对路径）
 
@@ -201,7 +201,6 @@ class User extends MobileBase
     
         $back_img = IMGROOT_PATH.tpCache('background')['background']; //获取背景图
         $qr_code_path = UPLOAD_PATH."qr_code/";
-        // $qr_code_file = $QR_path."/15235156654585.png";
 
         if (!file_exists($qr_code_path)) {
             mkdir($qr_code_path,777,true);
@@ -230,7 +229,7 @@ class User extends MobileBase
         
         $QR = imagecreatefromstring(file_get_contents($qr_code_file));
         $background_img = imagecreatefromstring(file_get_contents($new_QR));
-        imagecopyresampled($background_img,$QR,$back_width-130,$back_height-150,0,0,110,110,128,128);  //合成图片
+        imagecopyresampled($background_img,$QR,$back_width-130,$back_height-150,0,0,110,110,102,102);  //合成图片
         $result_png = '/'.createImagesName().".png";
         $file = $QR_path.$result_png;
         imagepng ($background_img,$file);  //输出合成海报图片
