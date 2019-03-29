@@ -140,11 +140,10 @@ class User extends MobileBase
      * @date 2019/03/23
      */
     public function sharePoster(){
-        
+
         $user_id = $this->user_id;
 		$shareposter = Db::name('users')->field('shareposter')->where('user_id',$user_id)->find();
 		$shareposter = $shareposter['shareposter'];
-		 
 		if($shareposter){
 			$shareposter = json_decode($shareposter,true);
 			$ticket = $shareposter['ticket'];
@@ -154,8 +153,7 @@ class User extends MobileBase
 				$this->redirect('sharePoster');
 			}
 		}else{
-			
-			$conf = Db::name('wx_user')->field('web_expires,web_access_token')->where('wait_access',1)->find();
+            $conf = Db::name('wx_user')->field('web_expires,web_access_token')->where('wait_access',1)->find();
 			$token = $conf['web_access_token'];
 			$param = [
 				'expire_seconds' => 2592000,
@@ -180,11 +178,71 @@ class User extends MobileBase
 			}
 		}
         $imgUrl = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=".UrlEncode($ticket);
-    
-        $this->poster_qr($imgUrl);  //合成图片
+        // $this->poster_qr($imgUrl);  //合成图片
      
+
+        $filename = 'qrcode.png';
+        $save_dir = ROOT_PATH.'public/qrcode/user/'.$user_id.'/';
+        if(!file_exists($save_dir.$filename)){
+            $this->getImage($imgUrl,$save_dir,$filename);
+
+            $image = \think\Image::open($save_dir.$filename);
+            // 按照原图的比例生成一个最大为150*150的缩略图并保存为thumb.png
+            $image->thumb(150,150,\think\Image::THUMB_SOUTHEAST)->save($save_dir.$filename);
+        }
+
+        // $image = \think\Image::open(ROOT_PATH.'public/qrcode/qrcode_black.jpg');
+        // $image->water($save_dir.$filename,\think\Image::WATER_SOUTHEAST)->save($save_dir.'share.png'); 
+        // dump($image);exit;
+        
         return $this->fetch();
     }
+
+    function getImage($url,$save_dir='',$filename='',$type=0){
+        if(trim($url)==''){
+            return array('file_name'=>'','save_path'=>'','error'=>1);
+        }
+        if(trim($save_dir)==''){
+            $save_dir='./';
+        }
+        if(trim($filename)==''){//保存文件名
+            $ext=strrchr($url,'.');
+            if($ext!='.gif'&&$ext!='.jpg'){
+                return array('file_name'=>'','save_path'=>'','error'=>3);
+            }
+            $filename=time().$ext;
+        }
+        if(0!==strrpos($save_dir,'/')){
+            $save_dir.='/';
+        }
+        //创建保存目录
+        if(!file_exists($save_dir)&&!mkdir($save_dir,0777,true)){
+            return array('file_name'=>'','save_path'=>'','error'=>5);
+        }
+        //获取远程文件所采用的方法 
+        if($type){
+            $ch=curl_init();
+            $timeout=5;
+            curl_setopt($ch,CURLOPT_URL,$url);
+            curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+            curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,$timeout);
+            $img=curl_exec($ch);
+            curl_close($ch);
+        }else{
+            ob_start(); 
+            readfile($url);
+            $img=ob_get_contents(); 
+            ob_end_clean(); 
+        }
+        //$size=strlen($img);
+        //文件大小 
+        $fp2=@fopen($save_dir.$filename,'a');
+        fwrite($fp2,$img);
+        fclose($fp2);
+        unset($img,$url);
+        return array('file_name'=>$filename,'save_path'=>$save_dir.$filename,'error'=>0);
+    } 
+
 
     public function poster_qr($qr_url)
     {
