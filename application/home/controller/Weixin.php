@@ -12,15 +12,25 @@ class Weixin
      */
     public function index()
     {
-
+		
         $data = file_get_contents("php://input");
+		
     	if ($data) {
+			
+			
             $re = $this->xmlToArray($data);
-            
             // $this->write_log(json_encode($re));
-
-	    	$url = SITE_URL.'/mobile/message/index?eventkey='.$re['EventKey'].'&openid='.$re['FromUserName'].'&event='.$re['Event'];
-	    	httpRequest($url);
+			
+			
+			/**
+			* 微信扫描分享带参数的二维码
+			*/
+			if(($re['Event'] == 'SCAN' && $re['EventKey'] == 'sharePoster') || ($re['Event'] == 'subscribe' && $re['EventKey'] == 'qrscene_sharePoster')){
+				$this->sharePoster($re);
+			}
+			
+	    	// $url = SITE_URL.'/mobile/message/index?eventkey='.$re['EventKey'].'&openid='.$re['FromUserName'].'&event='.$re['Event'];
+	    	// httpRequest($url);
         }
 
         $config = Db::name('wx_user')->find();
@@ -31,6 +41,47 @@ class Weixin
         $logic = new WechatLogic($config);
         $logic->handleMessage();
     }
+
+	/**
+	* 微信扫描分享带参数的二维码
+	* @author Rock
+	* @date 2019/3/29
+	*/
+	public function sharePoster($data){
+		if(!isset($data)){
+			return false;
+		}
+		
+		$share_user = Db::query("select `user_id` from `tp_users` where `shareposter` like '%".$data['Ticket']."%' limit 1");
+		if(!empty($share_user[0])){
+			$share_user = $share_user[0]['user_id'];
+		}else{
+			return false;
+		}
+		
+		// 查询用户是否已经注册
+		$user = Db::query("select `user_id`,`first_leader` from `tp_users` where `openid` = '".$data['FromUserName']."'");
+		if(!empty($user[0])){
+			// 老用户
+			$user = $user[0];
+			// 用户是否已有上级
+			if($user['first_leader'] > 0){
+				return false;
+			}else{
+				// 用户没有上级
+				Db::execute("update `tp_users` set `first_leader` = '".$share_user."' where `user_id` = '".$user['user_id']."'");
+			}	
+		}else{
+			// 新用户 - 写入关系缓存表，新用户注册后自动更新
+			$cache = Db::table('tp_wxshare_cache')->where('openid',$data['FromUserName'])->find();
+			if(!$cache){
+				$insql = "insert into `tp_wxshare_cache` (`openid`,`share_user`,`ticket`,`time`) values ('".$data['FromUserName']."','".$share_user."','".$data['Ticket']."','".time()."')";
+				
+				Db::execute($insql);
+			}
+		}
+		
+	}
 
 
     public function xmlToArray($xml)
