@@ -90,7 +90,7 @@ class User extends MobileBase
      * @date 2019/03/23
      */
     public function sharePoster(){
-
+        
         $user_id = $this->user_id;
 		$shareposter = Db::name('users')->field('shareposter')->where('user_id',$user_id)->find();
 		$shareposter = $shareposter['shareposter'];
@@ -112,7 +112,7 @@ class User extends MobileBase
 				'action_name' => 'QR_STR_SCENE',
 				'action_info' => [
 						'scene' => [
-								'scene_str' => 'sharePoster',
+                            'scene_str' => 'sharePoster',
 						],
 				],
 			];
@@ -130,22 +130,92 @@ class User extends MobileBase
 			}
 		}
         $imgUrl = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=".UrlEncode($ticket);
-        
-        
-        define('IMGROOT_PATH', str_replace("\\","/",realpath(dirname(dirname(__FILE__)).'/../../'))); //图片根目录（绝对路径）
+       
+        // $this->poster_qr($imgUrl);  //合成图片
+        // define('IMGROOT_PATH', str_replace("\\","/",realpath(dirname(dirname(__FILE__)).'/../../'))); //图片根目录（绝对路径）
 
-        $qr_code_path = UPLOAD_PATH.'qr_code/';
+        // $qr_code_path = UPLOAD_PATH.'qr_code/';
+        // if (!file_exists($qr_code_path)) {
+        //     mkdir($qr_code_path,777,true);
+        // }
+
+        // /* 生成二维码 */
+        // $qr_code_file = $qr_code_path.time().rand(1, 10000).'.png';
+        // \QRcode::png($imgUrl, $qr_code_file, QR_ECLEVEL_M,1.8);
+        
+        // $back_img = IMGROOT_PATH.tpCache('background')['background']; //获取背景图
+        // $QR_path = UPLOAD_PATH."qr_code";
+        // // $qr_code_file = $QR_path."/15235156654585.png"; //二维码图片
+        
+        // if (!$back_img || !$qr_code_file) {
+        //     return $this->fetch();
+        // }
+
+        // $back_info = getimagesize($back_img);    //获取图片信息
+        // $im = checkPosterImagesType($back_info,$back_img);
+        
+        // $back_width = imagesx($im);    //背景图宽
+        // $back_height = imagesy($im);   //背景图高
+        // $canvas = imagecreatetruecolor($back_width,$back_height);  //创建画布
+        
+        // imagecopyresized($canvas,$im,0,0,0,0,$back_width,$back_height,$back_width,$back_height);   //缩放
+        // $new_QR = $QR_path."/".createImagesName().".png";    //获得缩小后新的二维码路径
+        
+        // inputPosterImages($back_info,$canvas,$new_QR);  //输出到png即为一个缩放后的文件
+        
+        // $QR = imagecreatefromstring(file_get_contents($imgUrl));
+        // $background_img = imagecreatefromstring(file_get_contents($new_QR));
+        // imagecopyresampled($background_img,$QR,$back_width-130,$back_height-200,0,0,100,100,125,125);  //合成图片
+        // $result_png = '/'.createImagesName().".png";
+        // $file = $QR_path.$result_png;
+        // imagepng ($background_img,$file);  //输出合成海报图片
+        
+        // $final_poster = imagecreatefromstring(file_get_contents($file)); //获得该图片资源显示图片
+        
+        // header("Content-type: image/png");
+        // imagepng($final_poster);
+        // imagedestroy($final_poster);
+
+        // $new_QR && unlink($new_QR);
+        // // $qr_code_file && unlink($qr_code_file);
+        // $file && unlink($file);
+        // exit();
+        // $this->assign('imgUrl',$find_password);
+
+        return $this->fetch();
+    }
+
+    public function poster_qr($qr_url)
+    {
+        if (!$qr_url) {
+            return false;
+        }
+
+        ob_end_clean();
+        vendor('topthink.think-image.src.Image');
+        vendor('phpqrcode.phpqrcode');
+
+        error_reporting(E_ERROR);
+
+        define('IMGROOT_PATH', str_replace("\\","/",realpath(dirname(dirname(__FILE__)).'/../../'))); //图片根目录（绝对路径）
+    
+        $back_img = IMGROOT_PATH.tpCache('background')['background']; //获取背景图
+        $qr_code_path = UPLOAD_PATH."qr_code/";
+        // $qr_code_file = $QR_path."/15235156654585.png";
+
         if (!file_exists($qr_code_path)) {
             mkdir($qr_code_path,777,true);
         }
+
+        /* 生成二维码 */
+        $qr_code_file = $qr_code_path.time().rand(1, 10000).'.png';
+        \QRcode::png($qr_url, $qr_code_file, QR_ECLEVEL_M,1.8);
         
-        $back_img = IMGROOT_PATH.tpCache('background')['background']; //获取背景图
-        $QR_path = UPLOAD_PATH."qr_code";
-        $qr_code_file = $QR_path."/15235156654585.png"; //二维码图片
-        
-        if (!$back_img || !$qr_code_file) {
-            return $this->fetch();
+        if (!is_file($back_img) || !is_file($qr_code_file)) {
+            @unlink($qr_code_file);
+            return false;
         }
+
         $back_info = getimagesize($back_img);    //获取图片信息
         $im = checkPosterImagesType($back_info,$back_img);
         
@@ -160,7 +230,7 @@ class User extends MobileBase
         
         $QR = imagecreatefromstring(file_get_contents($qr_code_file));
         $background_img = imagecreatefromstring(file_get_contents($new_QR));
-        imagecopyresampled($background_img,$QR,$back_width-130,$back_height-200,0,0,100,100,125,125);  //合成图片
+        imagecopyresampled($background_img,$QR,$back_width-130,$back_height-150,0,0,110,110,128,128);  //合成图片
         $result_png = '/'.createImagesName().".png";
         $file = $QR_path.$result_png;
         imagepng ($background_img,$file);  //输出合成海报图片
@@ -172,12 +242,9 @@ class User extends MobileBase
         imagedestroy($final_poster);
 
         $new_QR && unlink($new_QR);
-        // $qr_code_file && unlink($qr_code_file);
+        $qr_code_file && unlink($qr_code_file);
         $file && unlink($file);
         exit();
-        // $this->assign('imgUrl',$find_password);
-
-        // return $this->fetch();
     }
 
     public function logout()
