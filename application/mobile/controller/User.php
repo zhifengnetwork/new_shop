@@ -87,15 +87,55 @@ class User extends MobileBase
     /**
      * 我的分享
      * @author Rock
-     * @date 2019/03/23
+     * @date 2019/03/25
      */
     public function sharePoster(){
 
+        $user_id = $this->user_id;
+		$shareposter = Db::name('users')->field('shareposter')->where('user_id',$user_id)->find();
+		$shareposter = $shareposter['shareposter'];
+		 
+		if($shareposter){
+			$shareposter = json_decode($shareposter,true);
+			$ticket = $shareposter['ticket'];
+			$expire_seconds = $shareposter['expire_seconds'];
+			if($expire_seconds < time()){
+				Db::execute("update `tp_users` set `shareposter` = '' where `user_id` = '$user_id'");
+				$this->redirect('sharePoster');
+			}
+		}else{
+			
+			$conf = Db::name('wx_user')->field('web_expires,web_access_token')->where('wait_access',1)->find();
+			$token = $conf['web_access_token'];
+			$param = [
+				'expire_seconds' => 2592000,
+				'action_name' => 'QR_STR_SCENE',
+				'action_info' => [
+						'scene' => [
+								'scene_str' => 'sharePoster',
+						],
+				],
+			];
+			$url = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=$token";
+			$res = httpRequest($url,'POST',json_encode($param));
+			$res = json_decode($res,true);
+			
+			if($res['ticket']){
+				$ticket = $res['ticket'];
+				$expire_seconds = time() + $res['expire_seconds'] - 200;
+				$update = json_encode(['ticket'=>$ticket,'expire_seconds'=>$expire_seconds]);
+				Db::execute("update `tp_users` set `shareposter` = '$update' where `user_id` = '$user_id'");
+			}else{
+				$share_error = 1;
+			}
+		}
+        $imgUrl = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=".UrlEncode($ticket);
+        
 
+        
+        $this->assign('imgUrl',$imgUrl);
 
-
-        echo '我的分享';
-        exit;
+        return $this->fetch();
     }
 
 
