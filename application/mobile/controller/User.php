@@ -252,21 +252,12 @@ class User extends MobileBase
     {
         ob_end_clean();
         vendor('topthink.think-image.src.Image');
-        vendor('phpqrcode.phpqrcode');
 
         error_reporting(E_ERROR);
 
         define('IMGROOT_PATH', str_replace("\\","/",realpath(dirname(dirname(__FILE__)).'/../../'))); //图片根目录（绝对路径）
     
         $back_img = IMGROOT_PATH.tpCache('background.background'); //获取背景图
-
-        // $filename = 'qrcode.png';
-        // $qr_code_path = ROOT_PATH.'public/qrcode/user/'.$user_id.'/';
-        // $qr_code_file = $qr_code_path.$filename;
-
-        // if (!file_exists($qr_code_path)) {
-        //     mkdir($qr_code_path,777,true);
-        // }
 
         if (!is_file($back_img) || !is_file($qr_code_file)) {
             return $this->fetch('sharePoster');
