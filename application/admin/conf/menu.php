@@ -22,6 +22,10 @@ return	array(
 						array('name' => '快递公司', 'act'=>'index', 'op'=>'Shipping'),
 				)),
 
+				array('name' => '会员','child' => array(
+					array('name'=>'分享海报设置','act'=>'shareposter','op'=>'System'),
+				)),
+
 				array('name' => '支付','child'=>array(
 					array('name' => '支付配置', 'act'=>'index', 'op'=>'Plugin'),
 				)),
