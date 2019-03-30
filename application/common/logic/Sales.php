@@ -10,6 +10,7 @@ namespace app\common\logic;
 
 use think\Model;
 use think\Db;
+use think\Cache;
 
 /**
  * 销售类逻辑
@@ -35,6 +36,8 @@ class Sales extends Model
 		if ($user['parents']) {
 			$parents_id = explode(',', $user['parents']);
 			$parents_id = array_filter($parents_id);  //去除0,倒序排列
+			
+			$this->cash_unlock($parents_id);	//提现解锁
 			
 			$reward = $this->reward($parents_id);
 			return $reward;
@@ -237,5 +240,21 @@ class Sales extends Model
 		}
 		
 		return $bool;
+	}
+
+	/**
+	 * 提现解锁
+	 */
+	public function cash_unlock($parents_id)
+	{
+		if (!$parents_id) {
+			return false;
+		}
+
+		$is_cash = tpCache('cash.goods_id');
+		
+		if (intval($is_cash) == $this->goods_id) {
+			M('users')->where('user_id','in',$parents_id)->update(['is_cash'=>1]);
+		}
 	}
 }
