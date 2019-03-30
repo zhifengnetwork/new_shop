@@ -147,6 +147,13 @@ class User extends MobileBase
     public function sharePoster(){
 
         $user_id = $this->user_id;
+        $share_error = 0;
+
+        $filename = 'qrcode.png';
+        $save_dir = ROOT_PATH.'public/shareposter/user/'.$user_id.'/';
+        $my_poster = $save_dir.'poster.png';
+        $my_poster_src = '/public/shareposter/user/'.$user_id.'/poster.png';
+
 		$shareposter = Db::name('users')->field('shareposter')->where('user_id',$user_id)->find();
 		$shareposter = $shareposter['shareposter'];
 		if($shareposter){
@@ -154,7 +161,10 @@ class User extends MobileBase
 			$ticket = $shareposter['ticket'];
 			$expire_seconds = $shareposter['expire_seconds'];
 			if($expire_seconds < time()){
-				Db::execute("update `tp_users` set `shareposter` = '' where `user_id` = '$user_id'");
+                Db::execute("update `tp_users` set `shareposter` = '' where `user_id` = '$user_id'");
+
+                # 删除已存在的二维码文件
+                unlink($save_dir.$filename);
 				$this->redirect('sharePoster');
 			}
 		}else{
@@ -184,21 +194,52 @@ class User extends MobileBase
 		}
         $imgUrl = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=".UrlEncode($ticket);
      
-        $filename = 'qrcode.png';
-        $save_dir = ROOT_PATH.'public/qrcode/user/'.$user_id.'/';
+        # 临时二维码
         if(!file_exists($save_dir.$filename)){
             $this->getImage($imgUrl,$save_dir,$filename);
-            // $image = \think\Image::open($save_dir.$filename);
-            // // 按照原图的比例生成一个最大为150*150的缩略图并保存为thumb.png
-            // $image->thumb(150,150,\think\Image::THUMB_SOUTHEAST)->save($save_dir.$filename);
+        }
+        $image_path =  ROOT_PATH.'public/shareposter/load/qr_backgroup.png';
+        if(!file_exists($image_path)){
+            $share_error = 1;
         }
 
-        $this->poster_qr($save_dir.$filename,$save_dir);  //合成图片
+        # 分享海报
+        if(!file_exists($my_poster) && !$share_error){
+            # 海报配置
+            $conf = Db::name('config')->where(['inc_type' => 'shareposter', 'name' => 'shareposter'])->find();
+            if($conf){
+                $config = json_decode($conf['value'],true);
 
-        // $image = \think\Image::open(ROOT_PATH.'public/qrcode/qrcode_black.jpg');
-        // $image->water($save_dir.$filename,\think\Image::WATER_SOUTHEAST)->save($save_dir.'share.png'); 
-        // dump($image);exit;
+                $image_w = $config['w'] ? $config['w'] : 75;
+                $image_h = $config['h'] ? $config['h'] : 75;
+                $image_x = $config['x'] ? $config['x'] : 0;
+                $image_y = $config['y'] ? $config['y'] : 0;
+
+                # 根据设置的尺寸，生成缓存二维码
+                $qr_image = \think\Image::open($save_dir.$filename);
+                $qrcode_temp_path = $save_dir.'qrcode_temp.png';
+                $qr_image->thumb($image_w,$image_h,\think\Image::THUMB_SOUTHEAST)->save($qrcode_temp_path);
+                
+                if($image_x > 0 || $image_y > 0){
+                    $water = [$image_x, $image_y];
+                }else{
+                    $water = 5;
+                }
+                
+                # 图片合成
+                $image = \think\Image::open($image_path);
+                $image->water($qrcode_temp_path, $water)->save($my_poster);
+                unlink($qrcode_temp_path);
+                @unlink($save_dir.$filename);
+
+            }else{
+                $share_error = 1;
+            }
+
+
+        }
         
+        $this->assign('my_poster_src', $my_poster_src);
         return $this->fetch();
     }
 
@@ -289,7 +330,7 @@ class User extends MobileBase
         imagedestroy($final_poster);
 
         $new_QR && unlink($new_QR);
-        $qr_code_file && unlink($qr_code_file);
+        // $qr_code_file && unlink($qr_code_file);
         $file && unlink($file);
         exit();
     }
