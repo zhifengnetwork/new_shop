@@ -102,13 +102,13 @@ class Sales extends Model
 					continue;
 				}
 				
-				$money = $level[$user_level]['same_reword'];
+				$money = $level[$user_level]['same_reword'] * $order['goods_num'];
 				$msg = "同级奖励 ".$money."(元)";
 			}
 			if ($user_level < $value['distribut_level']) {
 				$layer = 0;
 				$user_level = $value['distribut_level'];
-				$money = $basic_reward[$value['distribut_level']];
+				$money = $basic_reward ? $basic_reward[$value['distribut_level']] : 0;
 				if (!$money) {
 					continue;
 				}
