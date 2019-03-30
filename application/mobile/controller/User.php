@@ -183,18 +183,17 @@ class User extends MobileBase
 			}
 		}
         $imgUrl = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=".UrlEncode($ticket);
-        // $this->poster_qr($imgUrl);  //合成图片
      
-
         $filename = 'qrcode.png';
         $save_dir = ROOT_PATH.'public/qrcode/user/'.$user_id.'/';
         if(!file_exists($save_dir.$filename)){
             $this->getImage($imgUrl,$save_dir,$filename);
-
-            $image = \think\Image::open($save_dir.$filename);
-            // 按照原图的比例生成一个最大为150*150的缩略图并保存为thumb.png
-            $image->thumb(150,150,\think\Image::THUMB_SOUTHEAST)->save($save_dir.$filename);
+            // $image = \think\Image::open($save_dir.$filename);
+            // // 按照原图的比例生成一个最大为150*150的缩略图并保存为thumb.png
+            // $image->thumb(150,150,\think\Image::THUMB_SOUTHEAST)->save($save_dir.$filename);
         }
+
+        $this->poster_qr($save_dir.$filename,$save_dir);  //合成图片
 
         // $image = \think\Image::open(ROOT_PATH.'public/qrcode/qrcode_black.jpg');
         // $image->water($save_dir.$filename,\think\Image::WATER_SOUTHEAST)->save($save_dir.'share.png'); 
@@ -249,12 +248,8 @@ class User extends MobileBase
     } 
 
 
-    public function poster_qr($qr_url)
+    public function poster_qr($qr_code_file,$qr_code_path)
     {
-        if (!$qr_url) {
-            return false;
-        }
-
         ob_end_clean();
         vendor('topthink.think-image.src.Image');
         vendor('phpqrcode.phpqrcode');
@@ -263,20 +258,18 @@ class User extends MobileBase
 
         define('IMGROOT_PATH', str_replace("\\","/",realpath(dirname(dirname(__FILE__)).'/../../'))); //图片根目录（绝对路径）
     
-        $back_img = IMGROOT_PATH.tpCache('background')['background']; //获取背景图
-        $qr_code_path = UPLOAD_PATH."qr_code/";
+        $back_img = IMGROOT_PATH.tpCache('background.background'); //获取背景图
 
-        if (!file_exists($qr_code_path)) {
-            mkdir($qr_code_path,777,true);
-        }
+        // $filename = 'qrcode.png';
+        // $qr_code_path = ROOT_PATH.'public/qrcode/user/'.$user_id.'/';
+        // $qr_code_file = $qr_code_path.$filename;
 
-        /* 生成二维码 */
-        $qr_code_file = $qr_code_path.time().rand(1, 10000).'.png';
-        \QRcode::png($qr_url, $qr_code_file, QR_ECLEVEL_M,1.8);
-        
+        // if (!file_exists($qr_code_path)) {
+        //     mkdir($qr_code_path,777,true);
+        // }
+
         if (!is_file($back_img) || !is_file($qr_code_file)) {
-            @unlink($qr_code_file);
-            return false;
+            return $this->fetch('sharePoster');
         }
 
         $back_info = getimagesize($back_img);    //获取图片信息
@@ -293,7 +286,7 @@ class User extends MobileBase
         
         $QR = imagecreatefromstring(file_get_contents($qr_code_file));
         $background_img = imagecreatefromstring(file_get_contents($new_QR));
-        imagecopyresampled($background_img,$QR,$back_width-130,$back_height-150,0,0,110,110,102,102);  //合成图片
+        imagecopyresampled($background_img,$QR,$back_width-130,$back_height-150,0,0,110,110,430,430);  //合成图片
         $result_png = createImagesName().".png";
         $file = $qr_code_path.$result_png;
         imagepng ($background_img,$file);  //输出合成海报图片
