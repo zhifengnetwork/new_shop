@@ -7,30 +7,28 @@ return	array(
 	)),
 
 	'system'=>array('name'=>'设置','child'=>array(
-				array('name' => '系统','child' => array(
-						array('name'=>'商城设置','act'=>'index','op'=>'System'),
-						
-						//array('name'=>'支付方式','act'=>'index1','op'=>'System'),
-						array('name'=>'地区&配送','act'=>'region','op'=>'Tools'),
-						array('name'=>'短信模板','act'=>'index','op'=>'SmsTemplate'),
-						array('name'=>'消息通知','act'=>'index','op'=>'MessageTemplate'),
-						//array('name'=>'接口对接','act'=>'index3','op'=>'System'),
-						//array('name'=>'验证码设置','act'=>'index4','op'=>'System'),
-						array('name'=>'友情链接','act'=>'linkList','op'=>'Article'),
-						array('name'=>'清除缓存','act'=>'cleanCache','op'=>'System'),
-						array('name' => '运费模板', 'act'=>'index', 'op'=>'Freight'),
-						array('name' => '快递公司', 'act'=>'index', 'op'=>'Shipping'),
-				)),
+			array('name' => '系统','child' => array(
+					array('name'=>'商城设置','act'=>'index','op'=>'System'),
+					
+					//array('name'=>'支付方式','act'=>'index1','op'=>'System'),
+					array('name'=>'地区&配送','act'=>'region','op'=>'Tools'),
+					array('name'=>'短信模板','act'=>'index','op'=>'SmsTemplate'),
+					array('name'=>'消息通知','act'=>'index','op'=>'MessageTemplate'),
+					//array('name'=>'接口对接','act'=>'index3','op'=>'System'),
+					//array('name'=>'验证码设置','act'=>'index4','op'=>'System'),
+					array('name'=>'友情链接','act'=>'linkList','op'=>'Article'),
+					array('name'=>'清除缓存','act'=>'cleanCache','op'=>'System'),
+					array('name' => '运费模板', 'act'=>'index', 'op'=>'Freight'),
+					array('name' => '快递公司', 'act'=>'index', 'op'=>'Shipping'),
+			)),
 
-				array('name' => '会员','child' => array(
-					array('name'=>'分享海报设置','act'=>'shareposter','op'=>'System'),
-				)),
+			array('name' => '会员','child' => array(
+				array('name'=>'分享海报设置','act'=>'shareposter','op'=>'System'),
+			)),
 
-				array('name' => '支付','child'=>array(
-					array('name' => '支付配置', 'act'=>'index', 'op'=>'Plugin'),
-				)),
-			
-
+			array('name' => '支付','child'=>array(
+				array('name' => '支付配置', 'act'=>'index', 'op'=>'Plugin'),
+			)),
 
 			array('name' => '权限','child'=>array(
 						array('name' => '管理员列表', 'act'=>'index', 'op'=>'Admin'),
@@ -40,31 +38,31 @@ return	array(
 						array('name' => '供应商列表', 'act'=>'supplier', 'op'=>'Admin'),
 				)),
 			
-				array('name' => '数据','child'=>array(
-						array('name' => '数据备份', 'act'=>'index', 'op'=>'Tools'),
-						array('name' => '数据还原', 'act'=>'restore', 'op'=>'Tools'),
-                        array('name' => '清空演示数据', 'act'=>'clear_demo_data', 'op'=>'Tools'),						
-						//array('name' => 'ecshop数据导入', 'act'=>'ecshop', 'op'=>'Tools'),
-						//array('name' => '淘宝csv导入', 'act'=>'taobao', 'op'=>'Tools'),
-						//array('name' => 'SQL查询', 'act'=>'log', 'op'=>'Admin'),
-				)),
+				// array('name' => '数据','child'=>array(
+				// 		array('name' => '数据备份', 'act'=>'index', 'op'=>'Tools'),
+				// 		array('name' => '数据还原', 'act'=>'restore', 'op'=>'Tools'),
+                //         array('name' => '清空演示数据', 'act'=>'clear_demo_data', 'op'=>'Tools'),						
+				// 		//array('name' => 'ecshop数据导入', 'act'=>'ecshop', 'op'=>'Tools'),
+				// 		//array('name' => '淘宝csv导入', 'act'=>'taobao', 'op'=>'Tools'),
+				// 		//array('name' => 'SQL查询', 'act'=>'log', 'op'=>'Admin'),
+				// )),
 
 	)),
 		
-	'decorate'=>array('name'=>'装修','child'=>array(
-		// array('name' => '模板','child'=>array(
-		// 		array('name' => '模板分类管理', 'act'=>'template_class', 'op'=>'block', 'admin_saas'=>1),
-		// 		//array('name' => '首页装修', 'act'=>'templateList', 'op'=>'Template'),
-		// 		array('name' => '首页装修', 'act'=>'templateList', 'op'=>'block'),
-		// 		array('name' => '行业模板设置', 'act'=>'templateList2', 'op'=>'block',  'admin_saas'=>1),
-		// 		array('name' => '自定义页面', 'act'=>'pageList', 'op'=>'Block'),
-		// 		array('name' => '会员中心自定义', 'act'=>'user_center_menu', 'op'=>'System'),
-		// 		array('name' => '模板切换', 'act'=>'change', 'op'=>'Template'),
-		// )),
-		array('name' => '导航','child' => array(
-			array('name'=>'PC端导航栏','act'=>'navigationList','op'=>'System'),
-		)),
-	)),
+	// 'decorate'=>array('name'=>'装修','child'=>array(
+	// 	// array('name' => '模板','child'=>array(
+	// 	// 		array('name' => '模板分类管理', 'act'=>'template_class', 'op'=>'block', 'admin_saas'=>1),
+	// 	// 		//array('name' => '首页装修', 'act'=>'templateList', 'op'=>'Template'),
+	// 	// 		array('name' => '首页装修', 'act'=>'templateList', 'op'=>'block'),
+	// 	// 		array('name' => '行业模板设置', 'act'=>'templateList2', 'op'=>'block',  'admin_saas'=>1),
+	// 	// 		array('name' => '自定义页面', 'act'=>'pageList', 'op'=>'Block'),
+	// 	// 		array('name' => '会员中心自定义', 'act'=>'user_center_menu', 'op'=>'System'),
+	// 	// 		array('name' => '模板切换', 'act'=>'change', 'op'=>'Template'),
+	// 	// )),
+	// 	array('name' => '导航','child' => array(
+	// 		array('name'=>'PC端导航栏','act'=>'navigationList','op'=>'System'),
+	// 	)),
+	// )),
 
 
 	'shop'=>array('name'=>'商城','child'=>array(
