@@ -22,6 +22,10 @@ return	array(
 						array('name' => '快递公司', 'act'=>'index', 'op'=>'Shipping'),
 				)),
 
+				array('name' => '会员','child' => array(
+					array('name'=>'分享海报设置','act'=>'shareposter','op'=>'System'),
+				)),
+
 				array('name' => '支付','child'=>array(
 					array('name' => '支付配置', 'act'=>'index', 'op'=>'Plugin'),
 				)),
@@ -48,15 +52,15 @@ return	array(
 	)),
 		
 	'decorate'=>array('name'=>'装修','child'=>array(
-		array('name' => '模板','child'=>array(
-				array('name' => '模板分类管理', 'act'=>'template_class', 'op'=>'block', 'admin_saas'=>1),
-				//array('name' => '首页装修', 'act'=>'templateList', 'op'=>'Template'),
-				array('name' => '首页装修', 'act'=>'templateList', 'op'=>'block'),
-				array('name' => '行业模板设置', 'act'=>'templateList2', 'op'=>'block',  'admin_saas'=>1),
-				array('name' => '自定义页面', 'act'=>'pageList', 'op'=>'Block'),
-				array('name' => '会员中心自定义', 'act'=>'user_center_menu', 'op'=>'System'),
-				array('name' => '模板切换', 'act'=>'change', 'op'=>'Template'),
-		)),
+		// array('name' => '模板','child'=>array(
+		// 		array('name' => '模板分类管理', 'act'=>'template_class', 'op'=>'block', 'admin_saas'=>1),
+		// 		//array('name' => '首页装修', 'act'=>'templateList', 'op'=>'Template'),
+		// 		array('name' => '首页装修', 'act'=>'templateList', 'op'=>'block'),
+		// 		array('name' => '行业模板设置', 'act'=>'templateList2', 'op'=>'block',  'admin_saas'=>1),
+		// 		array('name' => '自定义页面', 'act'=>'pageList', 'op'=>'Block'),
+		// 		array('name' => '会员中心自定义', 'act'=>'user_center_menu', 'op'=>'System'),
+		// 		array('name' => '模板切换', 'act'=>'change', 'op'=>'Template'),
+		// )),
 		array('name' => '导航','child' => array(
 			array('name'=>'PC端导航栏','act'=>'navigationList','op'=>'System'),
 		)),
@@ -66,7 +70,7 @@ return	array(
 	'shop'=>array('name'=>'商城','child'=>array(
 				array('name' => '商品','child' => array(
 				    array('name' => '商品列表', 'act'=>'goodsList', 'op'=>'Goods'),
-				    array('name' => '淘宝导入', 'act'=>'index', 'op'=>'Import'),
+				    // array('name' => '淘宝导入', 'act'=>'index', 'op'=>'Import'),
 					array('name' => '商品分类', 'act'=>'categoryList', 'op'=>'Goods'),
 					array('name' => '库存管理', 'act'=>'stockList', 'op'=>'Goods'),
 					array('name' => '商品模型', 'act'=>'type_list', 'op'=>'Goods'),
@@ -82,10 +86,10 @@ return	array(
 					array('name' => '退换货', 'act'=>'return_list', 'op'=>'Order'),
 					array('name' => '添加订单', 'act'=>'add_order', 'op'=>'Order'),
 					array('name' => '订单日志','act'=>'order_log','op'=>'Order'),
-					array('name' => '发票管理','act'=>'index', 'op'=>'Invoice'),
-			        array('name' => '拼团列表','act'=>'team_list','op'=>'Team'),
-			        array('name' => '拼团订单','act'=>'order_list','op'=>'Team'),
-			        array('name' => '上门自提','act'=>'index','op'=>'ShopOrder'),
+					// array('name' => '发票管理','act'=>'index', 'op'=>'Invoice'),
+			        // array('name' => '拼团列表','act'=>'team_list','op'=>'Team'),
+			        // array('name' => '拼团订单','act'=>'order_list','op'=>'Team'),
+			        // array('name' => '上门自提','act'=>'index','op'=>'ShopOrder'),
 			)),
 
 			array('name' => '广告','child' => array(
@@ -109,30 +113,31 @@ return	array(
 			)),
 	)),
 		
-	'marketing'=>array('name'=>'营销','child'=>array(
-			array('name' => '促销活动','child' => array(
-					array('name' => '抢购管理', 'act'=>'flash_sale', 'op'=>'Promotion'),
-					array('name' => '团购管理', 'act'=>'group_buy_list', 'op'=>'Promotion'),
-					array('name' => '优惠促销', 'act'=>'prom_goods_list', 'op'=>'Promotion'),
-					array('name' => '订单促销', 'act'=>'prom_order_list', 'op'=>'Promotion'),
-					array('name' => '预售管理','act'=>'index', 'op'=>'PreSell'),
-					array('name' => '拼团管理','act'=>'index', 'op'=>'Team'),
-					array('name' => '搭配购管理','act'=>'index', 'op'=>'Combination'),
-			)),
-			array('name' => '优惠积分','child' => array(
-					array('name' => '优惠券','act'=>'index', 'op'=>'Coupon'),
-					array('name' => '积分兑换','act'=>'index', 'op'=>'IntegralMall'),
-			)),
-	)),
+	// 'marketing'=>array('name'=>'营销','child'=>array(
+	// 		array('name' => '促销活动','child' => array(
+	// 				array('name' => '抢购管理', 'act'=>'flash_sale', 'op'=>'Promotion'),
+	// 				array('name' => '团购管理', 'act'=>'group_buy_list', 'op'=>'Promotion'),
+	// 				array('name' => '优惠促销', 'act'=>'prom_goods_list', 'op'=>'Promotion'),
+	// 				array('name' => '订单促销', 'act'=>'prom_order_list', 'op'=>'Promotion'),
+	// 				array('name' => '预售管理','act'=>'index', 'op'=>'PreSell'),
+	// 				array('name' => '拼团管理','act'=>'index', 'op'=>'Team'),
+	// 				array('name' => '搭配购管理','act'=>'index', 'op'=>'Combination'),
+	// 		)),
+	// 		array('name' => '优惠积分','child' => array(
+	// 				array('name' => '优惠券','act'=>'index', 'op'=>'Coupon'),
+	// 				array('name' => '积分兑换','act'=>'index', 'op'=>'IntegralMall'),
+	// 		)),
+	// )),
 		
-	'distribution'=>array('name'=>'销售','child'=>array(
-			array('name' => '销售管理','child' => array(
+	'distribution'=>array('name'=>'分销','child'=>array(
+			array('name' => '分销管理','child' => array(
 
 					// array('name' => '分销商品', 'act'=>'goods_list', 'op'=>'Distribut'),
 					// array('name' => '分销商列表', 'act'=>'distributor_list', 'op'=>'Distribut'),
 					// array('name' => '分销关系', 'act'=>'tree', 'op'=>'Distribut'),
-					array('name' => '销售业绩', 'act'=>'per_list', 'op'=>'Distribution'),
-					array('name' => '销售等级列表', 'act'=>'agent_level', 'op'=>'Distribution'),
+					array('name' => '分销业绩', 'act'=>'per_list', 'op'=>'Distribution'),
+					array('name' => '分销等级列表', 'act'=>'agent_level', 'op'=>'Distribution'),
+					array('name' => '日志', 'act'=>'per_log', 'op'=>'Distribution'),
 					// array('name' => '分销设置', 'act'=>'distribut', 'op'=>'System'),
 					// array('name' => '销售日志', 'act'=>'sales_log', 'op'=>'Distribut'),
 			)),
@@ -151,7 +156,7 @@ return	array(
  	'member'=>array('name'=>'会员','child'=>array(
 		array('name' => '会员管理','child'=>array(
 			array('name'=>'会员列表','act'=>'index','op'=>'User'),
-			array('name'=>'会员等级','act'=>'levelList','op'=>'User'),
+			// array('name'=>'会员等级','act'=>'levelList','op'=>'User'),
 		)),
 		array('name' => '充值提现','child'=>array(
 			array('name'=>'充值记录','act'=>'recharge','op'=>'User'),

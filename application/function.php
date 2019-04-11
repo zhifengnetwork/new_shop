@@ -12,6 +12,24 @@
  * $Author: IT宇宙人 2015-08-10 $
  */
  
+/**
+ * 保留文件夹，删除路径下的文件
+ */
+function delFileUnderDir( $dirName = '') 
+{ 
+    if ($handle = opendir("$dirName")){ 
+        while (false !== ( $item = readdir($handle))){
+        if ($item != "." && $item != ".."){
+            if (is_dir("$dirName/$item")){ 
+                delFileUnderDir("$dirName/$item"); 
+            } else {
+                unlink("$dirName/$item");
+            } 
+        } 
+    } 
+    closedir($handle);
+    } 
+}
  
 /**
  * @param $arr

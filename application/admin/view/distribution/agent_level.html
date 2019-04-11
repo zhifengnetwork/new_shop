@@ -6,8 +6,8 @@
 	<div class="fixed-bar">
 		<div class="item-title">
 			<div class="subject">
-				<h3>销售等级管理</h3>
-				<h5>网站系统销售等级索引与管理</h5>
+				<h3>分销等级管理</h3>
+				<h5>网站系统分销等级索引与管理</h5>
 			</div>
 		</div>
 	</div>
@@ -18,13 +18,13 @@
 			<span title="收起提示" id="explanationZoom" style="display: block;"></span>
 		</div>
 		<ul>
-			<li>销售等级管理，不同销售等级可设置不同奖金</li>
+			<li>分销等级管理，不同分销等级可设置不同奖金</li>
 		</ul>
 	</div>
 	<div class="flexigrid">
 		<div class="mDiv">
 			<div class="ftitle">
-				<h3>销售等级列表</h3>
+				<h3>分销等级列表</h3>
 				<h5>(共{$list|count}条记录)</h5>
 			</div>
 			<div title="刷新数据" class="pReload"><i class="fa fa-refresh"></i></div>
@@ -79,7 +79,7 @@
 			<div class="tDiv2">
 				<div class="fbutton"> <a href="{:U('Distribution/level')}">
 					<div class="add" title="新增分销商等级">
-						<span><i class="fa fa-plus"></i>新增销售等级</span>
+						<span><i class="fa fa-plus"></i>新增分销等级</span>
 					</div>
 				</a> </div>
 			</div>
@@ -104,10 +104,10 @@
 								<div style="text-align: center; width: 100px;">{$vo.level}</div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 100px;">{$vo.ind_per}</div>
+								<div style="text-align: center; width: 100px;">{$vo.ind_goods_sum}</div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 100px;">{$vo.agent_per}</div>
+								<div style="text-align: center; width: 100px;">{$vo.agent_goods_sum}</div>
 							</td>
 							<td align="center" class="">
 								<div style="text-align: center; width: 100px;">{$vo.team_nums}</div>

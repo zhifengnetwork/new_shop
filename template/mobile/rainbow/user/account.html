@@ -6,26 +6,26 @@
     </div>
     <div class="scgz">
         <ul>
-            <li>
+            <!-- <li>
                 <a href="{:U('Mobile/User/recharge')}">
                     <img src="__STATIC__/images/cz.png"/>
                     <p>账户充值</p>
                 </a>
-            </li>
+            </li> -->
             <li>
                 <a href="{:U('Mobile/User/withdrawals')}">
                     <img src="__STATIC__/images/tx.png"/>
                     <p>申请提现</p>
                 </a>
             </li>
-            <if condition="$tpshop_config['basic_rechargevip_on_off'] eq 1">
+            <!-- <if condition="$tpshop_config['basic_rechargevip_on_off'] eq 1">
                 <li>
                     <a href="{:U('Mobile/User/rechargevip')}">
                         <img src="__STATIC__/images/tx.png"/>
                         <p> VIP充值</p>
                     </a>
                 </li>
-            </if>
+            </if> -->
         </ul>
     </div>
 </div>
@@ -70,6 +70,20 @@
             </div>
             <div class="myorder p">
                 <div class="content30">
+                    <a href="{:U('Mobile/User/mycommission')}">
+                        <div class="order">
+                            <div class="fl">
+                                <span>我的佣金</span>
+                            </div>
+                            <div class="fr">
+                                <i class="Mright"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <!-- <div class="myorder p">
+                <div class="content30">
                     <a href="{:U('Mobile/User/points_list')}">
                         <div class="order">
                             <div class="fl">
@@ -81,8 +95,8 @@
                         </div>
                     </a>
                 </div>
-            </div>
-            <div class="myorder p">
+            </div> -->
+            <!-- <div class="myorder p">
                 <div class="content30">
                     <a href="{:U('Mobile/User/recharge_list')}">
                         <div class="order">
@@ -95,7 +109,7 @@
                         </div>
                     </a>
                 </div>
-            </div>
+            </div> -->
             <div class="myorder p">
                 <div class="content30">
                     <a href="{:U('Mobile/User/withdrawals_list')}">

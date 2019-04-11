@@ -97,14 +97,19 @@ class MobileBase extends Controller {
         $this->public_assign();
 
         // 主动刷新全局 Access_Token
-        $this->Auto_Refresh_Access_Token(true);
+        $this->Auto_Refresh_Access_Token();
 
+		// 扫码上下级缓存
+		$this->share_poster();
 
         /**
          * 组装 【users -> parens】字段
          */
         $this->assemble_parents();
         $this->assemble_parents_exe();
+
+        if(!isset($user)) $user = session('user');
+        
         if($user['user_id']){
             // 邀请注册送佣金
             $UserInvite = new UserInvite();
@@ -112,11 +117,33 @@ class MobileBase extends Controller {
 
             // 签到送佣金
             $UserSign = new UserSign();
-            $UserSign->sign();
+            $UserSign->sign($user);
         }
         
     }
     
+	
+	/**
+	* 微信扫码上下级关系缓存处理
+	* @author rock
+	* @date 219/3/29
+	*/
+	public function share_poster(){
+		# 删除长时间的缓存
+		$del_time = time() - 600;
+		Db::execute("delete from `tp_wxshare_cache` where `time` <= '$del_time'");
+		
+		# 当前用户信息
+		$user_temp = session('user');
+		if (isset($user_temp['user_id']) && $user_temp['first_leader'] < 1 && $user_temp['openid']) {
+			$cache = Db::name('wxshare_cache')->where('openid',$user_temp['openid'])->find();
+			if($cache){
+				Db::execute("update `tp_users` set `first_leader` = '".$cache['share_user']."' where `user_id` = '".$user_temp['user_id']."'");
+				Db::execute("delete from `tp_wxshare_cache` where `id` = '".$cache['id']."'");
+			}
+		} 
+	}
+	
     /**
      * 组装、更新上级列
      * @author Rock

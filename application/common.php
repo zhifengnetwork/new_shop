@@ -45,23 +45,26 @@ function share_deal_after($xiaji,$shangji){
  * 销售奖励
  * @param $order_id
  * @return $result
- * -------------------
+ * ----------------------------
  * @author: pc
- * @date: 2019-3-25
+ * Date: 2019-3-25
  */
 function sales($order_id){
     $order_id = intval($order_id);
     if(!$order_id){
         return array('msg'=>"没有该商品的订单id",'code'=>0);
     }
-
-    $is_reward = M('order_divide')->where('order_id',$order_id)->where('pay_status',1)->find();
-
+    
+    $is_reward = M('order_divide')->where('order_id',$order_id)->find();
+    
     if ($is_reward) {
-       return array('msg'=>"该商品还没有付款",'code'=>0);
+       return array('msg'=>"该商品已奖励",'code'=>0);
     }
 
-    $order = M('order')->where(['order_id'=>$order_id])->find();
+    $order = M('order')->where(['order_id'=>$order_id])->where('pay_status',1)->find();
+    if (!$order) {
+        return array('msg'=>"该商品还没付款",'code'=>0);
+    }
     $user_id = $order['user_id'];
 
     $perfor = new PerformanceLogic;
@@ -73,7 +76,7 @@ function sales($order_id){
         $model = new Sales($user_id,$order_id,$v['goods_id']);
         $result = $model->sales();  //销售奖励
     }
-
+    
     return $result;
 }
 
@@ -907,7 +910,13 @@ function update_pay_status($order_sn,$ext=array())
         $User->setUserById($order['user_id']);
         $User->updateUserLevel();
 
-        sales($order['order_id']);  //销售奖励
+        
+        $sales = sales($order['order_id']);  //销售奖励
+        
+        // 分销商升级, 根据order表查看消费id 达到条件就给他分销商等级升级
+        $Level =new \app\common\logic\LevelLogic();
+        $Level->user_in($order['user_id']);
+
         // 记录订单操作日志
         $commonOrder = new \app\common\logic\Order();
         $commonOrder->setOrderById($order['order_id']);

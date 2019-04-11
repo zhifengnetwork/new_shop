@@ -28,6 +28,7 @@ use think\Verify;
 use think\Loader;
 use think\db;
 use think\Image;
+use think\Session;
 
 class User extends MobileBase
 {
@@ -84,35 +85,97 @@ class User extends MobileBase
         return $this->fetch();
     }
 
+     /**
+     * 我的佣金
+     * @author Rock
+     */
+    public function mycommission(){
+        $user_id = $this->user_id;
+        // echo $user_id;exit;
+        # 登录签到佣金
+        $data['sign_money'] = Db::name('commission_log')->where(['user_id'=>$user_id,'identification'=>1])->sum('money');
+        $data['invite_money'] = Db::name('commission_log')->where(['user_id'=>$user_id,'identification'=>2])->sum('money');
+        $data['distribution_rebate'] = Db::name('order_divide')->where(['user_id'=>$user_id])->sum('money');
+
+        
+        $this->assign('data',$data);
+        return $this->fetch();
+    }
+
+    /**
+     * 佣金明细
+     * @param int t 明细类型[1=>登录签到，2=>邀请注册，3=>分销返利]
+     * 
+     */
+    public function commission_log(){
+        $t = intval(input('get.t'));
+        if(!$t){
+            $this->error('参数错误！');
+        }
+        $user_id = $this->user_id;
+
+        switch($t){
+            case '1':
+                # 签到登录
+                $log = Db::query("select `money`,`date`,`num` from `tp_commission_log` where `user_id` = '$user_id' and `identification` = 1 order by `date` desc limit 50");
+                // dump($log);exit;
+                break;
+            case '2':
+                # 邀请注册
+                $log = Db::query("select a.`add_user_id`,b.`mobile`,b.`nickname`,`money`,`addtime` from `tp_commission_log` as a left join `tp_users` as b on a.`add_user_id` = b.`user_id` where a.`user_id` = '$user_id' and a.`identification` = 2 order by a.`addtime` desc limit 50");
+                break;
+            case '3':
+                #分销返利
+                $log = DB::query("select `add_time`, `money` from `tp_order_divide` where `user_id` = '$user_id' order by `add_time` desc limit 50");
+                break;
+
+            default:
+                return $this->error('无效的参数，请重试！');
+        }
+
+
+        $this->assign('log',$log);
+        $this->assign('t',$t);
+        return $this->fetch();
+    }
+
     /**
      * 我的分享
      * @author Rock
-     * @date 2019/03/25
+     * @date 2019/03/23
      */
     public function sharePoster(){
 
         $user_id = $this->user_id;
+        $share_error = 0;
+
+        $filename = 'qrcode.png';
+        $save_dir = ROOT_PATH.'public/shareposter/user/'.$user_id.'/';
+        $my_poster = $save_dir.'poster.png';
+        $my_poster_src = '/public/shareposter/user/'.$user_id.'/poster.png';
+
 		$shareposter = Db::name('users')->field('shareposter')->where('user_id',$user_id)->find();
 		$shareposter = $shareposter['shareposter'];
-		 
 		if($shareposter){
 			$shareposter = json_decode($shareposter,true);
 			$ticket = $shareposter['ticket'];
 			$expire_seconds = $shareposter['expire_seconds'];
 			if($expire_seconds < time()){
-				Db::execute("update `tp_users` set `shareposter` = '' where `user_id` = '$user_id'");
+                Db::execute("update `tp_users` set `shareposter` = '' where `user_id` = '$user_id'");
+
+                # 删除已存在的二维码文件
+                unlink($save_dir.$filename);
 				$this->redirect('sharePoster');
 			}
 		}else{
-			
-			$conf = Db::name('wx_user')->field('web_expires,web_access_token')->where('wait_access',1)->find();
+            $conf = Db::name('wx_user')->field('web_expires,web_access_token')->where('wait_access',1)->find();
 			$token = $conf['web_access_token'];
 			$param = [
 				'expire_seconds' => 2592000,
 				'action_name' => 'QR_STR_SCENE',
 				'action_info' => [
 						'scene' => [
-								'scene_str' => 'sharePoster',
+                            'scene_str' => 'sharePoster',
 						],
 				],
 			];
@@ -130,15 +193,147 @@ class User extends MobileBase
 			}
 		}
         $imgUrl = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=".UrlEncode($ticket);
-        
+     
+        # 临时二维码
+        if(!file_exists($save_dir.$filename)){
+            $this->getImage($imgUrl,$save_dir,$filename);
+        }
+        $image_path =  ROOT_PATH.'public/shareposter/load/qr_backgroup.png';
+        if(!file_exists($image_path)){
+            $share_error = 1;
+        }
 
-        
-        $this->assign('imgUrl',$imgUrl);
+        # 分享海报
+        if(!file_exists($my_poster) && !$share_error){
+            # 海报配置
+            $conf = Db::name('config')->where(['inc_type' => 'shareposter', 'name' => 'shareposter'])->find();
+            if($conf){
+                $config = json_decode($conf['value'],true);
 
+                $image_w = $config['w'] ? $config['w'] : 75;
+                $image_h = $config['h'] ? $config['h'] : 75;
+                $image_x = $config['x'] ? $config['x'] : 0;
+                $image_y = $config['y'] ? $config['y'] : 0;
+
+                # 根据设置的尺寸，生成缓存二维码
+                $qr_image = \think\Image::open($save_dir.$filename);
+                $qrcode_temp_path = $save_dir.'qrcode_temp.png';
+                $qr_image->thumb($image_w,$image_h,\think\Image::THUMB_SOUTHEAST)->save($qrcode_temp_path);
+                
+                if($image_x > 0 || $image_y > 0){
+                    $water = [$image_x, $image_y];
+                }else{
+                    $water = 5;
+                }
+                
+                # 图片合成
+                $image = \think\Image::open($image_path);
+                $image->water($qrcode_temp_path, $water)->save($my_poster);
+                unlink($qrcode_temp_path);
+                @unlink($save_dir.$filename);
+
+            }else{
+                $share_error = 1;
+            }
+
+
+        }
+        
+        $this->assign('my_poster_src', $my_poster_src);
         return $this->fetch();
     }
 
+    function getImage($url,$save_dir='',$filename='',$type=0){
+        if(trim($url)==''){
+            return array('file_name'=>'','save_path'=>'','error'=>1);
+        }
+        if(trim($save_dir)==''){
+            $save_dir='./';
+        }
+        if(trim($filename)==''){//保存文件名
+            $ext=strrchr($url,'.');
+            if($ext!='.gif'&&$ext!='.jpg'){
+                return array('file_name'=>'','save_path'=>'','error'=>3);
+            }
+            $filename=time().$ext;
+        }
+        if(0!==strrpos($save_dir,'/')){
+            $save_dir.='/';
+        }
+        //创建保存目录
+        if(!file_exists($save_dir)&&!mkdir($save_dir,0777,true)){
+            return array('file_name'=>'','save_path'=>'','error'=>5);
+        }
+        //获取远程文件所采用的方法 
+        if($type){
+            $ch=curl_init();
+            $timeout=5;
+            curl_setopt($ch,CURLOPT_URL,$url);
+            curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+            curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,$timeout);
+            $img=curl_exec($ch);
+            curl_close($ch);
+        }else{
+            ob_start(); 
+            readfile($url);
+            $img=ob_get_contents(); 
+            ob_end_clean(); 
+        }
+        //$size=strlen($img);
+        //文件大小 
+        $fp2=@fopen($save_dir.$filename,'a');
+        fwrite($fp2,$img);
+        fclose($fp2);
+        unset($img,$url);
+        return array('file_name'=>$filename,'save_path'=>$save_dir.$filename,'error'=>0);
+    } 
 
+
+    public function poster_qr($qr_code_file,$qr_code_path)
+    {
+        ob_end_clean();
+        vendor('topthink.think-image.src.Image');
+
+        error_reporting(E_ERROR);
+
+        define('IMGROOT_PATH', str_replace("\\","/",realpath(dirname(dirname(__FILE__)).'/../../'))); //图片根目录（绝对路径）
+    
+        $back_img = IMGROOT_PATH.tpCache('background.background'); //获取背景图
+
+        if (!is_file($back_img) || !is_file($qr_code_file)) {
+            return $this->fetch('sharePoster');
+        }
+
+        $back_info = getimagesize($back_img);    //获取图片信息
+        $im = checkPosterImagesType($back_info,$back_img);
+        
+        $back_width = imagesx($im);    //背景图宽
+        $back_height = imagesy($im);   //背景图高
+        $canvas = imagecreatetruecolor($back_width,$back_height);  //创建画布
+        
+        imagecopyresized($canvas,$im,0,0,0,0,$back_width,$back_height,$back_width,$back_height);   //缩放
+        $new_QR = $qr_code_path.createImagesName().".png";    //获得缩小后新的二维码路径
+        
+        inputPosterImages($back_info,$canvas,$new_QR);  //输出到png即为一个缩放后的文件
+        
+        $QR = imagecreatefromstring(file_get_contents($qr_code_file));
+        $background_img = imagecreatefromstring(file_get_contents($new_QR));
+        imagecopyresampled($background_img,$QR,$back_width-130,$back_height-150,0,0,110,110,430,430);  //合成图片
+        $result_png = createImagesName().".png";
+        $file = $qr_code_path.$result_png;
+        imagepng ($background_img,$file);  //输出合成海报图片
+        
+        $final_poster = imagecreatefromstring(file_get_contents($file)); //获得该图片资源显示图片
+        
+        header("Content-type: image/png");
+        imagepng($final_poster);
+        imagedestroy($final_poster);
+
+        $new_QR && unlink($new_QR);
+        // $qr_code_file && unlink($qr_code_file);
+        $file && unlink($file);
+        exit();
+    }
 
     public function logout()
     {
@@ -967,6 +1162,7 @@ class User extends MobileBase
             $data = $userLogic->password($this->user_id, I('post.old_password'), I('post.new_password'), I('post.confirm_password'));
             if ($data['status'] == -1)
                 $this->ajaxReturn(['status'=>-1,'msg'=>$data['msg']]);
+            Session::delete('user');
             $this->ajaxReturn(['status'=>1,'msg'=>$data['msg'],'url'=>U('/Mobile/User/index')]);
             exit;
         }

@@ -6,8 +6,8 @@
 	<div class="fixed-bar">
 		<div class="item-title">
 			<div class="subject">
-				<h3>销售业绩</h3>
-				<h5>销售业绩</h5>
+				<h3>分销业绩</h3>
+				<h5>分销业绩</h5>
 			</div>
 		</div>
 	</div>
@@ -18,13 +18,13 @@
 			<span title="收起提示" id="explanationZoom" style="display: block;"></span>
 		</div>
 		<ul>
-			<li>销售业绩，显示所有人的销售业绩</li>
+			<li>分销业绩，显示所有人的分销业绩</li>
 		</ul>
 	</div>
 	<div class="flexigrid">
 		<div class="mDiv">
 			<div class="ftitle">
-				<h3>销售业绩列表</h3>
+				<h3>分销业绩列表</h3>
 				<h5>(共{$list|count}条记录)</h5>
 			</div>
 			<div title="刷新数据" class="pReload"><i class="fa fa-refresh"></i></div>
@@ -38,28 +38,28 @@
 							<div style="width: 24px;"><i class="ico-check"></i></div>
 						</th>
 						<th align="center" abbr="ac_id" axis="col3" class="">
-							<div style="text-align: center; width: 50px;" class="">序列号</div>
+							<div style="text-align: center; width: 50px;" class="">序号</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col4" class="">
 							<div style="text-align: center; width: 100px;" class="">用户名称</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col5" class="">
-							<div style="text-align: center; width: 100px;" class="">个人业绩</div>
+							<div style="text-align: center; width: 100px;" class="">个人业绩(元)</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col6" class="">
-							<div style="text-align: center; width: 100px;" class="">团队业绩</div>
+							<div style="text-align: center; width: 100px;" class="">团队业绩(元)</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col6" class="">
-							<div style="text-align: center; width: 100px;" class="">个人销售数量</div>
+							<div style="text-align: center; width: 100px;" class="">个人销售数量(台)</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col6" class="">
-							<div style="text-align: center; width: 100px;" class="">团队销售数量</div>
+							<div style="text-align: center; width: 100px;" class="">团队销售数量(台)</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col6" class="">
-							<div style="text-align: center; width: 100px;" class="">创建时间</div>
+							<div style="text-align: center; width: 150px;" class="">创建时间</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col6" class="">
-							<div style="text-align: center; width: 100px;" class="">更新时间</div>
+							<div style="text-align: center; width: 150px;" class="">更新时间</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col6" class="">
 							<div style="text-align: center; width: 100px;" class="">描述</div>
@@ -100,10 +100,10 @@
 								<div style="text-align: center; width: 100px;">{$vo.agent_goods_sum}</div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 100px;">{$vo.create_time|date="Y-m-d", ###}</div>
+								<div style="text-align: center; width: 150px;">{$vo.create_time}</div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 100px;">{$vo.update_time|date="Y-m-d", ###}</div>
+								<div style="text-align: center; width: 150px;">{$vo.update_time}</div>
 							</td>
 							<td align="center" class="">
 								<div style="text-align: center; width: 100px;">{$vo.note}</div>

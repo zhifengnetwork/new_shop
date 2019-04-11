@@ -36,9 +36,9 @@ class System extends Base
             'smtp'      => '邮件设置',
             'water'     => '水印设置',
             'push'      => '推送设置',
-            'oss'       => '对象存储',
+            // 'oss'       => '对象存储',
             'express'	=> '物流设置',
-            'poster'	=> '海报设置'
+            // 'poster'	=> '海报设置',
         ];		
 		$this->assign('group_list',$group_list);
 		$inc_type =  I('get.inc_type','shop_info');
@@ -57,7 +57,142 @@ class System extends Base
         }
 		$this->assign('config',$config);//当前配置项
 		return $this->fetch($inc_type);
-	}
+    }
+    
+    /**
+     * 分享海报设置
+     *  --手机端、我的分享
+     * @author Rock
+     * @date 2019/3/30
+     */
+    public function shareposter(){
+        # 缓存文件夹
+        $temp_dir = ROOT_PATH.'public/shareposter/temp/';
+        # 配置文件夹
+        $load_dir = ROOT_PATH.'public/shareposter/load/';
+        # 会员文件夹
+        $user_dir = ROOT_PATH.'public/shareposter/user/';
+        # 默认配置二维码地址
+        $qrcode_path =  $load_dir.'qrcode.png';
+        # 默认缓存二维码地址
+        $qrcode_temp_path =  $temp_dir.'qrcode.png';
+        # 默认底部图片地址
+        $image_path =  $temp_dir.'qr_backgroup.png';
+        # 默认海报地址
+        $poster_path = 'public/shareposter/temp/poster_image.png';
+        
+
+
+        if(IS_AJAX){
+            $data = input('post.');
+            $val['w'] = $data['w'] ? $data['w'] : 75;
+            $val['h'] = $data['h'] ? $data['h'] : 75;
+            $val['x'] = $data['x'] ? $data['x'] : 0;
+            $val['y'] = $data['y'] ? $data['y'] : 0;
+            
+            $value = json_encode($val);
+
+            # 移动背景图片
+            $re = rename($image_path,$load_dir.'qr_backgroup.png');
+            if(!$re){
+                echo 0;exit;
+            }
+
+            # 删除会员文件夹下的文件
+            delFileUnderDir($user_dir);
+
+
+            $conf = Db::name('config')->where(['inc_type' => 'shareposter', 'name' => 'shareposter'])->find();
+            if($conf){
+                Db::name('config')->where(['inc_type' => 'shareposter', 'name' => 'shareposter'])->update(['value' => $value]);
+            }else{
+                Db::name('config')->insert(['name' => 'shareposter', 'value' => $value, 'inc_type' => 'shareposter', 'desc' => '移动端，我的分享，海报设置']);
+            }
+
+            echo 1;
+            exit;
+        }
+
+        $conf = Db::name('config')->where(['inc_type' => 'shareposter', 'name' => 'shareposter'])->find();
+        if($conf){
+            $config = json_decode($conf['value'],true);
+        }
+
+        $this->assign('poster_path', $poster_path);
+        $this->assign('config',$config);
+        return $this->fetch();
+    }
+
+    /**
+     * 分享海报图片静默处理
+     */
+    public function silence_image(){
+        # 缓存文件夹
+        $temp_dir = ROOT_PATH.'public/shareposter/temp/';
+        # 配置文件夹
+        $load_dir = ROOT_PATH.'public/shareposter/load/';
+        # 默认配置二维码地址
+        $qrcode_path =  $load_dir.'qrcode.png';
+        # 默认缓存二维码地址
+        $qrcode_temp_path =  $temp_dir.'qrcode.png';
+        # 默认底部图片地址
+        $image_path =  $temp_dir.'qr_backgroup.png';
+        # 默认海报地址
+        $poster_path = $temp_dir.'poster_image.png';
+
+        if(IS_POST){
+            $t = input('post.t');
+            if($t == 'temp_image'){
+                $file = request()->file('image');
+                if($file){
+                    $info = $file->validate(['ext'=>'jpg,png,jpeg'])->move($temp_dir,'qr_backgroup.png');
+                    if(!$info){
+                        echo '<script>window.parent.temp_msg("背景图片上传失败，请重试!")</script>';
+                    }
+                }
+                exit;
+            }
+
+            if($t == 'preview'){
+                $data = input('post.');
+
+                $image_w = $data['w'] ? $data['w'] : 75;
+                $image_h = $data['h'] ? $data['h'] : 75;
+                $image_x = $data['x'] ? $data['x'] : 0;
+                $image_y = $data['y'] ? $data['y'] : 0;
+                
+
+                
+                if(!file_exists($qrcode_path)){
+                    ajaxReturn(['status' => 0, 'msg' => '文件缺失，默认演示二维码不存在！']);
+                    exit;
+                }
+                # 根据设置的尺寸，生成缓存二维码
+                $qr_image = \think\Image::open($qrcode_path);
+                $qr_image->thumb($image_w,$image_h,\think\Image::THUMB_SOUTHEAST)->save($qrcode_temp_path);
+                
+                if($image_x > 0 || $image_y > 0){
+                    $water = [$image_x, $image_y];
+                }else{
+                    $water = 5;
+                }
+                
+
+                if(!file_exists($image_path)){
+                    ajaxReturn(['status' => 0, 'msg' => '背景图片不存在，请先上传背景图片']);
+                    exit;
+                }
+
+                # 图片合成
+                $image = \think\Image::open($image_path);
+                $image->water($qrcode_temp_path, $water)->save($poster_path);
+
+                ajaxReturn(['status' => 1, 'msg' => '操作成功', 'time' => time()]);
+                exit;
+            }
+
+        }
+    }
 
     public function cash()
     {
@@ -125,6 +260,9 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
                 break;
             case 'distribut':
                 $this->success("操作成功",U('System/distribut'));
+                break;
+            case 'background':
+                $this->success("操作成功",U('System/background'));
                 break;
             default:
                 $this->success("操作成功",U('System/index',array('inc_type'=>$inc_type)));

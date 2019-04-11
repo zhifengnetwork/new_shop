@@ -36,8 +36,16 @@ class ProfitShare extends MobileBase
             $data['msg']='暂时没有合伙人';
             //写入记录表
         }
-        //本日分红利润每人  暂定总利润的  2%
-        $partProfit=$today_profit*2/100/$partners;
+        //获取配置表值
+        $today_ratio=$goodsProfit->get_config('today_ratio');
+
+        //本日分红利润每人  $configs['today_ratio']['value']
+        if($today_profit['total']==0 || $today_ratio==0){
+            $partProfit=0;
+        }else{
+//            echo $today_profit['total']."````````````".$today_ratio;die;
+            $partProfit=$today_profit['total']*$today_ratio/100/$partners;
+        }
         //写入记录表
         $data=array();
         // 启动事务
@@ -47,17 +55,21 @@ class ProfitShare extends MobileBase
                 $data['uid']=$value;
                 $data['bonus_money']=$partProfit;
                 $data['today_population']=$partners;
-                $data['today_profit']=$today_profit;
-                $data['today_ratio']=2;
+                $data['today_profit']=$today_profit['total'];
+                $data['today_ratio']=$today_ratio;
                 $data['add_time']=time();
-                M('tp_profit_dividend_log')->insert($data);
+                Db::name('profit_dividend_log')->insert($data);
+//                $data[]=['uid'=>$value,'bonus_money'=>"$partProfit",'today_population'=>$partners,'today_profit'=>"'".$today_profit['total']."'",'today_ratio'=>"$today_ratio",'add_time'=>time()];
+//                var_dump($data);die;
             }
+//            var_dump($data);die;
+//            Db::name('profit_dividend_log')->insertAll($data);
             // 提交事务
             Db::commit();
         } catch (\Exception $e) {
             // 回滚事务
             Db::rollback();
         }
-
+        echo '执行成功,插入'.$partners.'条记录';
     }
 }

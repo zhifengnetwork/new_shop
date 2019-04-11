@@ -12,7 +12,7 @@
       </div>
 		<ul class="tab-base nc-row">
 			<li><a <if condition="$Request.param.prom_type neq 6">class="current"</if> href="{:U('Order/refund_order_list')}"><span>全部</span></a></li>
-			<li><a <if condition="$Request.param.prom_type eq 6">class="current"</if> href="{:U('Order/refund_order_list',['prom_type'=>6])}"><span>拼团退款单</span></a></li>
+			<!-- <li><a <if condition="$Request.param.prom_type eq 6">class="current"</if> href="{:U('Order/refund_order_list',['prom_type'=>6])}"><span>拼团退款单</span></a></li> -->
 		</ul>
     </div>
   </div>
