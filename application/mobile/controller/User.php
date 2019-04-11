@@ -79,6 +79,13 @@ class User extends MobileBase
 
     public function index()
     {
+        $agent_level = M('agent_level')->field('level_id,level_name')->select();
+        if($agent_level){
+            foreach($agent_level as $v){
+                $agnet_name[$v['level_id']] = $v['level_name'];
+            }
+            $this->assign('agnet_name', $agnet_name);
+        }
         $MenuCfg = new MenuCfg();
         $menu_list = $MenuCfg->where('is_show', 1)->order('menu_id asc')->select();
         $this->assign('menu_list', $menu_list);

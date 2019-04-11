@@ -69,6 +69,15 @@ class User extends Base
             $third_leader = DB::query("select third_leader,count(1) as count  from __PREFIX__users where third_leader in(" . implode(',', $user_id_arr) . ")  group by third_leader");
             $third_leader = convert_arr_key($third_leader, 'third_leader');
         }
+
+        $agent_level = M('agent_level')->field('level_id,level_name')->select();
+        if($agent_level){
+            foreach($agent_level as $v){
+                $agnet_name[$v['level_id']] = $v['level_name'];
+            }
+            $this->assign('agnet_name', $agnet_name);
+        }
+        // dump($agent_level);die;
         $this->assign('first_leader', $first_leader);
         $this->assign('second_leader', $second_leader);
         $this->assign('third_leader', $third_leader);

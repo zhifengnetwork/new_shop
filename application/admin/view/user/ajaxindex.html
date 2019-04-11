@@ -13,7 +13,11 @@
                     <div style="text-align: center; width: 150px;">{$list.nickname}</div>
                 </td>
                 <td align="left" class="">
-                    <div style="text-align: center; width: 50px;">{$level[$list.level]}</div>
+                    <div style="text-align: center; width: 100px;">
+                        <if condition="isset($agnet_name[$list.distribut_level])">
+                        {$agnet_name[$list.distribut_level]}
+                        </if>
+                        </div>
                 </td>
                 <td align="left" class="">
                     <div style="text-align: center; width: 50px;">{$list.total_amount}</div>
