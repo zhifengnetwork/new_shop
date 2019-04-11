@@ -17,11 +17,7 @@
             	    )
                ),             		
               'admin/index'=>array(
-<<<<<<< HEAD
-                'name' =>'TPshop系统管理',
-=======
-                'name' =>'分销商城系统管理',
->>>>>>> 6f89edcd32117396ff80a119da6f942eec8c9ce8
+                'name' =>'商城系统管理',
                 'action'=>array(
                      'index'=>'欢迎页面',                     
          	       )

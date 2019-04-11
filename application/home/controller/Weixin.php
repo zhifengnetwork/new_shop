@@ -1,72 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<?php
-
-namespace app\home\controller;
-
-use app\common\logic\WechatLogic;
-use think\Db;
-
-class Weixin
-{
-    /**
-     * 处理接收推送消息
-     */
-    public function index()
-    {
-		
-        $data = file_get_contents("php://input");
-		
-		$request = $_REQUEST;
-		if($request){
-			Db::name('wx_tem')->insert(['content' => json_encode($request)]);
-		}
-    	if ($data) {
-			
-			
-            $re = $this->xmlToArray($data);
-            Db::name('wx_tem')->insert(['content' => json_encode($re)]);
-            // $this->write_log(json_encode($re));
-
-	    	$url = SITE_URL.'/mobile/message/index?eventkey='.$re['EventKey'].'&openid='.$re['FromUserName'].'&event='.$re['Event'];
-	    	httpRequest($url);
-        }
-
-        $config = Db::name('wx_user')->find();
-        if ($config['wait_access'] == 0) {
-            ob_clean();
-            exit($_GET["echostr"]);
-        }
-        $logic = new WechatLogic($config);
-        $logic->handleMessage();
-    }
-
-
-    public function xmlToArray($xml)
-    {
-    	$obj = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
-		$json = json_encode($obj);
-		$arr = json_decode($json, true);  
-		return $arr;
-    }
-
-    public function write_log($content)
-    {
-        $content = "[".date('Y-m-d H:i:s')."]".$content."\r\n";
-        $dir = rtrim(str_replace('\\','/',$_SERVER['DOCUMENT_ROOT']),'/').'/logs';
-        if(!is_dir($dir)){
-            mkdir($dir,0777,true);
-        }
-        if(!is_dir($dir)){
-            mkdir($dir,0777,true);
-        }
-        $path = $dir.'/'.date('Ymd').'.txt';
-        file_put_contents($path,$content,FILE_APPEND);
-    }
-    
-=======
-=======
->>>>>>> 6f89edcd32117396ff80a119da6f942eec8c9ce8
 <?php
 
 namespace app\home\controller;
@@ -175,8 +106,5 @@ class Weixin
         file_put_contents($path,$content,FILE_APPEND);
     }
     
-<<<<<<< HEAD
->>>>>>> b6da9c97527f087a80f382fdcf1ee79228d2382e
-=======
->>>>>>> 6f89edcd32117396ff80a119da6f942eec8c9ce8
+
 }

@@ -111,11 +111,7 @@ class Sales extends Model
 			if ($user_level < $value['distribut_level']) {
 				$layer = 0;
 				$user_level = $value['distribut_level'];
-<<<<<<< HEAD
-				$money = $basic_reward[$value['distribut_level']];
-=======
 				$money = $basic_reward ? $basic_reward[$value['distribut_level']] : 0;
->>>>>>> 6f89edcd32117396ff80a119da6f942eec8c9ce8
 				if (!$money) {
 					continue;
 				}
