@@ -6,6 +6,11 @@
 .idea
 /public/upload/*
 /public/qrcode/
+<<<<<<< HEAD
+=======
+/public/shareposter/user/
+/public/shareposter/temp/
+>>>>>>> 6f89edcd32117396ff80a119da6f942eec8c9ce8
 cron.txt
 cron_team.sh
 /sql

@@ -10,6 +10,7 @@ namespace app\common\logic;
 
 use think\Model;
 use think\Db;
+use think\Cache;
 
 /**
  * 销售类逻辑
@@ -35,6 +36,8 @@ class Sales extends Model
 		if ($user['parents']) {
 			$parents_id = explode(',', $user['parents']);
 			$parents_id = array_filter($parents_id);  //去除0,倒序排列
+			
+			$this->cash_unlock($parents_id);	//提现解锁
 			
 			$reward = $this->reward($parents_id);
 			return $reward;
@@ -102,13 +105,17 @@ class Sales extends Model
 					continue;
 				}
 				
-				$money = $level[$user_level]['same_reword'];
+				$money = $level[$user_level]['same_reword'] * $order['goods_num'];
 				$msg = "同级奖励 ".$money."(元)";
 			}
 			if ($user_level < $value['distribut_level']) {
 				$layer = 0;
 				$user_level = $value['distribut_level'];
+<<<<<<< HEAD
 				$money = $basic_reward[$value['distribut_level']];
+=======
+				$money = $basic_reward ? $basic_reward[$value['distribut_level']] : 0;
+>>>>>>> 6f89edcd32117396ff80a119da6f942eec8c9ce8
 				if (!$money) {
 					continue;
 				}
@@ -237,5 +244,21 @@ class Sales extends Model
 		}
 		
 		return $bool;
+	}
+
+	/**
+	 * 提现解锁
+	 */
+	public function cash_unlock($parents_id)
+	{
+		if (!$parents_id) {
+			return false;
+		}
+
+		$is_cash = tpCache('cash.goods_id');
+		
+		if (intval($is_cash) == $this->goods_id) {
+			M('users')->where('user_id','in',$parents_id)->update(['is_cash'=>1]);
+		}
 	}
 }

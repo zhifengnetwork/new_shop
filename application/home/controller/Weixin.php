@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 <?php
 
 namespace app\home\controller;
@@ -64,6 +65,8 @@ class Weixin
     }
     
 =======
+=======
+>>>>>>> 6f89edcd32117396ff80a119da6f942eec8c9ce8
 <?php
 
 namespace app\home\controller;
@@ -172,5 +175,8 @@ class Weixin
         file_put_contents($path,$content,FILE_APPEND);
     }
     
+<<<<<<< HEAD
 >>>>>>> b6da9c97527f087a80f382fdcf1ee79228d2382e
+=======
+>>>>>>> 6f89edcd32117396ff80a119da6f942eec8c9ce8
 }
