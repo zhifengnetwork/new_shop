@@ -92,57 +92,88 @@ class User extends MobileBase
         return $this->fetch();
     }
 
-     /**
-     * 我的佣金
-     * @author Rock
-     */
-    public function mycommission(){
-        $user_id = $this->user_id;
-        // echo $user_id;exit;
-        # 登录签到佣金
-        $data['sign_money'] = Db::name('commission_log')->where(['user_id'=>$user_id,'identification'=>1])->sum('money');
-        $data['invite_money'] = Db::name('commission_log')->where(['user_id'=>$user_id,'identification'=>2])->sum('money');
-        $data['distribution_rebate'] = Db::name('order_divide')->where(['user_id'=>$user_id])->sum('money');
+    //  /**
+    //  * 我的佣金
+    //  * @author Rock
+    //  */
+    // public function mycommission(){
+    //     $user_id = $this->user_id;
+    //     // echo $user_id;exit;
+    //     # 登录签到佣金
+    //     $data['sign_money'] = Db::name('commission_log')->where(['user_id'=>$user_id,'identification'=>1])->sum('money');
+    //     $data['invite_money'] = Db::name('commission_log')->where(['user_id'=>$user_id,'identification'=>2])->sum('money');
+    //     $data['distribution_rebate'] = Db::name('order_divide')->where(['user_id'=>$user_id])->sum('money');
 
         
-        $this->assign('data',$data);
+    //     $this->assign('data',$data);
+    //     return $this->fetch();
+    // }
+
+    // /**
+    //  * 佣金明细
+    //  * @param int t 明细类型[1=>登录签到，2=>邀请注册，3=>分销返利]
+    //  * 
+    //  */
+    // public function commission_log(){
+    //     $t = intval(input('get.t'));
+    //     if(!$t){
+    //         $this->error('参数错误！');
+    //     }
+    //     $user_id = $this->user_id;
+
+    //     switch($t){
+    //         case '1':
+    //             # 签到登录
+    //             $log = Db::query("select `money`,`date`,`num` from `tp_commission_log` where `user_id` = '$user_id' and `identification` = 1 order by `date` desc limit 50");
+    //             // dump($log);exit;
+    //             break;
+    //         case '2':
+    //             # 邀请注册
+    //             $log = Db::query("select a.`add_user_id`,b.`mobile`,b.`nickname`,`money`,`addtime` from `tp_commission_log` as a left join `tp_users` as b on a.`add_user_id` = b.`user_id` where a.`user_id` = '$user_id' and a.`identification` = 2 order by a.`addtime` desc limit 50");
+    //             break;
+    //         case '3':
+    //             #分销返利
+    //             $log = DB::query("select `add_time`, `money` from `tp_order_divide` where `user_id` = '$user_id' order by `add_time` desc limit 50");
+    //             break;
+
+    //         default:
+    //             return $this->error('无效的参数，请重试！');
+    //     }
+
+
+    //     $this->assign('log',$log);
+    //     $this->assign('t',$t);
+    //     return $this->fetch();
+    // }
+
+    /**
+    *邀请用户
+    */
+    public function invite_user(){
+        $user_id = $this->user_id;
+        $log = Db::query("select a.`add_user_id`,b.`mobile`,b.`nickname`,`money`,`addtime` from `tp_commission_log` as a left join `tp_users` as b on a.`add_user_id` = b.`user_id` where a.`user_id` = '$user_id' and a.`identification` = 2 order by a.`addtime` desc limit 50");
+        $this->assign('log',$log);
+        return $this->fetch();
+
+    }
+
+    /**
+    *登录签到
+    */
+    public function sign_list(){
+        $user_id = $this->user_id;
+        $log = Db::query("select `money`,`date`,`num` from `tp_commission_log` where `user_id` = '$user_id' and `identification` = 1 order by `date` desc limit 50");
+        $this->assign('log',$log);
         return $this->fetch();
     }
 
     /**
-     * 佣金明细
-     * @param int t 明细类型[1=>登录签到，2=>邀请注册，3=>分销返利]
-     * 
-     */
-    public function commission_log(){
-        $t = intval(input('get.t'));
-        if(!$t){
-            $this->error('参数错误！');
-        }
+    *分销返利
+    */
+    public function distribution_rebate(){
         $user_id = $this->user_id;
-
-        switch($t){
-            case '1':
-                # 签到登录
-                $log = Db::query("select `money`,`date`,`num` from `tp_commission_log` where `user_id` = '$user_id' and `identification` = 1 order by `date` desc limit 50");
-                // dump($log);exit;
-                break;
-            case '2':
-                # 邀请注册
-                $log = Db::query("select a.`add_user_id`,b.`mobile`,b.`nickname`,`money`,`addtime` from `tp_commission_log` as a left join `tp_users` as b on a.`add_user_id` = b.`user_id` where a.`user_id` = '$user_id' and a.`identification` = 2 order by a.`addtime` desc limit 50");
-                break;
-            case '3':
-                #分销返利
-                $log = DB::query("select `add_time`, `money` from `tp_order_divide` where `user_id` = '$user_id' order by `add_time` desc limit 50");
-                break;
-
-            default:
-                return $this->error('无效的参数，请重试！');
-        }
-
-
+        $log = DB::query("select `add_time`, `money` from `tp_order_divide` where `user_id` = '$user_id' order by `add_time` desc limit 50");
         $this->assign('log',$log);
-        $this->assign('t',$t);
         return $this->fetch();
     }
 
