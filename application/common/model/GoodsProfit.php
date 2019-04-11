@@ -22,7 +22,7 @@ class GoodsProfit extends Model
     public function get_goods_profit(){
         //今日起始时间戳
         $todaytime=strtotime(date('Y-m-d 00:00:00',time()));
-        return M('order_goods')->alias('og')->join('order o','og.order_id=o.order_id')->where('o.pay_time','>=',$todaytime)->field('sum(og.final_price-og.cost_price) total')->find();
+        return M('order_goods')->alias('og')->join('order o','og.order_id=o.order_id')->where('o.pay_time','>=',$todaytime)->field('goods_num,sum(og.final_price-og.cost_price) total')->find();
     }
     //查询合伙人的个数   $level是要查询的等级
     public function get_partners_num($level){

@@ -28,6 +28,11 @@ class ProfitShare extends MobileBase
         $goodsProfit=new GoodsProfit();
         //获取当天利润
         $today_profit=$goodsProfit->get_goods_profit();
+        if (!isset($today_profit['total'])){
+            $today_profit['total']=0;
+        }
+        $today_profit['total']=$today_profit['total']*$today_profit['goods_num'];
+//        var_dump($today_profit);
         //获取合伙人个数   默认合伙人等级是5
         $partners=$goodsProfit->get_partners_num(5);
         //获取所有合伙人uid用于记录
@@ -61,7 +66,9 @@ class ProfitShare extends MobileBase
                 Db::name('profit_dividend_log')->insert($data);
 //                $data[]=['uid'=>$value,'bonus_money'=>"$partProfit",'today_population'=>$partners,'today_profit'=>"'".$today_profit['total']."'",'today_ratio'=>"$today_ratio",'add_time'=>time()];
 //                var_dump($data);die;
+//                echo "<hr />";
             }
+            echo '执行成功,插入'.$partners.'条记录';
 //            var_dump($data);die;
 //            Db::name('profit_dividend_log')->insertAll($data);
             // 提交事务
@@ -70,6 +77,6 @@ class ProfitShare extends MobileBase
             // 回滚事务
             Db::rollback();
         }
-        echo '执行成功,插入'.$partners.'条记录';
+
     }
 }
