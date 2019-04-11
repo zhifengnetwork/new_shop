@@ -70,10 +70,10 @@ class User extends Base
             $third_leader = convert_arr_key($third_leader, 'third_leader');
         }
 
-        $agent_level = M('agent_level')->field('level_id,level_name')->select();
+        $agent_level = M('agent_level')->field('level,level_name')->select();
         if($agent_level){
             foreach($agent_level as $v){
-                $agnet_name[$v['level_id']] = $v['level_name'];
+                $agnet_name[$v['level']] = $v['level_name'];
             }
             $this->assign('agnet_name', $agnet_name);
         }
