@@ -52,18 +52,6 @@
             </dl>
             <dl class="row">
                 <dt class="tit">
-                    <label>会员等级</label>
-                </dt>
-                <dd class="opt">
-                	<select id="level" name="level">
-                		<tpshop sql="select * from `__PREFIX__user_level`" key="k" item='v'>
-                		<option value="{$v[level_id]}" <if condition="$v.level_id eq $user.level">selected</if>>{$v[level_name]}</option>
-                		</tpshop>
-                	</select>
-                </dd>
-            </dl>
-            <dl class="row">
-                <dt class="tit">
                     <label for="email"><em>*</em>电子邮箱</label>
                 </dt>
                 <dd class="opt">
