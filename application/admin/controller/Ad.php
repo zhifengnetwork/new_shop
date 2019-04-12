@@ -158,9 +158,9 @@ class Ad extends Base{
         delFile(RUNTIME_PATH.'html'); // 先清除缓存, 否则不好预览
         clearCache();
     	if($r){
-    	    $redirect_url = session("ad_request_url");
-            $img_url= session('img_url');
-    	    $redirect_url && $this->success("操作成功",U('Admin/Ad/editAd' , ['request_url'=>$redirect_url,'pid'=>$data['pid'],'img_url'=>$img_url]));
+    	    // $redirect_url = session("ad_request_url");
+            // $img_url= session('img_url');
+    	    // $redirect_url && $this->success("操作成功",U('Admin/Ad/editAd' , ['request_url'=>$redirect_url,'pid'=>$data['pid'],'img_url'=>$img_url]));
     		$this->success("操作成功",U('Admin/Ad/adList'));
     	}else{
     		$this->error("操作失败",$referurl);
