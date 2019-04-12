@@ -52,6 +52,18 @@
             </dl>
             <dl class="row">
                 <dt class="tit">
+                    <label>会员等级</label>
+                </dt>
+                <dd class="opt">
+                	<select id="distribut_level" name="distribut_level">
+                		<tpshop sql="select * from `__PREFIX__agent_level`" key="k" item='v'>
+                		<option value="{$v[level]}" <if condition="$v.level eq $user.distribut_level">selected</if>>{$v[level_name]}</option>
+                		</tpshop>
+                	</select>
+                </dd>
+            </dl>
+            <dl class="row">
+                <dt class="tit">
                     <label for="email"><em>*</em>电子邮箱</label>
                 </dt>
                 <dd class="opt">

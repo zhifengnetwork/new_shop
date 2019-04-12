@@ -124,8 +124,8 @@ class User extends Base
                 $c && exit($this->error('手机号不得和已有用户重复'));
             }
 
-            $userLevel = D('user_level')->where('level_id=' . $_POST['level'])->value('discount');
-            $_POST['discount'] = $userLevel / 100;
+            // $userLevel = D('user_level')->where('level_id=' . $_POST['level'])->value('discount');
+            // $_POST['discount'] = $userLevel / 100;
             $row = M('users')->where(array('user_id' => $uid))->save($_POST);
             if ($row) {
                 exit($this->success('修改成功','User/index'));
