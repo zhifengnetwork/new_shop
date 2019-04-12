@@ -279,7 +279,8 @@ class Ad extends Base{
         $request_url = urldecode(I('request_url'));
         $request_url = urldecode($request_url);
         $request_url = U($request_url,array('edit_ad'=>1,'img_url'=>$img_url,'pid'=>$pid));
-        
+        // echo $request_url;
+        // $request_url = "/index.php/mobile/Index/index/edit_ad/1/pid/9";
         echo "<script>location.href='".$request_url."';</script>";
         exit;                
     }
