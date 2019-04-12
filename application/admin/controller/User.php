@@ -123,10 +123,24 @@ class User extends Base
                 $c = M('users')->where("user_id != $uid and mobile = '$mobile'")->count();
                 $c && exit($this->error('手机号不得和已有用户重复'));
             }
+            $fleader = $_POST['fleader'] ? intval($_POST['fleader']) : 0;
+            
+            $post_data = $_POST;
+
+            $u_info = Db::name('users')->field('user_id,first_leader')->find($uid);
+           
+            if($fleader > 0 && $fleader != $u_info['first_leader']){
+                $post_data['first_leader'] = $_POST['fleader'];
+                $post_data['second_leader'] = 0;
+                $post_data['third_leader'] = 0;
+                $post_data['parents'] = '';
+            }
+            
+            unset($post_data['fleader']);
 
             // $userLevel = D('user_level')->where('level_id=' . $_POST['level'])->value('discount');
             // $_POST['discount'] = $userLevel / 100;
-            $row = M('users')->where(array('user_id' => $uid))->save($_POST);
+            $row = M('users')->where(array('user_id' => $uid))->save($post_data);
             if ($row) {
                 exit($this->success('修改成功','User/index'));
             }
