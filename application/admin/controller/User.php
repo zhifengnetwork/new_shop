@@ -77,7 +77,7 @@ class User extends Base
             }
             $this->assign('agnet_name', $agnet_name);
         }
-        // dump($agent_level);die;
+        
         $this->assign('first_leader', $first_leader);
         $this->assign('second_leader', $second_leader);
         $this->assign('third_leader', $third_leader);

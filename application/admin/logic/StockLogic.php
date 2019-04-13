@@ -44,10 +44,38 @@ class StockLogic
         $Page  = new Page($count,20);
         $show = $Page->show();
         $stock_list = $model->where($map)->order('id desc')->limit($Page->firstRow.','.$Page->listRows)->select();
+        $stock_list = $this->get_img($stock_list);
         return array('pager'=>$Page,'page'=>$show, 'stock_list'=>$stock_list, 'stockChangeType'=>$this->stockChangeType);
 
     }
 
+    /**
+     * 获取商品图片
+     */
+    public function get_img($data)
+    {
+        if ($data) {
+            $goods_id = array_column($data,'goods_id');
+            $n_goods_id = array_unique($goods_id);
+            $img = M('goods')->where('goods_id','in',$goods_id)->column('goods_id,original_img');
+            
+            if ($img) {
+                $path = ROOT_PATH;
+                
+                foreach($img as $k => $v){
+                    if(!is_file($path.$v)){
+                        $img[$k] = '';
+                    }
+                }
+                
+                foreach($data as $key => $value){
+                    $data[$key]['img'] = $img[$value['goods_id']];
+                }
+            }
+        }
+
+        return $data;
+    }
 
     /**
      * 获取库存预警列表
