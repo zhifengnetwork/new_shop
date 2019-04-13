@@ -29,6 +29,7 @@ use think\Loader;
 use think\db;
 use think\Image;
 use think\Session;
+use app\common\logic\LevelLogic;
 
 class User extends MobileBase
 {
@@ -79,6 +80,9 @@ class User extends MobileBase
 
     public function index()
     {
+        $le = new LevelLogic();
+        $list = $le->user_info_agent(8);
+        dump($list);die;
         $agent_level = M('agent_level')->field('level,level_name')->select();
         if($agent_level){
             foreach($agent_level as $v){
@@ -151,7 +155,23 @@ class User extends MobileBase
     */
     public function invite_user(){
         $user_id = $this->user_id;
-        $log = Db::query("select a.`add_user_id`,b.`mobile`,b.`nickname`,`money`,`addtime` from `tp_commission_log` as a left join `tp_users` as b on a.`add_user_id` = b.`user_id` where a.`user_id` = '$user_id' and a.`identification` = 2 order by a.`addtime` desc limit 50");
+        //获取下级id列表
+        $agent_level = M('users')->where('user_id',$user_id)->value('distribut_level');
+        $d_info = Db::query("select `user_id`, `first_leader`,`parents` from `tp_users` where 'first_leader' = $user_id or parents like '%,$user_id,%'");
+        if($d_info){
+            $id_array =[];
+            foreach($d_info as $k=>$v){
+                array_push($id_array ,$v['user_id']);
+            }
+        }
+        //获取对应下级id的数据
+        $log = [];
+        foreach ($id_array as $value) {
+            $list = M('users')->where('user_id',$value)->find();
+            array_push($log,$list);
+        }
+        // $log = Db::query("select a.`add_user_id`,b.`mobile`,b.`nickname`,`money`,`addtime` from `tp_commission_log` as a left join `tp_users` as b on a.`add_user_id` = b.`user_id` where a.`user_id` = '$user_id' and a.`identification` = 2 order by a.`addtime` desc limit 50");
+        // dump($log);//die;
         $this->assign('log',$log);
         return $this->fetch();
 
