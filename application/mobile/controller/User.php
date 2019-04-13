@@ -29,7 +29,6 @@ use think\Loader;
 use think\db;
 use think\Image;
 use think\Session;
-use app\common\logic\LevelLogic;
 
 class User extends MobileBase
 {
@@ -80,9 +79,6 @@ class User extends MobileBase
 
     public function index()
     {
-        $le = new LevelLogic();
-        $list = $le->user_info_agent(8);
-        dump($list);die;
         $agent_level = M('agent_level')->field('level,level_name')->select();
         if($agent_level){
             foreach($agent_level as $v){
