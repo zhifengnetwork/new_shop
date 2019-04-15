@@ -186,7 +186,6 @@ class User extends MobileBase
         
         $this->assign('log',$log);
         return $this->fetch();
-
     }
 
     /**

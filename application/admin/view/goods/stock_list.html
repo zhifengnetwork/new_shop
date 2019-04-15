@@ -72,7 +72,7 @@
                             <div style="text-align: center; width:400px;" class="">商品名称</div>
                         </th>
                         <th align="center" abbr="ac_id" axis="col4" class="">
-                            <div style="text-align: center; width:100px;" class="">商品图片</div>
+                            <div style="text-align: center; width:50px;" class="">商品图片</div>
                         </th>
                         <th align="center" abbr="article_show" axis="col5" class="">
                             <div style="text-align: center; width: 300px;" class="">商品规格</div>
@@ -119,7 +119,11 @@
                                 <div style="text-align: center; width:400px;">{$v.goods_name}</div>
                             </td>
                             <td align="center" class="">
-                                <div style="text-align: center; width:100px;"><notempty name="$v.img"><img src="{$v.img}" alt="" style="width:40px;height:40px;"></notempty></div>
+                                <div style="text-align: center; width:50px;">
+                                    <notempty name="$v.img">
+                                        <img src="{$v.img}" alt="" style="width:30px;height:30px;">
+                                    </notempty>
+                                </div>
                             </td>
                             <td align="center" class="">
                                 <div style="text-align: center; width: 300px;">{$v.goods_spec|default='无'}</div>
