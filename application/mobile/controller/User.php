@@ -147,6 +147,71 @@ class User extends MobileBase
     // }
 
     /**
+     * 我的分销
+     */
+    public function team_list()
+    {
+        $user_id = $this->user_id;
+        //获取下级id列表
+        $d_info = Db::query("select `user_id`, `first_leader`,`parents` from `tp_users` where 'first_leader' = $user_id or parents like '%,$user_id,%'");
+        
+        if($d_info){
+            $id_array = array_column($d_info,'user_id');
+        }
+        
+        //获取对应下级id的数据
+        $team_list = M('users')->where('user_id','in',$id_array)->field('user_id,distribut_level,head_pic')->select();
+        //获取对应下级消费金额
+        $performance = M('agent_performance')->where('user_id','in',$id_array)->field('user_id,ind_per')->select();
+        //获取等级
+        $level = M('agent_level')->column('level,level_name');
+        
+        foreach($team_list as $k1 => $v1){
+            $team_list[$k1]['use_money'] = '0.00';
+            $team_list[$k1]['level_name'] = $level[$v1['distribut_level']];
+            foreach($performance as $k2 => $v2){
+                if ($v1['user_id'] == $v2['user_id']) {
+                    $team_list[$k1]['use_money'] = $v2['ind_per'];
+                }
+            }
+        }
+
+        $count = 0;
+        if (count($team_list) == count($team_list,1)) {
+            $count = 1;
+        } else {
+            $count = count($team_list);
+        }
+        $leader_id = M('users')->where('user_id',$user_id)->value('first_leader');
+        $leader = M('users')->where('user_id',$leader_id)->field('user_id,mobile')->find();
+        $this->assign('leader',$leader);
+        $this->assign('count',$count);
+        $this->assign('team',$team_list);
+        return $this->fetch();
+    }
+
+    /**
+     * 下级购买记录
+     */
+    public function purchase_log()
+    {
+        $id = input('id/d');
+        
+        $log = Db::name('order')->alias('order')
+                ->distinct(true)
+                ->join('order_goods goods','order.order_id = goods.order_id')
+                ->join('order_goods goods1','goods1.order_sn = order.order_sn')
+                ->where('order.user_id',$id)
+                ->order('goods.rec_id','desc')
+                ->field('goods.rec_id,order.pay_time,goods.goods_price,goods.goods_num')
+                ->limit(50)
+                ->select();
+                
+        $this->assign('log',$log);
+        return $this->fetch();
+    }
+
+    /**
     *邀请用户
     */
     public function invite_user(){
