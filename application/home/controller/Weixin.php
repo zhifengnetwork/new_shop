@@ -16,10 +16,12 @@ class Weixin
         $data = file_get_contents("php://input");
 		
     	if ($data) {
-			
-			
+
+			$this->write_log($data);
+
+
             $re = $this->xmlToArray($data);
-            // $this->write_log(json_encode($re));
+            $this->write_log(json_encode($re));
 			
 			
 			/**
@@ -94,8 +96,7 @@ class Weixin
 
     public function write_log($content)
     {
-        $content = "[".date('Y-m-d H:i:s')."]".$content."\r\n";
-        $dir = rtrim(str_replace('\\','/',$_SERVER['DOCUMENT_ROOT']),'/').'/logs';
+		$content = "[".date('Y-m-d H:i:s')."]".$content."\r\n";
         if(!is_dir($dir)){
             mkdir($dir,0777,true);
         }
