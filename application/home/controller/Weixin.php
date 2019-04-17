@@ -12,17 +12,13 @@ class Weixin
      */
     public function index()
     {
-		
         $data = file_get_contents("php://input");
 		
     	if ($data) {
 
-			$this->write_log($data);
-
-
             $re = $this->xmlToArray($data);
-            $this->write_log(json_encode($re));
-			
+            // $this->write_log(json_encode($re));
+			// Db::name('wx_temp')->insert(['content'=>json_encode($re)]);
 			
 			/**
 			* 微信扫描分享带参数的二维码
@@ -30,7 +26,6 @@ class Weixin
 			if(($re['Event'] == 'SCAN' && $re['EventKey'] == 'sharePoster') || ($re['Event'] == 'subscribe' && $re['EventKey'] == 'qrscene_sharePoster')){
 				$this->sharePoster($re);
 			}
-			
 	    	// $url = SITE_URL.'/mobile/message/index?eventkey='.$re['EventKey'].'&openid='.$re['FromUserName'].'&event='.$re['Event'];
 	    	// httpRequest($url);
         }
@@ -55,6 +50,7 @@ class Weixin
 		}
 		
 		$share_user = Db::query("select `user_id` from `tp_users` where `shareposter` like '%".$data['Ticket']."%' limit 1");
+
 		if(!empty($share_user[0])){
 			$share_user = $share_user[0]['user_id'];
 		}else{
@@ -94,18 +90,19 @@ class Weixin
 		return $arr;
     }
 
-    public function write_log($content)
-    {
-		$content = "[".date('Y-m-d H:i:s')."]".$content."\r\n";
-        if(!is_dir($dir)){
-            mkdir($dir,0777,true);
-        }
-        if(!is_dir($dir)){
-            mkdir($dir,0777,true);
-        }
-        $path = $dir.'/'.date('Ymd').'.txt';
-        file_put_contents($path,$content,FILE_APPEND);
-    }
+    function write_log($content)
+	{
+		$content = "[" . date('Y-m-d H:i:s') . "]" . $content . "\r\n";
+		$dir = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']), '/') . '/logs';
+		if (!is_dir($dir)) {
+			mkdir($dir, 0777, true);
+		}
+		if (!is_dir($dir)) {
+			mkdir($dir, 0777, true);
+		}
+		$path = $dir . '/' . date('Ymd') . '.txt';
+		file_put_contents($path, $content, FILE_APPEND);
+	}
     
 
 }

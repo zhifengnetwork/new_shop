@@ -178,7 +178,7 @@ class User extends MobileBase
 
         $count = 0;
         if (count($team_list) == count($team_list,1)) {
-            $count = 1;
+            $count = $team_list ? 1 : 0;
         } else {
             $count = count($team_list);
         }
