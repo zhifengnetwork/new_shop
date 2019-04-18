@@ -108,10 +108,10 @@
 .z_user_down ul li a{
 	width: 100%;
 }
-.user_down_dev{
+.z_user_down .user_down_devv{
 	font-size: 0.64rem !important;
 	margin-top: 0.4266666666666667rem !important;
-	/* color: #ffff !important; */
+	color: #ffff !important;
 }
 .user_down_name{
 	margin-top: 0.213rem;
