@@ -161,19 +161,11 @@ class User extends MobileBase
         
         //获取对应下级id的数据
         $team_list = M('users')->where('user_id','in',$id_array)->field('user_id,distribut_level,distribut_money,head_pic')->select();
-        //获取对应下级消费金额
-        $performance = M('agent_performance')->where('user_id','in',$id_array)->field('user_id,ind_per')->select();
         //获取等级
         $level = M('agent_level')->column('level,level_name');
         
         foreach($team_list as $k1 => $v1){
-            // $team_list[$k1]['use_money'] = '0.00';
             $team_list[$k1]['level_name'] = $level[$v1['distribut_level']];
-            // foreach($performance as $k2 => $v2){
-            //     if ($v1['user_id'] == $v2['user_id']) {
-            //         $team_list[$k1]['use_money'] = $v2['ind_per'];
-            //     }
-            // }
         }
 
         $count = 0;

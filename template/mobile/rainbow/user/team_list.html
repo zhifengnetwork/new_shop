@@ -40,8 +40,8 @@
             <foreach name="team" item="v">
                 <ul>
                     <li class="li1" style="margin:line-height;"><span><notempty name="$v[head_pic]"><img src="{$v[head_pic]}" style="border-radius:50%;"></notempty></span></li> 
-                    <li class="li2" style="width:30%;"><span>{$v[level_name]}</span></li>  
-                    <li class="li2" style=""><span>{$v[distribut_money]}</span></li>
+                    <li class="li2" style="width:30%;"><span>{$v.level_name}</span></li>  
+                    <li class="li2" style=""><span>{$v.distribut_money}</span></li>
                     <li class="li1" style="width:25%; margin:line-height;"><span><a href="{:url('Mobile/User/purchase_log', array('id'=>$v.user_id))}" style="color:dodgerblue">查看</a></span></li>
                 </ul>
             </foreach>
