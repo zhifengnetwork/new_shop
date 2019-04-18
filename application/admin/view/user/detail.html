@@ -169,6 +169,20 @@
             </dl>
             <dl class="row">
                 <dt class="tit">
+                    <label>公司人员</label>
+                </dt>
+                <dd class="opt">
+                    <div class="onoff">
+                        <label for="is_employees1" class="cb-enable <if condition="$user['is_employees'] eq 1">selected</if>"><span>是</span></label>
+                        <label for="is_employees2" class="cb-disable <if condition="$user['is_employees'] eq 0">selected</if>"><span>否</span></label>
+                        <input id="is_employees1" name="is_employees" value="1" type="radio" <if condition="$user['is_employees'] eq 1">checked</if>>
+                        <input id="is_employees2" name="is_employees" value="0" type="radio" <if condition="$user['is_employees'] eq 0">checked</if>>
+                    </div>
+                    <p class="notic">选是，该会员则成为公司人员。</p>
+                </dd>
+            </dl>
+            <dl class="row">
+                <dt class="tit">
                 </dt>
                 <dd class="opt">
                     <div style="height:160px;">

@@ -66,8 +66,13 @@ class Weixin
 			if($user['first_leader'] > 0){
 				return false;
 			}else{
-				// 用户没有上级
-				Db::execute("update `tp_users` set `first_leader` = '".$share_user."' where `user_id` = '".$user['user_id']."'");
+				// 用户没有上级且用户不是公司人员绑定上下级
+				if ($user['is_employees'] == 1) {
+					return false;
+				} else {
+					
+					Db::execute("update `tp_users` set `first_leader` = '".$share_user."' where `user_id` = '".$user['user_id']."'");
+				}
 			}	
 		}else{
 			// 新用户 - 写入关系缓存表，新用户注册后自动更新
