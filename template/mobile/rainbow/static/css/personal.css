@@ -111,7 +111,7 @@
 .user_down_dev{
 	font-size: 0.64rem;
 	margin-top: 0.4266666666666667rem;
-	color: #ffff;
+	color: #ffff !important;
 }
 .user_down_name{
 	margin-top: 0.213rem;
