@@ -58,7 +58,7 @@ class Weixin
 		}
 		
 		// 查询用户是否已经注册
-		$user = Db::query("select `user_id`,`first_leader` from `tp_users` where `openid` = '".$data['FromUserName']."'");
+		$user = Db::query("select `user_id`,`first_leader`,`is_employees` from `tp_users` where `openid` = '".$data['FromUserName']."'");
 		if(!empty($user[0])){
 			// 老用户
 			$user = $user[0];
