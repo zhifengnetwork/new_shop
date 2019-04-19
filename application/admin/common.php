@@ -34,6 +34,17 @@ function user_name($user_id){
 }
 
 /**
+ * 商品名称
+ */
+function goods_name($goods_id){
+	$goods_name = M('goods')->where('goods_id',$goods_id)->value('goods_name');
+
+	$goods_name = $goods_name ? $goods_name : "暂无";
+
+	return $goods_name;
+}
+
+/**
  * 管理员操作记录
  * @param $log_info string 记录信息
  */
