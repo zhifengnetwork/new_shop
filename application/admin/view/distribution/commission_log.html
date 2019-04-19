@@ -6,8 +6,8 @@
 	<div class="fixed-bar">
 		<div class="item-title">
 			<div class="subject">
-				<h3>业绩日志</h3>
-				<h5>业绩日志</h5>
+				<h3>返佣日志</h3>
+				<h5>返佣日志</h5>
 			</div>
 		</div>
 	</div>
@@ -18,13 +18,13 @@
 			<span title="收起提示" id="explanationZoom" style="display: block;"></span>
 		</div>
 		<ul>
-			<li>业绩日志，显示所有人的业绩日志,不可更改</li>
+			<li>返佣日志，显示所有人的业绩日志,不可更改</li>
 		</ul>
 	</div>
 	<div class="flexigrid">
 		<div class="mDiv">
 			<div class="ftitle">
-				<h3>业绩日志</h3>
+				<h3>返佣日志</h3>
 				<h5>(共{$count}条记录)</h5>
 			</div>
 			<div title="刷新数据" class="pReload"><i class="fa fa-refresh"></i></div>
@@ -43,8 +43,11 @@
 						<th align="center" abbr="article_time" axis="col4" class="">
 							<div style="text-align: center; width: 100px;" class="">用户名称</div>
 						</th>
+						<th align="center" abbr="article_time" axis="col4" class="">
+							<div style="text-align: center; width: 100px;" class="">获得返利用户</div>
+						</th>
 						<th align="center" abbr="article_time" axis="col5" class="">
-							<div style="text-align: center; width: 100px;" class="">业绩(元)</div>
+							<div style="text-align: center; width: 100px;" class="">所得金额</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col6" class="">
 							<div style="text-align: center; width: 150px;" class="">订单编号</div>
@@ -79,10 +82,13 @@
 								<div style="width: 24px;"><i class="ico-check"></i></div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 50px;">{$vo.performance_id}</div>
+								<div style="text-align: center; width: 50px;">{$vo.log_id}</div>
 							</td>
 							<td align="center" class="">
 								<div style="text-align: center; width: 100px;">{$vo.user_id|user_name}</div>
+							</td>
+							<td align="center" class="">
+								<div style="text-align: center; width: 100px;">{$vo.to_user_id|user_name}</div>
 							</td>
 							<td align="center" class="">
 								<div style="text-align: center; width: 100px;">{$vo.money|default='0'}</div>
@@ -91,13 +97,13 @@
 								<div style="text-align: center; width: 150px;">{$vo.order_id|order_sn}</div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 100px;">{$vo.goods_num}</div>
+								<div style="text-align: center; width: 100px;">{$vo.num}</div>
 							</td>
 							<td align="center" class="">
 								<div style="text-align: center; width: 150px;">{$vo.create_time}</div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 200px;">{$vo.note}</div>
+								<div style="text-align: center; width: 200px;">{$vo.desc}</div>
                             </td>
                             <td align="center" class="handle">
 								<div style="text-align: center; width: 200px; max-width:200px;">

@@ -109,7 +109,7 @@ class Distribution extends Base
     {
         $Ad = M('agent_performance');
         $p = input('p/d');
-        $res = $Ad->order('performance_id','asc')->page($p . ',10')->select();
+        $res = $Ad->order('performance_id','asc')->page($p . ',20')->select();
         if ($res) {
             foreach ($res as $val) {
                 $list[] = $val;
@@ -123,12 +123,12 @@ class Distribution extends Base
         return $this->fetch();
     }
 
-    //日志
+    //业绩日志
     public function per_log()
     {
         $Ad = M('agent_performance_log');
         $p = input('p/d');
-        $res = $Ad->order('performance_id','asc')->page($p . ',10')->select();
+        $res = $Ad->order('performance_id','asc')->page($p . ',20')->select();
         if ($res) {
             foreach ($res as $val) {
                 $list[] = $val;
@@ -138,17 +138,39 @@ class Distribution extends Base
         $count = $Ad->count();
         $Page = new Page($count, 10);
         $show = $Page->show();
+        $this->assign('count',$count);
         $this->assign('page', $show);
         return $this->fetch();
     }
 
-    //日志详情
+    //业绩日志详情
     public function log_detail()
     {
         $id = input('id/d');
         $detail = M('agent_performance_log')->where('performance_id',$id)->find();
         
         $this->assign('detail',$detail);
+        return $this->fetch();
+    }
+
+    //返佣日志
+    public function commission_log()
+    {
+        // dump(sales(81));die;
+        $Ad = M('distrbut_commission_log');
+        $p = input('p/d');
+        $res = $Ad->order('log_id','asc')->page($p . ',20')->select();
+        if ($res) {
+            foreach ($res as $val) {
+                $list[] = $val;
+            }
+        }
+        $this->assign('list', $list);
+        $count = $Ad->count();
+        $Page = new Page($count, 10);
+        $show = $Page->show();
+        $this->assign('count',$count);
+        $this->assign('page', $show);
         return $this->fetch();
     }
 }

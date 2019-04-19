@@ -137,18 +137,21 @@ class Sales extends Model
 			$bool = M('users')->where('user_id',$value['user_id'])->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
 			
 			if ($bool) {
-				$this->writeLog($value['user_id'],$money,$order['order_sn'],$msg);
+				$this->writeLog($value['user_id'],$money,$order['order_sn'],$msg,$order['goods_num']);
 			} else {
 				$data = array(
-					'user_id'=>$value['user_id'],
-					'user_money'=>$money,
-					'change_time'=>time(),
-					'desc'=>"用户表更新失败 ".$msg,
+					'user_id' =>$this->user_id,
+					'to_user_id'=>$value['user_id'],
+					'money'=>$money,
 					'order_sn'=>$order['order_sn'],
-					'order_id'=>$this->order_id
+					'order_id'=>$this->order_id,
+					'goods_id'=>$this->goods_id,
+					'num'=>$order['goods_num'],
+					'create_time'=>time(),
+					'desc'=>"用户表更新失败 ".$msg
 				);
 
-				M('account_log')->insert($data);
+				M('distrbut_commission_log')->insert($data);
 			}
 		}
 		
@@ -213,18 +216,21 @@ class Sales extends Model
 	}
 
 	//记录日志
-	public function writeLog($user_id,$money,$order_sn,$desc)
+	public function writeLog($user_id,$money,$order_sn,$desc,$num)
 	{
 		$data = array(
-			'user_id'=>$user_id,
-			'user_money'=>$money,
-			'change_time'=>time(),
-			'desc'=>$desc,
+			'user_id'=>$this->user_id,
+			'to_user_id'=>$user_id,
+			'money'=>$money,
 			'order_sn'=>$order_sn,
-			'order_id'=>$this->order_id
+			'order_id'=>$this->order_id,
+			'goods_id'=>$this->goods_id,
+			'num'=>$num,
+			'create_time'=>time(),
+			'desc'=>$desc
 		);
 
-		$bool = M('account_log')->insert($data);
+		$bool = M('distrbut_commission_log')->insert($data);
 
 		if($bool){
 			//分钱记录
