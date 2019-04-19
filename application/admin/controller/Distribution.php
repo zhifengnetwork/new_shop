@@ -156,7 +156,6 @@ class Distribution extends Base
     //返佣日志
     public function commission_log()
     {
-        // dump(sales(81));die;
         $Ad = M('distrbut_commission_log');
         $p = input('p/d');
         $res = $Ad->order('log_id','asc')->page($p . ',20')->select();
@@ -171,6 +170,15 @@ class Distribution extends Base
         $show = $Page->show();
         $this->assign('count',$count);
         $this->assign('page', $show);
+        return $this->fetch();
+    }
+    
+    //返佣日志详情
+    public function commission_detail()
+    {
+        $id = input('id/d');
+        $detail = M('distrbut_commission_log')->where('log_id',$id)->find();
+        $this->assign('detail',$detail);
         return $this->fetch();
     }
 }
