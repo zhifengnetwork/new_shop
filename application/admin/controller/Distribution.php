@@ -117,7 +117,7 @@ class Distribution extends Base
         }
         $this->assign('list', $list);
         $count = $Ad->count();
-        $Page = new Page($count, 10);
+        $Page = new Page($count, 20);
         $show = $Page->show();
         $this->assign('page', $show);
         return $this->fetch();
@@ -136,7 +136,7 @@ class Distribution extends Base
         }
         $this->assign('list', $list);
         $count = $Ad->count();
-        $Page = new Page($count, 10);
+        $Page = new Page($count, 20);
         $show = $Page->show();
         $this->assign('count',$count);
         $this->assign('page', $show);
@@ -167,7 +167,7 @@ class Distribution extends Base
         }
         $this->assign('list', $list);
         $count = $Ad->count();
-        $Page = new Page($count, 10);
+        $Page = new Page($count, 20);
         $show = $Page->show();
         $this->assign('count',$count);
         $this->assign('page', $show);
