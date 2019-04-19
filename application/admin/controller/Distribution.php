@@ -158,7 +158,27 @@ class Distribution extends Base
     {
         $Ad = M('distrbut_commission_log');
         $p = input('p/d');
-        $res = $Ad->order('log_id','asc')->page($p . ',20')->select();
+
+        $ctime = urldecode(I('ctime'));
+        $user_name = I('user_name');
+        
+        $where = [];
+
+        if($user_name){
+            $user['nickname'] = ['like', "%$user_name%"];
+            $id_list = M('users')->where($user)->column('user_id');
+            $where['user_id|to_user_id'] = $id_list ? ['in',$id_list] : [];
+            $this->assign('user_name',$user_name);
+        }
+        if($ctime){
+            $gap = explode(' - ', $ctime);
+            $where['create_time'] = [['>= time',strtotime($gap[0])],['< time',strtotime($gap[1]." 23:59:59")],'and'];;
+            $this->assign('start_time',$gap[0]);
+            $this->assign('end_time',$gap[1]);
+            $this->assign('ctime',$gap[0].' - '.$gap[1]);
+        }
+        
+        $res = $Ad->where($where)->order('log_id','asc')->page($p . ',20')->select();
         if ($res) {
             foreach ($res as $val) {
                 $list[] = $val;
