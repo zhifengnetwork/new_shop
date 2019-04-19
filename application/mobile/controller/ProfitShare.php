@@ -35,21 +35,36 @@ class ProfitShare extends MobileBase
 //        var_dump($today_profit);
         //获取合伙人个数   默认合伙人等级是5
         $partners=$goodsProfit->get_partners_num(5);
+        $managers=$goodsProfit->get_partners_num(3);
+        $inspector=$goodsProfit->get_partners_num(4);
         //获取所有合伙人uid用于记录
         $partnersIds=$goodsProfit->get_all_partners(5);
-        if($partners==0){
-            $data['msg']='暂时没有合伙人';
-            //写入记录表
-        }
+        $managersIds=$goodsProfit->get_all_partners(3);
+        $inspectorIds=$goodsProfit->get_all_partners(4);
+
+        //获取分红比例
+        $partners_ratio=$this->get_agent_ratio(5);
+        $managers_ratio=$this->get_agent_ratio(3);
+        $inspector_ratio=$this->get_agent_ratio(4);
+//        if($partners==0){
+//            $data['msg']='暂时没有合伙人';
+//            //写入记录表
+//        }
+        //获取合伙人分红百分比
+
         //获取配置表值
         $today_ratio=$goodsProfit->get_config('today_ratio');
 
         //本日分红利润每人  $configs['today_ratio']['value']
         if($today_profit['total']==0 || $today_ratio==0){
-            $partProfit=0;
+            $partnersPartProfit=0;
+            $managersPartProfit=0;
+            $inspectorPartProfit=0;
         }else{
 //            echo $today_profit['total']."````````````".$today_ratio;die;
-            $partProfit=$today_profit['total']*$today_ratio/100/$partners;
+            $partnersPartProfit=$today_profit['total']*$today_ratio/100/$partners*$partners_ratio/100;
+            $managersPartProfit=$today_profit['total']*$today_ratio/100/$managers*$managers_ratio/100;
+            $inspectorPartProfit=$today_profit['total']*$today_ratio/100/$inspector*$inspector_ratio/100;
         }
         //写入记录表
         $data=array();
@@ -58,17 +73,46 @@ class ProfitShare extends MobileBase
         try {
             foreach($partnersIds as $key=>$value){
                 $data['uid']=$value;
-                $data['bonus_money']=$partProfit;
+                $data['bonus_money']=$partnersPartProfit;
                 $data['today_population']=$partners;
                 $data['today_profit']=$today_profit['total'];
-                $data['today_ratio']=$today_ratio;
+                $data['today_ratio']=$partners_ratio;
                 $data['add_time']=time();
                 Db::name('profit_dividend_log')->insert($data);
 //                $data[]=['uid'=>$value,'bonus_money'=>"$partProfit",'today_population'=>$partners,'today_profit'=>"'".$today_profit['total']."'",'today_ratio'=>"$today_ratio",'add_time'=>time()];
 //                var_dump($data);die;
 //                echo "<hr />";
+                Db::name('users')->where(['user_id'=>$value])->setInc('user_money',$partnersPartProfit);
             }
-            echo '执行成功,插入'.$partners.'条记录';
+
+            foreach($managersIds as $ke=>$val){
+                $data['uid']=$val;
+                $data['bonus_money']=$managersPartProfit;
+                $data['today_population']=$managers;
+                $data['today_profit']=$today_profit['total'];
+                $data['today_ratio']=$managers_ratio;
+                $data['add_time']=time();
+                Db::name('profit_dividend_log')->insert($data);
+//                $data[]=['uid'=>$value,'bonus_money'=>"$partProfit",'today_population'=>$partners,'today_profit'=>"'".$today_profit['total']."'",'today_ratio'=>"$today_ratio",'add_time'=>time()];
+//                var_dump($data);die;
+//                echo "<hr />";
+                Db::name('users')->where(['user_id'=>$val])->setInc('user_money',$managersPartProfit);
+            }
+
+            foreach($inspectorIds as $k=>$v){
+                $data['uid']=$v;
+                $data['bonus_money']=$inspectorPartProfit;
+                $data['today_population']=$inspector;
+                $data['today_profit']=$today_profit['total'];
+                $data['today_ratio']=$inspector_ratio;
+                $data['add_time']=time();
+                Db::name('profit_dividend_log')->insert($data);
+//                $data[]=['uid'=>$value,'bonus_money'=>"$partProfit",'today_population'=>$partners,'today_profit'=>"'".$today_profit['total']."'",'today_ratio'=>"$today_ratio",'add_time'=>time()];
+//                var_dump($data);die;
+//                echo "<hr />";
+                Db::name('users')->where(['user_id'=>$v])->setInc('user_money',$inspectorPartProfit);
+            }
+            echo '执行成功,插入'.$partners+$managers+$inspector.'条记录/n';
 //            var_dump($data);die;
 //            Db::name('profit_dividend_log')->insertAll($data);
             // 提交事务
@@ -78,5 +122,9 @@ class ProfitShare extends MobileBase
             Db::rollback();
         }
 
+    }
+    private function get_agent_ratio($level){
+        $ratio=M('agent_level')->where(['level'=>$level])->find();
+        return $ratio['ratio'];
     }
 }
