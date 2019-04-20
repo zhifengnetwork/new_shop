@@ -1,4 +1,5 @@
 <include file="public/layout" />
+<script src="__ROOT__/public/static/js/layer/laydate/laydate.js"></script>
 <body style="background-color: rgb(255, 255, 255); overflow: auto; cursor: default; -moz-user-select: inherit;">
 <div id="append_parent"></div>
 <div id="ajaxwaitid"></div>
@@ -28,6 +29,32 @@
 				<h5>(共{$count}条记录)</h5>
 			</div>
 			<div title="刷新数据" class="pReload"><i class="fa fa-refresh"></i></div>
+			<form class="navbar-form form-inline" id="search-form" method="get" action="{:U('Distribution/per_log')}" onsubmit="return check_form();">
+				<input type="hidden" name="ctime" id="ctime" value="{$ctime}">
+				<div class="sDiv">
+					<div class="sDiv2" style="margin-right: 10px;">
+						<input type="text" size="30" id="start_time" value="{$start_time}" placeholder="起始时间" class="qsbox">
+						<input type="button" class="btn" value="起始时间">
+					</div>
+					<div class="sDiv2" style="margin-right: 10px;">
+						<input type="text" size="30" id="end_time" value="{$end_time}" placeholder="截止时间" class="qsbox">
+						<input type="button" class="btn" value="截止时间">
+					</div>
+					<div class="sDiv2" style="margin-right: 10px;">
+						<input type="text" size="30" id="order_sn" name="order_sn" value="{$order_sn}" placeholder="订单编号" class="qsbox">
+					</div>
+					<div class="sDiv2" style="margin-right: 10px;">
+						<input type="text" size="30" id="permin" name="permin" value="{$permin}" placeholder="最小业绩" class="qsbox">
+					</div>
+					<div class="sDiv2" style="margin-right: 10px;">
+						<input type="text" size="30" id="permax" name="permax" value="{$permax}" placeholder="最大业绩" class="qsbox">
+					</div>
+					<div class="sDiv2">
+						<input size="30" placeholder="用户名称" value="{$user_name}" name="user_name" class="qsbox" type="text">
+						<input class="btn" value="搜索" type="submit">
+					</div>
+				</div>
+			</form>
 		</div>
 		<div class="hDiv">
 			<div class="hDivBox">
@@ -38,13 +65,13 @@
 							<div style="width: 24px;"><i class="ico-check"></i></div>
 						</th>
 						<th align="center" abbr="ac_id" axis="col3" class="">
-							<div style="text-align: center; width: 50px;" class="">ID</div>
+							<div style="text-align: center; width: 80px;" class="">ID</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col4" class="">
-							<div style="text-align: center; width: 100px;" class="">用户名称</div>
+							<div style="text-align: center; width: 150px;" class="">用户名称</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col5" class="">
-							<div style="text-align: center; width: 100px;" class="">业绩(元)</div>
+							<div style="text-align: center; width: 100px;" class="">业绩</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col6" class="">
 							<div style="text-align: center; width: 150px;" class="">订单编号</div>
@@ -79,10 +106,10 @@
 								<div style="width: 24px;"><i class="ico-check"></i></div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 50px;">{$vo.performance_id}</div>
+								<div style="text-align: center; width: 80px;">{$vo.performance_id}</div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 100px;">{$vo.user_id|user_name}</div>
+								<div style="text-align: center; width: 150px;">{$vo.user_id|user_name}</div>
 							</td>
 							<td align="center" class="">
 								<div style="text-align: center; width: 100px;">{$vo.money|default='0'}</div>
@@ -129,7 +156,37 @@
 			location.href = location.href;
 		});
 
+		$('#start_time').layDate();
+        $('#end_time').layDate();
 	});
+
+	function check_form(){
+        var start_time = $.trim($('#start_time').val());
+        var end_time =  $.trim($('#end_time').val());
+		var permin = $('#permin').val();
+		var permax = $('#permax').val();
+		var reg = /^(\-|\+)?\d+(\.\d+)?$/;
+		
+		if (permin && !reg.test(permin)) {
+			layer.alert('最小业绩必须是数字');
+			return false;
+		}
+		if (permax && !reg.test(permax)) {
+			layer.alert('最大业绩必须是数字');
+			return false;
+		}
+        if(start_time == '' ^ end_time == ''){
+            layer.alert('请选择完整的时间间隔', {icon: 2});
+            return false;
+        }
+        if(start_time !== '' && end_time !== ''){
+            $('#ctime').val(start_time+" - "+end_time);
+        }
+        if(start_time == '' && end_time == ''){
+            $('#ctime').val('');
+        }
+        return true;
+    }
 </script>
 </body>
 </html>

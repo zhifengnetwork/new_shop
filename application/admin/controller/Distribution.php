@@ -109,12 +109,45 @@ class Distribution extends Base
     {
         $Ad = M('agent_performance');
         $p = input('p/d');
-        $res = $Ad->order('performance_id','asc')->page($p . ',20')->select();
+        $ctime = urldecode(I('ctime'));
+        $ttype = I('ttype');
+        $user_name = I('user_name');
+        $min = I('min');
+        $max = I('max');
+        $per_type = I('per_type');
+        $where = [];
+
+        if($user_name){
+            $user['nickname'] = ['like', "%$user_name%"];
+            $id_list = M('users')->where($user)->column('user_id');
+            $where['user_id'] = $id_list ? ['in',$id_list] : [];
+        }
+        
+        if($ctime){
+            $gap = explode(' - ', $ctime);
+            $time_val = array('1'=>"create_time",'2'=>"update_time");
+            $where[$time_val[$ttype]] = [['>= time',strtotime($gap[0])],['< time',strtotime($gap[1]." 23:59:59")],'and'];
+        }
+        
+        if ($min || $max) {
+            $val = array('1'=>"ind_per",'2'=>"agent_per",'3'=>"ind_goods_sum",'4'=>"agent_goods_sum");
+            $where[$val[$per_type]] = ['between',[floatval($min),floatval($max)]];
+        }
+        
+        $res = $Ad->where($where)->order('performance_id','asc')->page($p . ',20')->select();
         if ($res) {
             foreach ($res as $val) {
                 $list[] = $val;
             }
         }
+        $this->assign('user_name',$user_name);
+        $this->assign('start_time',$gap[0]);
+        $this->assign('end_time',$gap[1]);
+        $this->assign('ctime',$gap[0].' - '.$gap[1]);
+        $this->assign('ttype',$ttype);
+        $this->assign('min',$min);
+        $this->assign('max',$max);
+        $this->assign('per_type',$per_type);
         $this->assign('list', $list);
         $count = $Ad->count();
         $Page = new Page($count, 20);
@@ -128,12 +161,43 @@ class Distribution extends Base
     {
         $Ad = M('agent_performance_log');
         $p = input('p/d');
-        $res = $Ad->order('performance_id','asc')->page($p . ',20')->select();
+        $ctime = urldecode(I('ctime'));
+        $user_name = I('user_name');
+        $order_sn = I('order_sn');
+        $permin = I('permin');
+        $permax = I('permax');
+        
+        $where = [];
+
+        if($user_name){
+            $user['nickname'] = ['like', "%$user_name%"];
+            $id_list = M('users')->where($user)->column('user_id');
+            $where['user_id'] = $id_list ? ['in',$id_list] : [];
+        }
+        if($ctime){
+            $gap = explode(' - ', $ctime);
+            $where['create_time'] = [['>= time',strtotime($gap[0])],['< time',strtotime($gap[1]." 23:59:59")],'and'];;
+        }
+        if ($order_sn) {
+            $where['order_sn'] = ['like',"%$order_sn%"];
+        }
+        if ($permin || $permax) {
+            $where['money'] = ['between',[floatval($permin),floatval($permax)]];
+        }
+
+        $res = $Ad->where($where)->order('performance_id','asc')->page($p . ',20')->select();
         if ($res) {
             foreach ($res as $val) {
                 $list[] = $val;
             }
         }
+        $this->assign('user_name',$user_name);
+        $this->assign('start_time',$gap[0]);
+        $this->assign('end_time',$gap[1]);
+        $this->assign('ctime',$gap[0].' - '.$gap[1]);
+        $this->assign('order_sn',$order_sn);
+        $this->assign('permin',$permin);
+        $this->assign('permax',$permax);
         $this->assign('list', $list);
         $count = $Ad->count();
         $Page = new Page($count, 20);
@@ -161,6 +225,7 @@ class Distribution extends Base
 
         $ctime = urldecode(I('ctime'));
         $user_name = I('user_name');
+        $order_sn = I('order_sn');
         
         $where = [];
 
@@ -168,14 +233,13 @@ class Distribution extends Base
             $user['nickname'] = ['like', "%$user_name%"];
             $id_list = M('users')->where($user)->column('user_id');
             $where['user_id|to_user_id'] = $id_list ? ['in',$id_list] : [];
-            $this->assign('user_name',$user_name);
         }
         if($ctime){
             $gap = explode(' - ', $ctime);
             $where['create_time'] = [['>= time',strtotime($gap[0])],['< time',strtotime($gap[1]." 23:59:59")],'and'];;
-            $this->assign('start_time',$gap[0]);
-            $this->assign('end_time',$gap[1]);
-            $this->assign('ctime',$gap[0].' - '.$gap[1]);
+        }
+        if ($order_sn) {
+            $where['order_sn'] = ['like',"%$order_sn%"];
         }
         
         $res = $Ad->where($where)->order('log_id','asc')->page($p . ',20')->select();
@@ -184,6 +248,11 @@ class Distribution extends Base
                 $list[] = $val;
             }
         }
+        $this->assign('user_name',$user_name);
+        $this->assign('start_time',$gap[0]);
+        $this->assign('end_time',$gap[1]);
+        $this->assign('ctime',$gap[0].' - '.$gap[1]);
+        $this->assign('order_sn',$order_sn);
         $this->assign('list', $list);
         $count = $Ad->count();
         $Page = new Page($count, 20);
