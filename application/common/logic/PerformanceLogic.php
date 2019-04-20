@@ -63,11 +63,11 @@ class PerformanceLogic extends Model
 		//个人业绩日志
 		if ($bool) {
 			$log['user_id'] = $user_id;
-			$note = '订单编号为'.$order_sn.'的业绩';
+			$note = '订单编号为 '.$order_sn.' 的业绩';
 			$this->per_log($log,$note);
 		} else {
 			$log['user_id'] = $user_id;
-			$note = '订单编号为'.$order_sn.'的业绩增加失败';
+			$note = '订单编号为 '.$order_sn.' 的业绩增加失败';
 			
 			$this->per_log($log,$note);
 		}
@@ -104,11 +104,11 @@ class PerformanceLogic extends Model
 
 			//团队业绩日志
 			if ($bool1) {
-				$note = '订单编号为'.$order_sn.'的业绩';
+				$note = '订单编号为 '.$order_sn.' 的业绩';
 
 				$this->per_log($log,$note);
 			} else {
-				$note = '订单编号为'.$order_sn.'的业绩添加失败';
+				$note = '订单编号为 '.$order_sn.' 的业绩添加失败';
 
 				$this->per_log($log,$note);
 			}

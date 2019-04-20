@@ -712,8 +712,8 @@ class User extends Base
                 foreach ($remittanceList as $k => $val) {
                     $strTable .= '<tr>';
                     $strTable .= '<td style="text-align:center;font-size:12px;">' . $val['nickname'] . '</td>';
-                    $strTable .= '<td style="text-align:left;font-size:12px;">' . $val['money'] . ' </td>';
-                    $strTable .= '<td style="text-align:left;font-size:12px;">' . $val['bank_name'] . '</td>';
+                    $strTable .= '<td style="text-align:center;font-size:12px;">' . $val['money'] . ' </td>';
+                    $strTable .= '<td style="text-align:center;font-size:12px;">' . $val['bank_name'] . '</td>';
                     $strTable .= '<td style="vnd.ms-excel.numberformat:@">' . $val['bank_card'] . '</td>';
                     $strTable .= '<td style="text-align:left;font-size:12px;">' . $val['realname'] . '</td>';
                     $strTable .= '<td style="text-align:left;font-size:12px;">' . date('Y-m-d H:i:s', $val['create_time']) . '</td>';
@@ -723,7 +723,7 @@ class User extends Base
             }
             $strTable .= '</table>';
             unset($remittanceList);
-            downloadExcel($strTable, 'remittance');
+            downloadExcel($strTable, '用户提现明细表');
             exit();
         }
         $count = Db::name('withdrawals')->alias('w')->join('__USERS__ u', 'u.user_id = w.user_id', 'INNER')->where($where)->count();
@@ -989,6 +989,7 @@ class User extends Base
         $where['identification'] = ['=', 2];
         $count = Db::name('commission_log')->where($where)->count();
         $Page = new AjaxPage($count, 15);
+        $invite_id = '';
        
         if(input('post.mobile')){
             $mobile = input('post.mobile');
@@ -1011,9 +1012,10 @@ class User extends Base
             ->order('id desc')
             ->limit($Page->firstRow . ',' . $Page->listRows)
             ->select();
-
+        
         if($list){
             foreach($list as $k => $v){
+                $invite_ids[] = $v['id'];
                 $user_id_arr[] = $v['user_id'];
                 $user_id_arr[] = $v['add_user_id'];
                 $list[$k]['addtime'] = date('Y-m-d H:i:s',$v['addtime']);
@@ -1031,10 +1033,12 @@ class User extends Base
                     $list[$k]['mobile'] = $userinfo[$v['user_id']]['mobile'];
                 }
             }
+            $invite_id = implode(',',$invite_ids);
         }
         // dump($list);exit;
         $show = $Page->show();
 
+        $this->assign('invite_id',$invite_id);
         $this->assign('list', $list);
         $this->assign('page', $show);// 赋值分页输出
         $this->assign('pager', $Page);
@@ -1096,7 +1100,78 @@ class User extends Base
     }
 
 
+    //导出签到、邀新返佣明细
+    public function export_commission_log()
+    {
+        $ids = I('ids');
+        $identification = I('ident');
+        
+        switch($identification){
+            case 1:
+                $title = '签到返佣明细表';
+                $addStrTable = '';
+                break;
+            case 2:
+                $title = '邀请新会员返佣明细表';
+                $addStrTable = '<td style="text-align:center;font-size:14px;" width="*">获得返利用户名</td>';
+                break;
+            default:
+                $title = '签到返佣明细表';
+                $addStrTable = '';
+                break;
+        }
 
+        $strTable = '<table width="500" border="1">';
+        $strTable .= '<tr >';
+        $strTable .= '<td style="text-align:center;font-size:14px;width:120px;">ID</td>';
+        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">用户名</td>';
+        $strTable .= $addStrTable;
+        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">所得金额</td>';
+        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">数量</td>';
+        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">时间</td>';
+        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">描述</td>';
+        $strTable .= '</tr>';
+        
+        $condition = array();
+        if ($ids) {
+            $condition['id'] = ['in', explode(',',$ids)];
+        }
+        $count = DB::name('commission_log')->where(['identification'=>$identification])->where($condition)->count();
+        $p = ceil($count / 5000);
+        for ($i = 0; $i < $p; $i++) {
+            $start = $i * 5000;
+            $end = ($i + 1) * 5000;
+            $commission_log = M('commission_log')->where(['identification'=>$identification])->where($condition)->order('id')->limit($start, 5000)->select();
+            if (is_array($commission_log)) {
+                $user_ids = array_column($commission_log,'user_id');
+                $to_user_ids = array_column($commission_log,'add_user_id');
+                $n_user_ids = array_merge($user_ids,$to_user_ids);
+                $n_user_ids = array_unique($n_user_ids);
+                $user_names = Db::name('users')->where('user_id','in',$n_user_ids)->column('user_id,nickname,mobile');
+                foreach ($commission_log as $k => $val) {
+                    $username = $user_names[$val['user_id']]['nickname'] ? $user_names[$val['user_id']]['nickname'] : $user_names[$val['user_id']]['mobile'];
+                    $to_username = $user_names[$val['add_user_id']]['nickname'] ? $user_names[$val['add_user_id']]['nickname'] : $user_names[$val['to_user_id']]['mobile'];
+                    $order_sn = $val['order_sn'];
+
+                    $strTable .= '<tr>';
+                    $strTable .= '<td style="text-align:center;font-size:12px;">' . $val['id'] . '</td>';
+                    $strTable .= '<td style="text-align:center;font-size:12px;">' . $username . ' </td>';
+                    $strTable .= ($identification == 2 ) ? '<td style="text-align:center;font-size:12px;">' . $to_username . '</td>' : '';
+                    $strTable .= '<td style="text-align:center;font-size:12px;">' . $val['money'] . '</td>';
+                    $strTable .= '<td style="text-align:center;font-size:12px;">' . $val['num'] . '</td>';
+                    $strTable .= '<td style="text-align:center;font-size:12px;">' . date('Y-m-d H:i', $val['add_time']) . '</td>';
+                    $strTable .= '<td style="text-align:left;font-size:12px;">' . $val['desc'] . ' </td>';
+                    $strTable .= '</tr>';
+                }
+                unset($log_list);
+            }
+        }
+        $strTable .= '</table>';
+        $i = ($i == 1) ? '' : '_'.$i;
+
+        downloadExcel($strTable,  $title. $i);
+        exit();
+    }
 
 
     /**

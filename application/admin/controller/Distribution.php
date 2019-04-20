@@ -228,6 +228,7 @@ class Distribution extends Base
         $order_sn = I('order_sn');
         
         $where = [];
+        $log_ids = '';
 
         if($user_name){
             $user['nickname'] = ['like', "%$user_name%"];
@@ -245,9 +246,12 @@ class Distribution extends Base
         $res = $Ad->where($where)->order('log_id','asc')->page($p . ',20')->select();
         if ($res) {
             foreach ($res as $val) {
+                $id_lists[] = $val['log_id'];
                 $list[] = $val;
             }
+            $log_ids = implode(',',$id_lists);
         }
+        $this->assign('log_ids',$log_ids);
         $this->assign('user_name',$user_name);
         $this->assign('start_time',$gap[0]);
         $this->assign('end_time',$gap[1]);
@@ -269,5 +273,62 @@ class Distribution extends Base
         $detail = M('distrbut_commission_log')->where('log_id',$id)->find();
         $this->assign('detail',$detail);
         return $this->fetch();
+    }
+
+    //购买返佣
+    public function export_commission_log()
+    {
+        $strTable = '<table width="500" border="1">';
+        $strTable .= '<tr >';
+        $strTable .= '<td style="text-align:center;font-size:14px;width:120px;">ID</td>';
+        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">用户名</td>';
+        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">获得返利用户名</td>';
+        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">所得金额</td>';
+        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">订单编号</td>';
+        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">数量</td>';
+        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">时间</td>';
+        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">描述</td>';
+        $strTable .= '</tr>';
+        $log_ids = I('log_ids');
+        
+        $condition = array();
+        if ($log_ids) {
+            $condition['log_id'] = ['in', explode(',',$log_ids)];
+        }
+        $count = DB::name('distrbut_commission_log')->where($condition)->count();
+        $p = ceil($count / 5000);
+        for ($i = 0; $i < $p; $i++) {
+            $start = $i * 5000;
+            $end = ($i + 1) * 5000;
+            $log_list = M('distrbut_commission_log')->where($condition)->order('log_id')->limit($start, 5000)->select();
+            if (is_array($log_list)) {
+                $user_ids = array_column($log_list,'user_id');
+                $to_user_ids = array_column($log_list,'to_user_id');
+                $n_user_ids = array_merge($user_ids,$to_user_ids);
+                $n_user_ids = array_unique($n_user_ids);
+                $user_names = Db::name('users')->where('user_id','in',$n_user_ids)->column('user_id,nickname,mobile');
+                foreach ($log_list as $k => $val) {
+                    $username = $user_names[$val['user_id']]['nickname'] ? $user_names[$val['user_id']]['nickname'] : $user_names[$val['user_id']]['mobile'];
+                    $to_username = $user_names[$val['to_user_id']]['nickname'] ? $user_names[$val['to_user_id']]['nickname'] : $user_names[$val['to_user_id']]['mobile'];
+                    $order_sn = $val['order_sn'];
+
+                    $strTable .= '<tr>';
+                    $strTable .= '<td style="text-align:center;font-size:12px;">' . $val['log_id'] . '</td>';
+                    $strTable .= '<td style="text-align:center;font-size:12px;">' . $username . ' </td>';
+                    $strTable .= '<td style="text-align:center;font-size:12px;">' . $to_username . '</td>';
+                    $strTable .= '<td style="text-align:center;font-size:12px;">' . $val['money'] . '</td>';
+                    $strTable .= '<td style="vnd.ms-excel.numberformat:@">' . $order_sn . '</td>';
+                    $strTable .= '<td style="text-align:center;font-size:12px;">' . $val['num'] . '</td>';
+                    $strTable .= '<td style="text-align:center;font-size:12px;">' . date('Y-m-d H:i', $val['create_time']) . '</td>';
+                    $strTable .= '<td style="text-align:left;font-size:12px;">' . $val['desc'] . ' </td>';
+                    $strTable .= '</tr>';
+                }
+                unset($log_list);
+            }
+        }
+        $strTable .= '</table>';
+        $i = ($i == 1) ? '' : '_'.$i;
+        downloadExcel($strTable, '购买商品返佣明细表' . $i);
+        exit();
     }
 }

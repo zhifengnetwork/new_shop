@@ -33,6 +33,7 @@
             <div title="刷新数据" class="pReload"><a href=""><i class="fa fa-refresh"></i></a></div>
             <form class="navbar-form form-inline" id="search-form" method="get" action="{:U('withdrawals')}" onsubmit="return check_form();">
                 <input type="hidden" name="create_time" id="create_time" value="{$create_time}">
+                <input type="hidden" name="export" value="" id="export" />
                 <div class="sDiv">
                     <div class="sDiv2" style="margin-right: 10px;">
                         <input type="text" size="30" id="start_time" value="{$start_time}" placeholder="起始时间" class="qsbox">
@@ -137,6 +138,13 @@
                     <a onclick="act_submit(-2)">
                         <div class="add" title="无效作废">
                             <span><i class="fa fa-close"></i>无效作废</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="fbutton">
+                    <a href="javascript:;" onclick="exportUser()">
+                        <div class="add" title="导出用户提现明细">
+                            <span><i class="fa fa-share"></i>导出用户提现明细</span>
                         </div>
                     </a>
                 </div>
@@ -323,6 +331,11 @@
         });
     }
 
+    //导出Excel表格
+    function exportUser() {
+        $('#export').val(1);
+        $('#search-form').submit();
+    }
 </script>
 </body>
 </html>
