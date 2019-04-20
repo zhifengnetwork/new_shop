@@ -13,8 +13,9 @@ use think\Db;
 use think\Page;
 use think\Loader;
 use app\common\logic\PerformanceLogic;
+use app\admin\logic\UsersLogic;
 /**
-*  销售设置
+*  分销
 **/
 class Distribution extends Base
 {
@@ -330,5 +331,29 @@ class Distribution extends Base
         $i = ($i == 1) ? '' : '_'.$i;
         downloadExcel($strTable, '购买商品返佣明细表' . $i);
         exit();
+    }
+
+    //分销关系
+    public function tree()
+    {
+        $UsersLogic = new UsersLogic();    
+        $cat_list = $UsersLogic->relation();
+       
+        if($cat_list){
+            $level = array_column($cat_list, 'level');
+            $heightLevel = max($level);
+            $level_name = Db::name('agent_level')->column('level,level_name');
+
+            if ($level_name) {
+                foreach($cat_list as $key => $value){
+                    $cat_list[$key]['level_name'] =  $level_name[$value['distribut_level']];
+                }
+            }
+        }
+        
+        $this->assign('heightLevel',$heightLevel);
+        $this->assign('cat_list',$cat_list);    
+        
+        return $this->fetch();
     }
 }
