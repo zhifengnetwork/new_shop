@@ -867,6 +867,7 @@ class User extends Base
         $where['identification'] = ['=', 1];
         $count = Db::name('commission_log')->where($where)->count();
         $Page = new AjaxPage($count, 15);
+        $sign_id = I('ids');
        
         if(input('post.mobile')){
             $mobile = input('post.mobile');
@@ -889,9 +890,10 @@ class User extends Base
             ->order('id desc')
             ->limit($Page->firstRow . ',' . $Page->listRows)
             ->select();
-
+        
         if($list){
             foreach($list as $k => $v){
+                $sign_ids[] = $v['id'];
                 $user_id_arr[] = $v['user_id'];
                 $list[$k]['addtime'] = date('Y-m-d H:i:s',$v['addtime']);
             }
@@ -906,10 +908,13 @@ class User extends Base
                     $list[$k]['mobile'] = $userinfo[$v['user_id']]['mobile'];
                 }
             }
+            
+            $sign_id = implode(',',$sign_ids);
         }
         // dump($list);exit;
         $show = $Page->show();
 
+        $this->assign('sign_id',$sign_id);
         $this->assign('list', $list);
         $this->assign('page', $show);// 赋值分页输出
         $this->assign('pager', $Page);
@@ -989,7 +994,7 @@ class User extends Base
         $where['identification'] = ['=', 2];
         $count = Db::name('commission_log')->where($where)->count();
         $Page = new AjaxPage($count, 15);
-        $invite_id = '';
+        $invite_id = I('invite_id');
        
         if(input('post.mobile')){
             $mobile = input('post.mobile');
@@ -1110,9 +1115,11 @@ class User extends Base
             case 1:
                 $title = '签到返佣明细表';
                 $addStrTable = '';
+                $title_name = '连续签到天数';
                 break;
             case 2:
                 $title = '邀请新会员返佣明细表';
+                $title_name = '邀新个数';
                 $addStrTable = '<td style="text-align:center;font-size:14px;" width="*">获得返利用户名</td>';
                 break;
             default:
@@ -1127,7 +1134,7 @@ class User extends Base
         $strTable .= '<td style="text-align:center;font-size:14px;" width="*">用户名</td>';
         $strTable .= $addStrTable;
         $strTable .= '<td style="text-align:center;font-size:14px;" width="*">所得金额</td>';
-        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">数量</td>';
+        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">' . $title_name . '</td>';
         $strTable .= '<td style="text-align:center;font-size:14px;" width="*">时间</td>';
         $strTable .= '<td style="text-align:center;font-size:14px;" width="*">描述</td>';
         $strTable .= '</tr>';
