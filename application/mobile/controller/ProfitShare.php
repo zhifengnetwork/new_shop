@@ -83,6 +83,7 @@ class ProfitShare extends MobileBase
 //                var_dump($data);die;
 //                echo "<hr />";
                 Db::name('users')->where(['user_id'=>$value])->setInc('user_money',$partnersPartProfit);
+                $this->set_log($value,$partnersPartProfit,'获得当日利润分红'.$partnersPartProfit);
             }
 
             foreach($managersIds as $ke=>$val){
@@ -97,6 +98,7 @@ class ProfitShare extends MobileBase
 //                var_dump($data);die;
 //                echo "<hr />";
                 Db::name('users')->where(['user_id'=>$val])->setInc('user_money',$managersPartProfit);
+                $this->set_log($val,$managersPartProfit,'获得当日利润分红'.$managersPartProfit);
             }
 
             foreach($inspectorIds as $k=>$v){
@@ -111,6 +113,7 @@ class ProfitShare extends MobileBase
 //                var_dump($data);die;
 //                echo "<hr />";
                 Db::name('users')->where(['user_id'=>$v])->setInc('user_money',$inspectorPartProfit);
+                $this->set_log($v,$inspectorPartProfit,'获得当日利润分红'.$inspectorPartProfit);
             }
             echo '执行成功,插入'.$partners+$managers+$inspector.'条记录\n';
 //            var_dump($data);die;
@@ -126,5 +129,11 @@ class ProfitShare extends MobileBase
     private function get_agent_ratio($level){
         $ratio=M('agent_level')->where(['level'=>$level])->find();
         return $ratio['ratio'];
+    }
+    //后台记录
+    private function set_log($user_id,$money,$desc){
+        $data=['user_id'=>10,'to_user_id'=>$user_id,'money'=>$money,'create_time'=>time(),'desc'=>$desc];
+        M('distrbut_commission_log')->insert($data);
+
     }
 }
