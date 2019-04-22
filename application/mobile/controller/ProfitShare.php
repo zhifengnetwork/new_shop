@@ -112,7 +112,7 @@ class ProfitShare extends MobileBase
 //                echo "<hr />";
                 Db::name('users')->where(['user_id'=>$v])->setInc('user_money',$inspectorPartProfit);
             }
-            echo '执行成功,插入'.$partners+$managers+$inspector.'条记录/n';
+            echo '执行成功,插入'.$partners+$managers+$inspector.'条记录\n';
 //            var_dump($data);die;
 //            Db::name('profit_dividend_log')->insertAll($data);
             // 提交事务
