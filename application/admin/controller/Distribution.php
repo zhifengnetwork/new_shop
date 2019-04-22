@@ -135,7 +135,7 @@ class Distribution extends Base
             $where[$val[$per_type]] = ['between',[floatval($min),floatval($max)]];
         }
         
-        $res = $Ad->where($where)->order('performance_id','asc')->page($p . ',20')->select();
+        $res = $Ad->where($where)->order('performance_id','desc')->page($p . ',20')->select();
         if ($res) {
             foreach ($res as $val) {
                 $list[] = $val;
@@ -186,7 +186,7 @@ class Distribution extends Base
             $where['money'] = ['between',[floatval($permin),floatval($permax)]];
         }
 
-        $res = $Ad->where($where)->order('performance_id','asc')->page($p . ',20')->select();
+        $res = $Ad->where($where)->order('performance_id','desc')->page($p . ',20')->select();
         if ($res) {
             foreach ($res as $val) {
                 $list[] = $val;
@@ -244,7 +244,7 @@ class Distribution extends Base
             $where['order_sn'] = ['like',"%$order_sn%"];
         }
         
-        $res = $Ad->where($where)->order('log_id','asc')->page($p . ',20')->select();
+        $res = $Ad->where($where)->order('log_id','desc')->page($p . ',20')->select();
         if ($res) {
             foreach ($res as $val) {
                 $id_lists[] = $val['log_id'];

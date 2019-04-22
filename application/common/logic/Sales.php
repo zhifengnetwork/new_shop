@@ -194,7 +194,6 @@ class Sales extends Model
 		
 		$order_goods = M('order_goods')
 						->where('order_id',$this->order_id)
-						// ->where('order_sn',$order['order_sn'])
 						->where('goods_id',$this->goods_id)
 						->find();
 		
