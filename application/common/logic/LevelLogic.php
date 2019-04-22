@@ -19,7 +19,7 @@ class LevelLogic extends Model
         //判断是否有上级,有就升级
         if($frist_leader_info){
             foreach($frist_leader_info as $k=>$v){               
-                    $this->upgrade_agent($v);
+                $this->upgrade_agent($v);
             }
         }
     }
