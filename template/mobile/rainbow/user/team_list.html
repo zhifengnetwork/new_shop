@@ -14,6 +14,11 @@
         width: 1.3rem;
          height: 1.3rem;
     }
+    .leader>p{
+        margin-top: 0.7em;
+        margin-bottom: 0.7em;
+        font-size:2em;
+    }
 </style>
 <div class="application-record">
     <div class="maleri30">
@@ -22,10 +27,16 @@
             <li class="li4">{$count}</li>
         </ul>
         <ul class="re_tit">
-            <li class="li5">上级ID：</li>
-            <li class="li1">{$leader.user_id}</li>
+            <div style="height:5em;">
+                <div class="leader">
+                    <p>上级名称：{$leader.nickname}</p>
+                    <p>上级联系方式：{$leader.mobile}</p>
+                </div>
+            </div>
+            <!-- <li class="li5">上级名称：</li>
+            <li class="li1">{$leader.nickname}</li>
             <li class="li3">上级联系方式：</li>
-            <li class="li3">{$leader.mobile}</li>
+            <li class="li3">{$leader.mobile}</li> -->
         </ul>
         <ul class="re_tit">
             <li>我的团队</li>

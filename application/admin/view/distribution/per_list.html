@@ -1,4 +1,5 @@
 <include file="public/layout" />
+<script src="__ROOT__/public/static/js/layer/laydate/laydate.js"></script>
 <body style="background-color: rgb(255, 255, 255); overflow: auto; cursor: default; -moz-user-select: inherit;">
 <div id="append_parent"></div>
 <div id="ajaxwaitid"></div>
@@ -28,6 +29,35 @@
 				<h5>(共{$list|count}条记录)</h5>
 			</div>
 			<div title="刷新数据" class="pReload"><i class="fa fa-refresh"></i></div>
+			<form class="navbar-form form-inline" id="search-form" method="get" action="{:U('Distribution/per_list')}" onsubmit="return check_form();">
+				<input type="hidden" name="ctime" id="ctime" value="{$ctime}">
+				<div class="sDiv">
+					<div class="sDiv2" style="margin-right: 10px;">
+						<select class="form-control" id="ttype" name="ttype" style="border: none;">
+							<option value="1" <if condition="$ttype eq 1">selected</if>>创建时间</option>
+							<option value="2" <if condition="$ttype eq 2">selected</if>>更新时间</option>
+						</select>
+						<input type="text" size="30" id="start_time" value="{$start_time}" placeholder="起始时间" class="qsbox">
+						<!-- <input type="button" class="btn" value="起始时间"> -->
+						<input type="text" size="30" id="end_time" value="{$end_time}" placeholder="截止时间" class="qsbox" style="border-left:1px dashed rgb(231, 227, 227);">
+						<!-- <input type="button" class="btn" value="截止时间"> -->
+					</div>
+					<div class="sDiv2" style="margin-right: 10px;">
+						<select class="form-control" id="per_type" name="per_type" style="border: none;">
+							<option value="1" <if condition="$per_type eq 1">selected</if>>个人业绩</option>
+							<option value="2" <if condition="$per_type eq 2">selected</if>>团队业绩</option>
+							<option value="3" <if condition="$per_type eq 3">selected</if>>个人销售数量</option>
+							<option value="4" <if condition="$per_type eq 4">selected</if>>团队销售数量</option>
+						</select>
+						<input type="text" size="30" id="min" name="min" value="{$min}" placeholder="最小值" class="qsbox">
+						<input type="text" size="30" id="max" name="max" value="{$max}" placeholder="最大值" class="qsbox" style="border-left:1px dashed rgb(231, 227, 227);">
+					</div>
+					<div class="sDiv2">
+						<input size="30" placeholder="用户名称" value="{$user_name}" name="user_name" class="qsbox" type="text">
+						<input class="btn" value="搜索" type="submit">
+					</div>
+				</div>
+			</form>
 		</div>
 		<div class="hDiv">
 			<div class="hDivBox">
@@ -41,7 +71,7 @@
 							<div style="text-align: center; width: 50px;" class="">序号</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col4" class="">
-							<div style="text-align: center; width: 100px;" class="">用户名称</div>
+							<div style="text-align: center; width: 150px;" class="">用户名称</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col5" class="">
 							<div style="text-align: center; width: 100px;" class="">个人业绩(元)</div>
@@ -85,7 +115,7 @@
 								<div style="text-align: center; width: 50px;">{$k+1}</div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 100px;">{$vo.user_id|user_name}</div>
+								<div style="text-align: center; width: 150px;">{$vo.user_id|user_name}</div>
 							</td>
 							<td align="center" class="">
 								<div style="text-align: center; width: 100px;">{$vo.ind_per|default='0'}</div>
@@ -133,8 +163,37 @@
 			location.href = location.href;
 		});
 
+		$('#start_time').layDate();
+        $('#end_time').layDate();
 	});
 
+	function check_form(){
+        var start_time = $.trim($('#start_time').val());
+        var end_time =  $.trim($('#end_time').val());
+		var min = $('#min').val();
+		var max = $('#max').val();
+		var reg = /^(\-|\+)?\d+(\.\d+)?$/;
+		
+		if (min && !reg.test(min)) {
+			layer.alert('最小值必须是数字');
+			return false;
+		}
+		if (max && !reg.test(max)) {
+			layer.alert('最大值必须是数字');
+			return false;
+		}
+        if(start_time == '' ^ end_time == ''){
+            layer.alert('请选择完整的时间间隔', {icon: 2});
+            return false;
+        }
+        if(start_time !== '' && end_time !== ''){
+            $('#ctime').val(start_time+" - "+end_time);
+        }
+        if(start_time == '' && end_time == ''){
+            $('#ctime').val('');
+        }
+        return true;
+    }
 
 	// function delfun(obj) {
 	// 	// 删除按钮

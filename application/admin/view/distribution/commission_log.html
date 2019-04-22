@@ -1,4 +1,5 @@
 <include file="public/layout" />
+<script src="__ROOT__/public/static/js/layer/laydate/laydate.js"></script>
 <body style="background-color: rgb(255, 255, 255); overflow: auto; cursor: default; -moz-user-select: inherit;">
 <div id="append_parent"></div>
 <div id="ajaxwaitid"></div>
@@ -18,7 +19,7 @@
 			<span title="收起提示" id="explanationZoom" style="display: block;"></span>
 		</div>
 		<ul>
-			<li>返佣日志，显示所有人的业绩日志,不可更改</li>
+			<li>返佣日志，显示所有人的业绩日志，不可更改</li>
 		</ul>
 	</div>
 	<div class="flexigrid">
@@ -28,6 +29,40 @@
 				<h5>(共{$count}条记录)</h5>
 			</div>
 			<div title="刷新数据" class="pReload"><i class="fa fa-refresh"></i></div>
+			<form class="navbar-form form-inline" id="search-form" method="get" action="{:U('Distribution/commission_log')}" onsubmit="return check_form();">
+				<input type="hidden" name="ctime" id="ctime" value="{$ctime}">
+				<input type="hidden" name="log_ids" value="{$log_ids}" id="log_ids" />
+				<div class="sDiv">
+					<div class="sDiv2" style="margin-right: 10px;">
+						<input type="text" size="30" id="start_time" value="{$start_time}" placeholder="起始时间" class="qsbox">
+						<!-- <input type="button" class="btn" value="起始时间"> -->
+					</div>
+					<div class="sDiv2" style="margin-right: 10px;">
+						<input type="text" size="30" id="end_time" value="{$end_time}" placeholder="截止时间" class="qsbox">
+						<!-- <input type="button" class="btn" value="截止时间"> -->
+					</div>
+					<div class="sDiv2" style="margin-right: 10px;">
+						<input type="text" size="30" id="order_sn" name="order_sn" value="{$order_sn}" placeholder="订单编号" class="qsbox">
+						<!-- <input type="button" class="btn" value="订单编号"> -->
+					</div>
+					<div class="sDiv2">
+						<input size="30" placeholder="用户名称、获得返利用户" value="{$user_name}" name="user_name" class="qsbox" type="text">
+						<input class="btn" value="搜索" type="submit">
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="tDiv">
+			<div class="tDiv2">
+				<div class="fbutton">
+					<a href="javascript:;" onclick="exportUser()">
+						<div class="add" title="导出返佣明细">
+							<span><i class="fa fa-share"></i>导出返佣明细</span>
+						</div>
+					</a>
+				</div>
+			</div>
+			<div style="clear:both"></div>
 		</div>
 		<div class="hDiv">
 			<div class="hDivBox">
@@ -38,13 +73,13 @@
 							<div style="width: 24px;"><i class="ico-check"></i></div>
 						</th>
 						<th align="center" abbr="ac_id" axis="col3" class="">
-							<div style="text-align: center; width: 50px;" class="">ID</div>
+							<div style="text-align: center; width: 80px;" class="">ID</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col4" class="">
-							<div style="text-align: center; width: 100px;" class="">用户名称</div>
+							<div style="text-align: center; width: 150px;" class="">用户名称</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col4" class="">
-							<div style="text-align: center; width: 100px;" class="">获得返利用户</div>
+							<div style="text-align: center; width: 150px;" class="">获得返利用户</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col5" class="">
 							<div style="text-align: center; width: 100px;" class="">所得金额</div>
@@ -82,13 +117,13 @@
 								<div style="width: 24px;"><i class="ico-check"></i></div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 50px;">{$vo.log_id}</div>
+								<div style="text-align: center; width: 80px;">{$vo.log_id}</div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 100px;">{$vo.user_id|user_name}</div>
+								<div style="text-align: center; width: 150px;">{$vo.user_id|user_name}</div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 100px;">{$vo.to_user_id|user_name}</div>
+								<div style="text-align: center; width: 150px;">{$vo.to_user_id|user_name}</div>
 							</td>
 							<td align="center" class="">
 								<div style="text-align: center; width: 100px;">{$vo.money|default='0'}</div>
@@ -100,7 +135,7 @@
 								<div style="text-align: center; width: 100px;">{$vo.num}</div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 150px;">{$vo.create_time}</div>
+								<div style="text-align: center; width: 150px;">{$vo.create_time|date="Y-m-d H:i:s",###}</div>
 							</td>
 							<td align="center" class="">
 								<div style="text-align: center; width: 200px;">{$vo.desc}</div>
@@ -135,7 +170,32 @@
 			location.href = location.href;
 		});
 
+		$('#start_time').layDate();
+        $('#end_time').layDate();
 	});
+
+	function check_form(){
+        var start_time = $.trim($('#start_time').val());
+        var end_time =  $.trim($('#end_time').val());
+        if(start_time == '' ^ end_time == ''){
+            layer.alert('请选择完整的时间间隔', {icon: 2});
+            return false;
+        }
+        if(start_time !== '' && end_time !== ''){
+            $('#ctime').val(start_time+" - "+end_time);
+        }
+        if(start_time == '' && end_time == ''){
+            $('#ctime').val('');
+        }
+        return true;
+    }
+
+	//导出Excel表格
+	function exportUser() {
+        $('#search-form').attr('action',"{:U('Distribution/export_commission_log')}")
+
+        $('#search-form').submit();
+    }
 </script>
 </body>
 </html>

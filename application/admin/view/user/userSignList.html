@@ -33,6 +33,7 @@
                     <h3>签到列表</h3>
                     <h5></h5>
                 </div>
+                <div title="刷新数据" class="pReload"><i class="fa fa-refresh"></i></div>
                 <form action="" id="search-form2" class="navbar-form form-inline" method="get" onsubmit="return false">
                     <div class="sDiv">
                         <div class="sDiv2">          
@@ -41,6 +42,22 @@
                         </div>
                     </div>
                 </form>
+                <form class="navbar-form form-inline" id="search-form3" method="get" action="">
+                    <input type="hidden" name="ids" value="" id="ids" />
+                    <input type="hidden" name="ident" value="1" id="ident" />
+                </form>
+            </div>
+            <div class="tDiv">
+                <div class="tDiv2">
+                    <div class="fbutton">
+                        <a href="javascript:;" onclick="exportUser()">
+                            <div class="add" title="导出签到返佣明细">
+                                <span><i class="fa fa-share"></i>导出签到返佣明细</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div style="clear:both"></div>
             </div>
             <div class="hDiv">
                 <div class="hDivBox">
@@ -113,6 +130,10 @@
     </script>
     <script>
         $(document).ready(function() {
+            // 点击刷新数据
+            $('.fa-refresh').click(function(){
+                location.href = location.href;
+            });
             // ajax 加载签到列表
             ajax_get_table('search-form2', 1);
 
@@ -138,6 +159,13 @@
             var url = $(obj).attr('data-state');
             $('.tab-base').find('a').removeClass('current')
             $(obj).addClass('current');
+        }
+
+        //导出Excel表格
+        function exportUser() {
+            $('#search-form3').attr('action',"{:U('User/export_commission_log')}")
+            
+            $('#search-form3').submit();
         }
 
     </script>

@@ -128,7 +128,7 @@ class Sales extends Model
 					break;
 				}
 				
-				$msg = "级别利润 ".$money."(元),商品:".$order['goods_num']."件";
+				$msg = "级别利润 ".$money."(元)，商品：".$order['goods_num']."件";
 			}
 			
 			$user_money = $money+$value['user_money'];

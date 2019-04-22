@@ -175,7 +175,7 @@ class User extends MobileBase
             $count = count($team_list);
         }
         $leader_id = M('users')->where('user_id',$user_id)->value('first_leader');
-        $leader = M('users')->where('user_id',$leader_id)->field('user_id,mobile')->find();
+        $leader = M('users')->where('user_id',$leader_id)->field('nickname,mobile')->find();
         $this->assign('leader',$leader);
         $this->assign('count',$count);
         $this->assign('team',$team_list);
@@ -484,7 +484,6 @@ class User extends MobileBase
         $logic = new UsersLogic();
         $data = $logic->get_account_log($this->user_id, I('get.type'));
         $account_log = $data['result'];
-
         $this->assign('user', $user);
         $this->assign('account_log', $account_log);
         $this->assign('page', $data['show']);
