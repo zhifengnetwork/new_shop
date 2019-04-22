@@ -96,47 +96,46 @@ class UsersLogic extends Model
         /**
      * 获得指定分销商下的上级的数组     
      * @access  public
-     * @param   int     $cat_id     分销商的ID
+     * @param   int     $user_id     分销商的ID
      * @param   int     $selected   当前选中分销商的ID
      * @param   boolean $re_type    返回的类型: 值为真时返回下拉列表,否则返回数组
      * @param   int     $level      限定返回的级数。为0时返回所有级数
-     * @return  mix
+     * @return  array   $user2
      */
-    public function relation($cat_id = 0, $selected = 0, $re_type = true, $level = 0)
+    public function relation($user_id = 0, $selected = 0, $re_type = true, $level = 0)
     {
         global $user, $user2;            
-        $sql = "SELECT user_id,nickname,mobile,is_distribut,first_leader,distribut_level,distribut_money FROM  __PREFIX__users ORDER BY first_leader ASC";
+        $sql = "SELECT user_id,nickname,mobile,is_distribut,first_leader,distribut_level FROM  __PREFIX__users ORDER BY first_leader ASC";
         $user = DB::query($sql);
         $user = convert_arr_key($user, 'user_id');
         
         foreach ($user AS $key => $value)
         {
             if(($value['is_distribut'] == 1) && $value['first_leader'] == 0){
-                $this->get_cat_tree($value['user_id'], 0);                               
+                $this->get_cat_tree($value['user_id'], 0);
             }
         }
         return $user2;
     }
 
     /**
-     * 获取指定id下的 所有分销商      
-     * @global type $goods_category 所有分销商
+     * 获取指定id下的 所有分销商
      * @param type $id 当前显示的 菜单id
      * @param type $level 等级
-     * @return 返回数组 Description
      */
     public function get_cat_tree($id, $level)
     {
         global $user, $user2;          
         $user2[$id] = $user[$id];
+        unset($user[$id]);
         $level = $level + 1;
         $user2[$id]['level'] = $level;
-        $k = $user[$id]['level']; 
+        $k = $user[$id]['level'];
 
         foreach ($user AS $key => $value){
              if(($value['is_distribut'] == 1) && $value['first_leader'] == $id)
              {
-                $this->get_cat_tree($value['user_id'], $level);  
+                $this->get_cat_tree($value['user_id'], $level);
                 $user2[$id]['have_son'] = 1; // 还有下级
                 $k++;
              }
