@@ -25,7 +25,7 @@ class PerformanceLogic extends Model
 			return false;
 		}
 
-		$goods_num = M('order_goods')->where('order_id',$order_id)->where('order_sn',$order['order_sn'])->sum('goods_num');
+		$goods_num = M('order_goods')->where('order_id',$order_id)->sum('goods_num');
 		$price = $order['goods_price'];
 		$user_id = $order['user_id'];
 		$order_sn = $order['order_sn'];
@@ -71,7 +71,7 @@ class PerformanceLogic extends Model
 			
 			$this->per_log($log,$note);
 		}
-
+		
 		$id_list = M('users')->where('user_id',$user_id)->value('parents');
 		$id_list = explode(',', $id_list);
 		$new_list = array_filter($id_list);

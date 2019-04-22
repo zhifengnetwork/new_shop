@@ -93,6 +93,10 @@ class Sales extends Model
 			if ($value['is_lock'] == 1) {
 				continue;
 			}
+			//不是分销商不奖励
+			if ($value['is_distribut'] != 1) {
+				continue;
+			}
 			//等级比下级低没有奖励
 			if ($user_level > $value['distribut_level']) {
 				continue;
@@ -108,6 +112,7 @@ class Sales extends Model
 				$money = $level[$user_level]['same_reword'] * $order['goods_num'];
 				$msg = "同级奖励 ".$money."(元)";
 			}
+			//极差奖
 			if ($user_level < $value['distribut_level']) {
 				$layer = 0;
 				$user_level = $value['distribut_level'];
@@ -189,7 +194,7 @@ class Sales extends Model
 		
 		$order_goods = M('order_goods')
 						->where('order_id',$this->order_id)
-						->where('order_sn',$order['order_sn'])
+						// ->where('order_sn',$order['order_sn'])
 						->where('goods_id',$this->goods_id)
 						->find();
 		

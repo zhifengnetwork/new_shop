@@ -42,7 +42,7 @@ function share_deal_after($xiaji,$shangji){
 
 
 /**
- * 销售奖励
+ * 购买返佣
  * @param $order_id
  * @return $result
  * ----------------------------
@@ -58,7 +58,7 @@ function sales($order_id){
     $is_reward = M('order_divide')->where('order_id',$order_id)->find();
     
     if ($is_reward) {
-       return array('msg'=>"该商品已奖励",'code'=>0);
+       return array('msg'=>"该商品已返佣",'code'=>0);
     }
 
     $order = M('order')->where(['order_id'=>$order_id])->where('pay_status',1)->find();
@@ -911,7 +911,7 @@ function update_pay_status($order_sn,$ext=array())
         // $User->updateUserLevel();
 
         
-        $sales = sales($order['order_id']);  //销售奖励
+        $sales = sales($order['order_id']);  //购买返佣
         
         // 分销商升级, 根据order表查看消费id 达到条件就给他分销商等级升级
         $Level =new \app\common\logic\LevelLogic();
