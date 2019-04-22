@@ -104,18 +104,18 @@ class UsersLogic extends Model
      */
     public function relation($cat_id = 0, $selected = 0, $re_type = true, $level = 0)
     {
-        global $goods_category, $goods_category2;            
+        global $user, $user2;            
         $sql = "SELECT user_id,nickname,mobile,is_distribut,first_leader,distribut_level,distribut_money FROM  __PREFIX__users ORDER BY first_leader ASC";
-        $goods_category = DB::query($sql);
-        $goods_category = convert_arr_key($goods_category, 'user_id');
+        $user = DB::query($sql);
+        $user = convert_arr_key($user, 'user_id');
         
-        foreach ($goods_category AS $key => $value)
+        foreach ($user AS $key => $value)
         {
             if(($value['is_distribut'] == 1) && $value['first_leader'] == 0){
                 $this->get_cat_tree($value['user_id'], 0);                               
             }
         }
-        return $goods_category2;
+        return $user2;
     }
 
     /**
@@ -127,17 +127,17 @@ class UsersLogic extends Model
      */
     public function get_cat_tree($id, $level)
     {
-        global $goods_category, $goods_category2;          
-        $goods_category2[$id] = $goods_category[$id];
+        global $user, $user2;          
+        $user2[$id] = $user[$id];
         $level = $level + 1;
-        $goods_category2[$id]['level'] = $level;
-        $k = $goods_category[$id]['level']; 
+        $user2[$id]['level'] = $level;
+        $k = $user[$id]['level']; 
 
-        foreach ($goods_category AS $key => $value){
+        foreach ($user AS $key => $value){
              if(($value['is_distribut'] == 1) && $value['first_leader'] == $id)
              {
                 $this->get_cat_tree($value['user_id'], $level);  
-                $goods_category2[$id]['have_son'] = 1; // 还有下级
+                $user2[$id]['have_son'] = 1; // 还有下级
                 $k++;
              }
         }            

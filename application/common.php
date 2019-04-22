@@ -905,10 +905,10 @@ function update_pay_status($order_sn,$ext=array())
                 minus_stock($order);
             }
         }
-        // 给他升级, 根据order表查看消费记录 给他会员等级升级 修改他的折扣 和 总金额
-        $User =new \app\common\logic\User();
-        $User->setUserById($order['user_id']);
-        $User->updateUserLevel();
+        // // 给他升级, 根据order表查看消费记录 给他会员等级升级 修改他的折扣 和 总金额
+        // $User =new \app\common\logic\User();
+        // $User->setUserById($order['user_id']);
+        // $User->updateUserLevel();
 
         
         $sales = sales($order['order_id']);  //销售奖励
