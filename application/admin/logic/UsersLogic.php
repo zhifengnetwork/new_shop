@@ -107,7 +107,7 @@ class UsersLogic extends Model
     {
         ini_set("max_execution_time", 300);
         global $user;
-        $user = Db::name('users')->where('user_id','<',10000)->column('user_id,nickname,mobile,is_distribut,first_leader');
+        $user = Db::name('users')->column('user_id,nickname,mobile,is_distribut,first_leader');
         
         foreach ($user as $key => $value)
         {
