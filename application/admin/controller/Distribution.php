@@ -336,8 +336,8 @@ class Distribution extends Base
     //分销关系
     public function tree()
     {
-        $UsersLogic = new UsersLogic();    
-        $cat_list = $UsersLogic->relation();
+        // $UsersLogic = new UsersLogic;    
+        $cat_list = UsersLogic::relation();
        
         if($cat_list){
             $level = array_column($cat_list, 'level');
