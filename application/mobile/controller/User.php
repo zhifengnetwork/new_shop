@@ -79,8 +79,6 @@ class User extends MobileBase
 
     public function index()
     {
-        $le = new \app\common\logic\LevelLogic();
-        $list = $le->get_down_all(128);dump($list);die;
         $agent_level = M('agent_level')->field('level,level_name')->select();
         if($agent_level){
             foreach($agent_level as $v){
