@@ -160,7 +160,7 @@ class User extends MobileBase
         }
         
         //获取对应下级id的数据
-        $team_list = M('users')->where('user_id','in',$id_array)->field('user_id,distribut_level,distribut_money,head_pic')->select();
+        $team_list = M('users')->where('user_id','in',$id_array)->field('user_id,nickname,mobile,distribut_level,distribut_money,head_pic')->select();
         //获取等级
         $level = M('agent_level')->column('level,level_name');
         
@@ -192,13 +192,15 @@ class User extends MobileBase
         $log = Db::name('order')->alias('order')
                 ->distinct(true)
                 ->join('order_goods goods','order.order_id = goods.order_id')
-                ->join('order_goods goods1','goods1.order_sn = order.order_sn')
                 ->where('order.user_id',$id)
-                ->order('goods.rec_id','desc')
+                ->order('order.pay_time','desc')
                 ->field('goods.rec_id,order.pay_time,goods.goods_price,goods.goods_num')
                 ->limit(50)
                 ->select();
-                
+
+        $user_info = Db::name('users')->where('user_id',$id)->field('nickname,mobile,head_pic')->find();
+        
+        $this->assign('info',$user_info);
         $this->assign('log',$log);
         return $this->fetch();
     }
