@@ -323,17 +323,19 @@ class Goods extends Base {
         $GoodsLogic = new GoodsLogic();
         $Goods = new \app\common\model\Goods();
         $goods_id = input('id');
-        $basic_reward = array();
-        $each_reward = array();
+        // $basic_reward = array();
+        // $each_reward = array();
+
         if($goods_id){
             $goods = $Goods->where('goods_id', $goods_id)->find();
             $level_cat = $GoodsLogic->find_parent_cat($goods['cat_id']); // 获取分类默认选中的下拉框
             $level_cat2 = $GoodsLogic->find_parent_cat($goods['extend_cat_id']); // 获取分类默认选中的下拉框
             $brandList = $GoodsLogic->getSortBrands($goods['cat_id']);   //获取三级分类下的全部品牌
-            $basic_reward = json_decode($goods['basic_reward'],true);
-            $each_reward = json_decode($goods['each_reward'],true);
-            $self_buying = json_decode($goods['self_buying'],true);
-            $higher_commission = json_decode($goods['higher_commission'],true);
+            // $basic_reward = json_decode($goods['basic_reward'],true);
+            // $each_reward = json_decode($goods['each_reward'],true);
+            // $self_buying = json_decode($goods['self_buying'],true);
+            // $higher_commission = json_decode($goods['higher_commission'],true);
+            $setting = json_decode($goods['goods_prize'],true);
 
             $this->assign('goods', $goods);
             $this->assign('level_cat', $level_cat);
@@ -351,27 +353,41 @@ class Goods extends Base {
 
         $sales = array();
         $num = 0;
+        foreach ($level_name as $key => $value) {
+            $sales[$num] =array(
+                'level' => $value['level'],
+                'level_name' => $value['level_name'],
+                'reward' => 0,
+                'poor_prize' => 0,
+                'same_reword' => 0,
+                'same_reword2' => 0,
+                'self_buying' => 0,
+                'self_poor_prize' => 0,
+                'self_reword' => 0,
+                'self_reword2' => 0,
+            );
+            $num ++;
+        }  
+
         //返佣设置
-        if ($basic_reward) {
-            foreach ($basic_reward as $k1 => $v1) {
-                $sales[$num]['level'] = $k1;
-                $sales[$num]['level_name'] = $level_name[$num]['level_name'];
-                $sales[$num]['reward'] = $v1;
-                $sales[$num]['each_reward'] = $each_reward[$k1];
-                $sales[$num]['self_buying'] = $self_buying[$k1];
-                $sales[$num]['higher_commission'] = $higher_commission[$k1];
+        if ($setting) {
+            $num = 0;
+            $setting_info = M('goods_commission')->select($setting);
+            foreach ($setting_info as $k1 => $v1) {
+                $sales[$num] = array(
+                    'level' => $v1['level'],
+                    'level_name' => $level_name[$v1['level']]['level_name'],
+                    'reward' => $v1['reward'],
+                    'poor_prize' => $v1['poor_prize'],
+                    'same_reword' => $v1['same_reword'],
+                    'same_reword2' => $v1['same_reword2'],
+                    'self_buying' => $v1['self_buying'],
+                    'self_poor_prize' => $v1['self_poor_prize'],
+                    'self_reword' => $v1['self_reword'],
+                    'self_reword2' => $v1['self_reword2']
+                );
                 $num ++;
             }
-        } else {
-            foreach ($level_name as $key => $value) {
-                $sales[$num]['level'] = $value['level'];
-                $sales[$num]['level_name'] = $value['level_name'];
-                $sales[$num]['reward'] = 0;
-                $sales[$num]['each_reward'] = 0;
-                $sales[$num]['self_buying'] = 0;
-                $sales[$num]['higher_commission'] = 0;
-                $num ++;
-            }           
         }
         
         $this->assign('sales',$sales);
@@ -415,36 +431,59 @@ class Goods extends Base {
         }
 
         $level_name = $this->get_level_name();
-        $num = 0;
-        $sal = array();
-        $each_reward = array();
-        $self_buying = array();
-        $higher_commission = array();
+        // $num = 0;
+        // $setting = array();
+        $ids = array();
+        $is_setting = $goods->goods_prize;
 
+        $is_setting = $is_setting ? json_decode($setting,true) : array();
+        $have_reward = M('goods_commission')->column('id,level');
+        
         //返佣设置
         foreach ($level_name as $key => $value) {
-            $num ++;
             foreach ($data as $k2 => $v2) {
-                $str = 'level_'.$num;
+                $str = 'level_'.$key;
                 if ($str == $k2) {
-                    $sal[$data[$str]] = $data['reward_'.$num];
-                    $each_reward[$data['level_'.$num]] = $data['each_reward_'.$num];
-                    $self_buying[$data['level_'.$num]] = $data['self_buying_'.$num];
-                    $higher_commission[$data['level_'.$num]] = $data['higher_commission_'.$num];
+                    $setting['level'] = $key;
+                    $setting['reward'] = floatval($data['reward_'.$key]);
+                    $setting['poor_prize'] = floatval($data['poor_prize_'.$key]);
+                    $setting['same_reword'] = floatval($data['same_reword_'.$key]);
+                    $setting['same_reword2'] = floatval($data['same_reword2_'.$key]);
+                    $setting['self_buying'] = floatval($data['self_buying_'.$key]);
+                    $setting['self_poor_prize'] = floatval($data['self_poor_prize_'.$key]);
+                    $setting['self_reword'] = floatval($data['self_reword_'.$key]);
+                    $setting['self_reword2'] = floatval($data['self_reword2_'.$key]);
+                    $setting['create_time'] = time();
+                    $setting['update_time'] = time();
+
+                    if ($is_setting) {
+                        $bool = false;
+                        foreach ($have_reward as $k3 => $v3) {
+                            if ($v3 == $k2) {
+                                $bool = true;
+                                break;
+                            }
+                        }
+                        if ($bool) {
+                            Db::name('goods_commission')->where('level',$key)->update($setting);
+                        } else {
+                            $is_setting[] = Db::name('goods_commission')->insertGetId($setting);
+                            $ids = $is_setting;
+                        }
+                        
+                    } else {
+                        $id = Db::name('goods_commission')->insertGetId($setting);
+                        $ids[] = $id ? $id : 0;
+                    }
                 }
+                
             }
         }
         
-        $sal= json_encode($sal);
-        $each_reward= json_encode($each_reward);
-        $self_buying= json_encode($self_buying);
-        $higher_commission= json_encode($higher_commission);
         $goods->data($data, true);
         $goods->last_update = time();
         $goods->price_ladder = true;
-        $goods->basic_reward = $sal;
-        $goods->self_buying = $self_buying;
-        $goods->higher_commission = $higher_commission;
+        $goods->goods_prize = json_encode($ids);
         $goods->save();
 
         if(empty($spec_item)){
@@ -639,8 +678,23 @@ class Goods extends Base {
     public function delGoods()
     {
         $ids = I('post.ids','');
+        
         empty($ids) &&  $this->ajaxReturn(['status' => -1,'msg' =>"非法操作！",'data'  =>'']);
         $goods_ids = rtrim($ids,",");
+        $$commission_ids = array();
+        $goods_commission = M('goods')->whereIn('goods_id',$goods_ids)->column('goods_prize');
+
+        if ($goods_commission) {
+            foreach ($goods_commission as $key1 => $value1) {
+                if ($value1) {
+                    $comm_ids = json_decode($value1,true);
+                    foreach ($comm_ids as $key2 => $value2) {
+                        $commission_ids[] = intval($value2);
+                    }
+                }
+            }
+        }
+        
         // 判断此商品是否有订单
         $ordergoods_count = Db::name('OrderGoods')->whereIn('goods_id',$goods_ids)->group('goods_id')->getField('goods_id',true);
         if($ordergoods_count)
@@ -658,7 +712,8 @@ class Goods extends Base {
         
         //删除用户收藏商品记录
         M('GoodsCollect')->whereIn('goods_id',$goods_ids)->delete();
-        
+        //删除返佣设置
+        M('goods_commission')->delete($commission_ids);
         // 删除此商品        
         M("Goods")->whereIn('goods_id',$goods_ids)->delete();  //商品表
         M("cart")->whereIn('goods_id',$goods_ids)->delete();  // 购物车

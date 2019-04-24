@@ -87,7 +87,7 @@
 }
     .err{color:#F00; display:none;}
     .sal_tit{text-align: center;}
-    .sal_bod{width: 100px; margin-right: 6px;}
+    .sal_bod{width: 90px; margin-right: 6px;}
     .level_name{margin-right: 6px;}
 </style>
 <!--物流配置 css -end-->
@@ -264,38 +264,60 @@
             </dl>
             <dl class="row">
               <dt class="tit">
-                <label for="ac_sort">奖励级别</label>
+                <label for="ac_sort">奖励</label>
               </dt>
               <dd class="opt">
                   <table class="table">
-                    <tr>
-                      <th class="sal_tit">名称</th>
-                      <th class="sal_tit">基本奖励</th>
-                      <th class="sal_tit">每件商品奖励</th>
-                      <th class="sal_tit">重购返佣</th>
-                      <th class="sal_tit">重购上级分佣</th>
-                    </tr>
+                    <thead>
+                        <tr>
+                          <th class="sal_tit">名称</th>
+                          <th class="sal_tit">直推奖</th>
+                          <th class="sal_tit">极差奖</th>
+                          <th class="sal_tit">同级奖(一代)</th>
+                          <th class="sal_tit">同级奖(二代)</th>
+                          <th class="sal_tit">自购直推奖</th>
+                          <th class="sal_tit">自购极差奖</th>
+                          <th class="sal_tit">自购同级奖(一代)</th>
+                          <th class="sal_tit">自购同级奖(二代)</th>
+                        </tr>
+                    </thead>
                     <foreach name="sales" item="vo">
                       <tr>
-                        <td>
-                          <input type="hidden" name="level_{$key+1}" value="{$vo.level}"style="">
+                        <td style="width:50px;">
+                          <input type="hidden" name="level_{$key}" value="{$vo.level}"style="">
                           <label for="ac_sort" class="level_name">{$vo.level_name}</label>
                         </td>
                         <td>
-                            <input type="text" name="reward_{$key+1}" value="{$vo.reward}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
-                            <span class="err" id="err_reward_{$key+1}" style="color:#F00; display:none;" ></span>
+                            <input type="text" name="reward_{$key}" value="{$vo.reward}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
+                            <span class="err" id="err_reward_{$key}" style="color:#F00; display:none;" ></span>
                         </td>
                         <td>
-                            <input type="text" name="each_reward_{$key+1}" value="{$vo.each_reward}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
-                            <span class="err" id="err_each_reward_{$key+1}" style="color:#F00; display:none;"></span>
+                            <input type="text" name="poor_prize_{$key}" value="{$vo.poor_prize}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
+                            <span class="err" id="err_poor_prize_{$key+1}" style="color:#F00; display:none;"></span>
                         </td>
                         <td>
-                            <input type="text" name="self_buying_{$key+1}" value="{$vo.self_buying}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
-                            <span class="err" id="err_self_buying_{$key+1}" style="color:#F00; display:none;"></span>
+                            <input type="text" name="same_reword_{$key}" value="{$vo.same_reword}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
+                            <span class="err" id="err_same_reword_{$key}" style="color:#F00; display:none;"></span>
                         </td>
                         <td>
-                            <input type="text" name="higher_commission_{$key+1}" value="{$vo.higher_commission}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
-                            <span class="err" id="err_higher_commission_{$key+1}" style="color:#F00; display:none;"></span>
+                            <input type="text" name="same_reword2_{$key}" value="{$vo.same_reword2}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
+                            <span class="err" id="err_same_reword2_{$key}" style="color:#F00; display:none;"></span>
+                        </td>
+                        <td>
+                            <input type="text" name="self_buying_{$key}" value="{$vo.self_buying}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
+                            <span class="err" id="err_self_buying_{$key}" style="color:#F00; display:none;" ></span>
+                        </td>
+                        <td>
+                            <input type="text" name="self_poor_prize_{$key}" value="{$vo.self_poor_prize}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
+                            <span class="err" id="err_self_poor_prize_{$key}" style="color:#F00; display:none;"></span>
+                        </td>
+                        <td>
+                            <input type="text" name="self_reword_{$key}" value="{$vo.self_reword}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
+                            <span class="err" id="err_self_reword_{$key}" style="color:#F00; display:none;"></span>
+                        </td>
+                        <td>
+                            <input type="text" name="self_reword2_{$key}" value="{$vo.self_reword2}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
+                            <span class="err" id="err_self_reword2_{$key}" style="color:#F00; display:none;"></span>
                         </td>
                       </tr>
                     </foreach>
