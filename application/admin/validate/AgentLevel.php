@@ -11,7 +11,8 @@ class AgentLevel extends Validate
         ['agent_goods_sum', 'require|number'],
         ['team_nums', 'require|number'],
         ['same_reword', 'require|number'],
-        ['layer', 'require|number'],
+        ['same_reword2', 'require|number'],
+        // ['layer', 'require|number'],
     ];
     //错误信息
     protected $message  = [
@@ -26,10 +27,12 @@ class AgentLevel extends Validate
         'agent_goods_sum.number'    => '团队业绩必须是数字',
         'team_nums.require'    => '团队同级人数必填',
         'team_nums.number'    => '团队同级人数是数字',
-        'same_reword.require'  => '同级奖励必填',
-        'same_reword.number'    => '同级奖励必须是数字',
-        'layer.require'     => '同级奖励层数必填',
-        'layer.number'      => '同级奖励层数必须是数字',
+        'same_reword.require'  => '同级奖励(一代)必填',
+        'same_reword.number'    => '同级奖励(一代)必须是数字',
+        'same_reword2.require'  => '同级奖励(二代)必填',
+        'same_reword2.number'    => '同级奖励(二代)必须是数字',
+        // 'layer.require'     => '同级奖励层数必填',
+        // 'layer.number'      => '同级奖励层数必须是数字',
     ];
     //验证场景
     protected $scene = [
@@ -40,7 +43,8 @@ class AgentLevel extends Validate
             'agent_goods_sum'    =>'require|number',
             'team_nums'    =>'require|number',
             'same_reword'    =>'require|number',
-            'layer'    =>'require|number',
+            'same_reword2'    =>'require|number',
+            // 'layer'    =>'require|number',
         ],
     ];
 }

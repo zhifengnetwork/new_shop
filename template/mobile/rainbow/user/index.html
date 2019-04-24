@@ -4,7 +4,7 @@
     <div class="z_user_head">
         <div class="z_user_top">
             <div class="user_top_tx">
-                <img src="{$user.head_pic}"/>
+                <notempty name="$user.head_pic"><img src="{$user.head_pic}"/><else/><img src="/public/images/user_default_icon.jpg"/></notempty>
             </div>
             <div class="user_top_name">
                 <a href="javascript:void(0);">{$user['nickname']}</a>

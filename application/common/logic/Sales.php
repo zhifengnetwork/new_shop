@@ -33,13 +33,14 @@ class Sales extends Model
 	public function sales()
 	{
 		$user = M('users')->where('user_id',$this->user_id)->find();
+		$user_level = $user['distribut_level'];
 		if ($user['parents']) {
 			$parents_id = explode(',', $user['parents']);
 			$parents_id = array_filter($parents_id);  //去除0,倒序排列
 			
 			$this->cash_unlock($parents_id);	//提现解锁
 			
-			$reward = $this->reward($parents_id);
+			$reward = $this->reward($parents_id,$user_level);
 			return $reward;
 		} else {
 			return array('msg'=>"该用户没有上级",'code'=>0);
@@ -47,7 +48,7 @@ class Sales extends Model
 	}
 
 	//奖励
-	public function reward($parents_id)
+	public function reward($parents_id,$user_level)
 	{
 		$order = $this->order();
 		
@@ -79,9 +80,11 @@ class Sales extends Model
 			$each_reward = array();
 		}
 		
-		$user_level = 0;
+		// $user_level = 0;
+		$min_level = 0;
 		$layer = 0;
 		$msg = "";
+		$is_prize = false;
 		
 		foreach ($all_user as $key => $value) {
 			$money = 0;
@@ -97,34 +100,50 @@ class Sales extends Model
 			if ($value['is_distribut'] != 1) {
 				continue;
 			}
+			
 			//等级比下级低没有奖励
 			if ($user_level > $value['distribut_level']) {
 				continue;
 			}
+			
 			//平级奖
 			if ($user_level == $value['distribut_level']) {
 				$layer ++;
 				//超过设定层数没有奖励
-				if ($layer > $level[$user_level]['layer']) {
+				if ($layer > 2) {
 					continue;
 				}
 				
-				$money = $level[$user_level]['same_reword'] * $order['goods_num'];
-				$msg = "同级奖励 ".$money."(元)";
+				switch($layer){
+					case 1:
+						$money = $level[$user_level]['same_reword'] * $order['goods_num'];
+						break;
+					case 2:
+						$money = $level[$user_level]['same_reword2'] * $order['goods_num'];
+						break;
+					default:
+						break;
+				}
+				
+				$msg = "同级奖励 ".$money."（元）";
 			}
 			//极差奖
 			if ($user_level < $value['distribut_level']) {
 				$layer = 0;
-				$user_level = $value['distribut_level'];
-				$money = $basic_reward ? $basic_reward[$value['distribut_level']] : 0;
-				if (!$money) {
-					continue;
+
+				//基本奖励已奖励的不再奖励
+				if (!$is_prize) {
+					$money = $basic_reward ? $basic_reward[$value['distribut_level']] : 0;
+					$is_prize = true;
 				}
 				
 				reset($each_reward);	//重置数组指针
-
-				//计算奖金
+				
+				//计算极差奖金
 				while(list($k1,$v1) = each($each_reward)){
+					if ($user_level >= $k1) {
+						continue;
+					}
 					if ($k1 <= $value['distribut_level']) {
 						$v1 = $v1 ? $v1 : 0;
 						$money += $v1 * $order['goods_num'];
@@ -133,31 +152,19 @@ class Sales extends Model
 					break;
 				}
 				
-				$msg = "级别利润 ".$money."(元)，商品：".$order['goods_num']."件";
+				$user_level = $value['distribut_level'];
+				$msg = "级别利润 ".$money."（元），商品：".$order['goods_num']."件";
+			}
+			if (!$money) {
+				continue;
 			}
 			
 			$user_money = $money+$value['user_money'];
 			$distribut_money = $money+$value['distribut_money'];
 			
-			$bool = M('users')->where('user_id',$value['user_id'])->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
-			
-			if ($bool) {
-				$this->writeLog($value['user_id'],$money,$order['order_sn'],$msg,$order['goods_num']);
-			} else {
-				$data = array(
-					'user_id' =>$this->user_id,
-					'to_user_id'=>$value['user_id'],
-					'money'=>$money,
-					'order_sn'=>$order['order_sn'],
-					'order_id'=>$this->order_id,
-					'goods_id'=>$this->goods_id,
-					'num'=>$order['goods_num'],
-					'create_time'=>time(),
-					'desc'=>"用户表更新失败 ".$msg
-				);
+			M('users')->where('user_id',$value['user_id'])->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
 
-				M('distrbut_commission_log')->insert($data);
-			}
+			$this->writeLog($value['user_id'],$money,$order['order_sn'],$msg,$order['goods_num']);
 		}
 		
 		return array('code'=>1);
@@ -167,7 +174,7 @@ class Sales extends Model
 	//获取所有用户信息
 	public function all_user($parents_id)
 	{
-		$all = M('users')->where('user_id','in',$parents_id)->column('user_id,first_leader,distribut_level,is_lock,user_money,distribut_money');
+		$all = M('users')->where('user_id','in',$parents_id)->column('user_id,first_leader,distribut_level,is_lock,user_money,distribut_money,is_distribut');
 		$result = array();
 
 		foreach ($parents_id as $key => $value) {
@@ -179,7 +186,7 @@ class Sales extends Model
 	//获取等级信息
 	public function get_level()
 	{
-		$level = M('agent_level')->column('level,same_reword,bonus,layer');
+		$level = M('agent_level')->column('level,same_reword,same_reword2');
 
 		return $level;
 	}

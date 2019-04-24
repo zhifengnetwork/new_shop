@@ -33,7 +33,7 @@
 <div class="application-record">
     <div class="hh" style="padding-top: 1rem;">
         <div class="user_top_tx">
-            <notempty name="info.head_pic"><img src="{$info.head_pic}"/></notempty>
+            <notempty name="info.head_pic"><img src="{$info.head_pic}"/><else/><img src="/public/images/user_default_icon.jpg"/></notempty>
         </div>
         <h2 id="nickname">{$info.nickname}</h2>
     </div>

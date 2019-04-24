@@ -10,14 +10,45 @@
         transform: translate(-50%,-50%);
         font-size: 0.7rem;
     }
-    .li1>span>img{
-        width: 1rem;
-         height: 1rem;
-    }
     .leader>p{
         margin-top: 0.7em;
         margin-bottom: 0.7em;
         font-size:2em;
+    }
+    .re_tit{
+    display: flex
+    }
+    .ul_liebiao{
+        display: flex
+    }
+    .ul_liebiao li{
+         flex: 1;
+         height: 3rem !important;
+         line-height: 3rem !important;
+    }
+    .ul_liebiao li:first-child{
+        line-height: 0;
+        position: relative;
+    }
+    .touxiang{
+         position: absolute;
+         left: 0;
+         right: 0;
+         margin: 0 auto;
+         top: .3rem;
+         width: 1.5rem;
+         height: 1.5rem;
+    }
+    .nickname{
+       position: absolute;
+       top:.8rem;
+       left: 0;
+       right: 0;
+       margin: 0 auto;
+
+    }
+    .re_tit li{
+        flex: 1;
     }
 </style>
 <div class="application-record">
@@ -49,8 +80,17 @@
             </div>
         <else/>
             <foreach name="team" item="v">
-                <ul>
-                    <li class="li1" style="margin:line-height;"><span><notempty name="$v[head_pic]"><img src="{$v[head_pic]}" style="border-radius:50%;"></notempty>{$v.nickname ? $v.nickname : $v.mobile}</span></li> 
+                <ul class="ul_liebiao">
+                    <li class="li1" style="margin:line-height;">
+                        <span>
+                            <notempty name="$v[head_pic]">
+                                <img src="$v[head_pic]" style="border-radius:50%;" class="touxiang">
+                            <else/>
+                                <img src="/public/images/user_default_icon.jpg" style="border-radius:50%;" class="touxiang">
+                            </notempty>
+                           <span class="nickname">{$v.nickname ? $v.nickname : $v.mobile}</span>
+                        </span>
+                    </li> 
                     <li class="li2" style="width:30%;"><span>{$v.level_name}</span></li>  
                     <li class="li2" style=""><span>{$v.distribut_money}</span></li>
                     <li class="li1" style="width:25%; margin:line-height;"><span><a href="{:url('Mobile/User/purchase_log', array('id'=>$v.user_id))}" style="color:dodgerblue">查看</a></span></li>
