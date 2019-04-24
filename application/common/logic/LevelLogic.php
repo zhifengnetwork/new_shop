@@ -43,11 +43,17 @@ class LevelLogic extends Model
         //最大等级
         $max_level = Db::name('agent_level')->max('level');
         $field = "ind_goods_sum, agent_goods_sum";
-        //用户业绩
+        //获取用户业绩
+        //所有直推下级总业绩
+        $down_nums = $this->get_down_all($agent_id);
         $agent_cond = Db::name('agent_performance')
                     ->field($field)
                     ->where('user_id',$agent_id)->find();
+        //团队业绩 = 自己业绩 + 所有下级总业绩
         $agent_cond['agent_goods_sum'] = $agent_cond['ind_goods_sum'] + $agent_cond['agent_goods_sum'];
+        //个人业绩 = 自己业绩 + 所有直推下级总业绩
+        $agent_cond['ind_goods_sum'] = $agent_cond['ind_goods_sum'] + $down_nums;
+        //团队标准（团队同级人数）
         $team_nums = $this->get_down_nums($agent_id);
         $agent_cond['team_nums'] = $team_nums;
         //升级条件
@@ -169,6 +175,28 @@ class LevelLogic extends Model
             }
         }
         return $count;
+    }
+
+    /**
+     * 获取所有直推下级业绩
+     */
+    public function get_down_all($agent_id)
+    {
+        //获取直推下级id
+        $ids = Db::name('users')->where('first_leader',$agent_id)->field('user_id')->select();
+        if($ids){
+            $id_array =[];
+            foreach($ids as $k=>$v){
+                array_push($id_array ,$v['user_id']);
+            }
+        }
+        // dump($id_array);
+        $down_count = 0;
+        foreach($id_array as $v){
+            $count = Db::name('agent_performance')->where('user_id',$v)->value('ind_goods_sum');
+            $down_count = $down_count + $count;
+        }
+        return $down_count;
     }
 
 }
