@@ -14,6 +14,8 @@ use think\Page;
 use think\Loader;
 use app\common\logic\PerformanceLogic;
 use app\admin\logic\UsersLogic;
+use think\Cache;
+
 /**
 *  分销
 **/
@@ -336,9 +338,13 @@ class Distribution extends Base
     //分销关系
     public function tree()
     {
-        // $UsersLogic = new UsersLogic;    
-        $cat_list = UsersLogic::relation();
-       
+        $cat_list = tpCache('team_tree');
+
+        if (!$cat_list) {
+            $UsersLogic = UsersLogic::relation();
+            $cat_list = tpCache('team_tree');
+        }
+        
         if($cat_list){
             $level = array_column($cat_list, 'level');
             $heightLevel = max($level);
@@ -350,7 +356,14 @@ class Distribution extends Base
                 }
             }
         }
+
+        $count = count($cat_list);
+
+        if ($count == count($cat_list,1)) {
+            $count = $count ? 1 : 0;
+        }
         
+        $this->assign('count',$count);
         $this->assign('heightLevel',$heightLevel);
         $this->assign('cat_list',$cat_list);    
         

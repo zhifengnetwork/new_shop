@@ -19,6 +19,7 @@ use app\common\model\UserLabel;
 use think\Loader;
 use think\Model;
 use think\Db;
+use think\Cache;
 
 class UsersLogic extends Model
 {
@@ -118,7 +119,8 @@ class UsersLogic extends Model
             }
         }
         
-        return self::$user2;
+        cache::set('team_tree',self::$user2);
+        // return self::$user2;
     }
 
     /**

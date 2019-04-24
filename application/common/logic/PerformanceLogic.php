@@ -30,6 +30,7 @@ class PerformanceLogic extends Model
 		$user_id = $order['user_id'];
 		$order_sn = $order['order_sn'];
 		
+		$user = M('users')->where('user_id',$user_id)->value('first_leader');
 		$is_per = M('agent_performance')->where('user_id',$order['user_id'])->find();
 
 		$log = array(
@@ -75,11 +76,15 @@ class PerformanceLogic extends Model
 		$id_list = M('users')->where('user_id',$user_id)->value('parents');
 		$id_list = explode(',', $id_list);
 		$new_list = array_filter($id_list);
+
+		if (!$new_list) {
+			return false;
+		}
 		
 		foreach ($new_list as $key => $value) {
 			$is_team = M('agent_performance')->where('user_id',$value)->find();
 			
-			//团队者添加业绩
+			//团队添加业绩
 			if ($is_team) {
 				$team_per = array(
 					'agent_per'=>$is_team['agent_per']+$price,
