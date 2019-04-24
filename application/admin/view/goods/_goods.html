@@ -272,21 +272,31 @@
                       <th class="sal_tit">名称</th>
                       <th class="sal_tit">基本奖励</th>
                       <th class="sal_tit">每件商品奖励</th>
+                      <th class="sal_tit">重购返佣</th>
+                      <th class="sal_tit">重购上级分佣</th>
                     </tr>
                     <foreach name="sales" item="vo">
                       <tr>
                         <td>
                           <input type="hidden" name="level_{$key+1}" value="{$vo.level}"style="">
                           <label for="ac_sort" class="level_name">{$vo.level_name}</label>
-                      </td>
-                      <td>
-                          <input type="text" name="reward_{$key+1}" value="{$vo.reward}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
-                          <span class="err" id="err_reward_{$key+1}" style="color:#F00; display:none;" ></span>
-                      </td>
-                      <td>
-                          <input type="text" name="each_reward_{$key+1}" value="{$vo.each_reward}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
-                          <span class="err" id="err_each_reward_{$key+1}" style="color:#F00; display:none;"></span>
-                      </td>
+                        </td>
+                        <td>
+                            <input type="text" name="reward_{$key+1}" value="{$vo.reward}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
+                            <span class="err" id="err_reward_{$key+1}" style="color:#F00; display:none;" ></span>
+                        </td>
+                        <td>
+                            <input type="text" name="each_reward_{$key+1}" value="{$vo.each_reward}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
+                            <span class="err" id="err_each_reward_{$key+1}" style="color:#F00; display:none;"></span>
+                        </td>
+                        <td>
+                            <input type="text" name="self_buying_{$key+1}" value="{$vo.self_buying}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
+                            <span class="err" id="err_self_buying_{$key+1}" style="color:#F00; display:none;"></span>
+                        </td>
+                        <td>
+                            <input type="text" name="higher_commission_{$key+1}" value="{$vo.higher_commission}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
+                            <span class="err" id="err_higher_commission_{$key+1}" style="color:#F00; display:none;"></span>
+                        </td>
                       </tr>
                     </foreach>
                   </table>

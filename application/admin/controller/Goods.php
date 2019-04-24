@@ -332,6 +332,8 @@ class Goods extends Base {
             $brandList = $GoodsLogic->getSortBrands($goods['cat_id']);   //获取三级分类下的全部品牌
             $basic_reward = json_decode($goods['basic_reward'],true);
             $each_reward = json_decode($goods['each_reward'],true);
+            $self_buying = json_decode($goods['self_buying'],true);
+            $higher_commission = json_decode($goods['higher_commission'],true);
 
             $this->assign('goods', $goods);
             $this->assign('level_cat', $level_cat);
@@ -349,25 +351,29 @@ class Goods extends Base {
 
         $sales = array();
         $num = 0;
+        //返佣设置
         if ($basic_reward) {
             foreach ($basic_reward as $k1 => $v1) {
                 $sales[$num]['level'] = $k1;
                 $sales[$num]['level_name'] = $level_name[$num]['level_name'];
                 $sales[$num]['reward'] = $v1;
                 $sales[$num]['each_reward'] = $each_reward[$k1];
+                $sales[$num]['self_buying'] = $self_buying[$k1];
+                $sales[$num]['higher_commission'] = $higher_commission[$k1];
                 $num ++;
             }
         } else {
             foreach ($level_name as $key => $value) {
-                
                 $sales[$num]['level'] = $value['level'];
                 $sales[$num]['level_name'] = $value['level_name'];
                 $sales[$num]['reward'] = 0;
                 $sales[$num]['each_reward'] = 0;
+                $sales[$num]['self_buying'] = 0;
+                $sales[$num]['higher_commission'] = 0;
                 $num ++;
             }           
         }
-
+        
         $this->assign('sales',$sales);
         $this->assign('freight_template',$freight_template);
         $this->assign('suppliersList', $suppliersList);
@@ -412,7 +418,10 @@ class Goods extends Base {
         $num = 0;
         $sal = array();
         $each_reward = array();
+        $self_buying = array();
+        $higher_commission = array();
 
+        //返佣设置
         foreach ($level_name as $key => $value) {
             $num ++;
             foreach ($data as $k2 => $v2) {
@@ -420,17 +429,22 @@ class Goods extends Base {
                 if ($str == $k2) {
                     $sal[$data[$str]] = $data['reward_'.$num];
                     $each_reward[$data['level_'.$num]] = $data['each_reward_'.$num];
+                    $self_buying[$data['level_'.$num]] = $data['self_buying_'.$num];
+                    $higher_commission[$data['level_'.$num]] = $data['higher_commission_'.$num];
                 }
             }
         }
         
         $sal= json_encode($sal);
         $each_reward= json_encode($each_reward);
+        $self_buying= json_encode($self_buying);
+        $higher_commission= json_encode($higher_commission);
         $goods->data($data, true);
         $goods->last_update = time();
         $goods->price_ladder = true;
         $goods->basic_reward = $sal;
-        $goods->each_reward = $each_reward;
+        $goods->self_buying = $self_buying;
+        $goods->higher_commission = $higher_commission;
         $goods->save();
 
         if(empty($spec_item)){

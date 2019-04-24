@@ -13,7 +13,7 @@ use think\Db;
 use think\Cache;
 
 /**
- * 销售类逻辑
+ * 返佣类逻辑
  * Class Sales
  * @package app\common\logic
  */
