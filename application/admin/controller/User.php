@@ -100,11 +100,29 @@ class User extends Base
 	
 	# 直推下级列表
 	public function direct_list(){
-		$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-		
-		$list = Db::name('users')->field('')->where('first_leader', $id)->paginate(10);
-		
-		$this->assign('list',$list);
+        
+        $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+
+
+        $list = Db::query("select * from `tp_users` where `first_leader` > 0 and `first_leader` = $id");
+        $count = count($list);
+
+        $this->assign('list',$list);
+        $this->assign('count',$count);
+		return $this->fetch();
+    }
+
+    # 团队列表
+	public function team_list(){
+        
+        $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+        
+
+        $list = Db::query("select * from `tp_users` where `first_leader` > 0 and find_in_set('$id',parents)");
+        $count = count($list);
+
+        $this->assign('list',$list);
+        $this->assign('count',$count);
 		return $this->fetch();
 	}
 

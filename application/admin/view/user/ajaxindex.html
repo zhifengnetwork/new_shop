@@ -42,10 +42,10 @@
                     <div style="text-align: center; width: 60px;"><eq name="$list.is_employees" value="1"> 是 <else/> 否 </eq></div>
                 </td>
                 <td align="left" class="">
-                    <div style="text-align: center; width: 80px;"><a href="{:U('Admin/user/direct_list',array('id'=>$list['user_id']))}">{$last_cout[$list.user_id]['direct']|default="0"}</a></div>
+                    <div style="text-align: center; width: 80px;"><a onclick="direct_list('{$list.user_id}');">{$last_cout[$list.user_id]['direct']|default="0"}</a></div>
                 </td>
                 <td align="left" class="">
-                    <div style="text-align: center; width: 80px;">{$last_cout[$list.user_id]['team']|default="0"}</div>
+                    <div style="text-align: center; width: 80px;"><a onclick="team_list('{$list.user_id}');">{$last_cout[$list.user_id]['team']|default="0"}</a></div>
                 </td>
                 <td align="left" class="">
                     <div style="text-align: center; width: 80px;">{$list.mobile}
@@ -81,6 +81,28 @@
 <!--分页位置-->
 {$pager->show()}
 <script>
+
+    function direct_list(id){
+        layer.open({
+            title: '直推下级列表',
+            type: 2,
+            content: "/Admin/user/direct_list?id="+id,
+            btn:false,
+            area:['90%','90%'],
+        });
+    }
+    function team_list(id){
+        layer.open({
+            title: '直推下级列表',
+            type: 2,
+            content: "/Admin/user/team_list?id="+id,
+            btn:false,
+            area:['90%','90%'],
+        });
+    }
+
+
+
     $(".pagination  a").click(function(){
         var page = $(this).data('p');
         ajax_get_table('search-form2',page);
