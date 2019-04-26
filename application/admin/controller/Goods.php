@@ -355,6 +355,7 @@ class Goods extends Base {
                 'poor_prize' => 0,
                 'same_reword' => 0,
                 'same_reword2' => 0,
+                'preferential' => 0,
                 'self_buying' => 0,
                 'self_poor_prize' => 0,
                 'self_reword' => 0,
@@ -375,6 +376,7 @@ class Goods extends Base {
                     'poor_prize' => $v1['poor_prize'],
                     'same_reword' => $v1['same_reword'],
                     'same_reword2' => $v1['same_reword2'],
+                    'preferential' => $v1['preferential'],
                     'self_buying' => $v1['self_buying'],
                     'self_poor_prize' => $v1['self_poor_prize'],
                     'self_reword' => $v1['self_reword'],
@@ -441,6 +443,7 @@ class Goods extends Base {
                     $setting['poor_prize'] = floatval($data['poor_prize_'.$key]);
                     $setting['same_reword'] = floatval($data['same_reword_'.$key]);
                     $setting['same_reword2'] = floatval($data['same_reword2_'.$key]);
+                    $setting['preferential'] = floatval($data['preferential_'.$key]);
                     $setting['self_buying'] = floatval($data['self_buying_'.$key]);
                     $setting['self_poor_prize'] = floatval($data['self_poor_prize_'.$key]);
                     $setting['self_reword'] = floatval($data['self_reword_'.$key]);

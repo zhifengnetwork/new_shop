@@ -33,6 +33,9 @@ class Sales extends Model
 	public function sales()
 	{
 		$user = M('users')->where('user_id',$this->user_id)->find();
+		if (!$user) {
+			return array('msg'=>"该用户不存在",'code'=>0);
+		}
 		$user_level = $user['distribut_level'];
 		if ($user['parents']) {
 			$parents_id = explode(',', $user['parents']);
@@ -43,9 +46,9 @@ class Sales extends Model
 			
 			//是否重复购买
 			if ($is_repeat) {
-				$reward = $this->repeat_reward($parents_id,$all_level);
+				$reward = $this->repeat_reward($parents_id,$user_level,$is_repeat);
 			} else {
-				$reward = $this->reward($parents_id,$user_level);
+				$reward = $this->reward($parents_id,$user_level,$is_repeat);
 			}
 
 			$this->team_bonus();	//团队奖励
@@ -80,7 +83,7 @@ class Sales extends Model
 	}
 
 	//第一次购买奖励
-	public function reward($parents_id,$user_level)
+	public function reward($parents_id,$user_level,$is_repeat)
 	{
 		$order = $this->order();
 		
@@ -94,7 +97,7 @@ class Sales extends Model
 		$all_user = $this->all_user($parents_id);	//获取所有用户信息
 		$level = $this->get_level();				//获取等级信息
 		
-		$comm = $this->get_goods_prize($order_num);
+		$comm = $this->get_goods_prize($is_repeat);
 		$basic_reward = $comm['basic'];  //直推奖励
 		$poor_prize = $comm['poor_prize'];//极差奖励
 		$first_layer = $comm['first_layer'];//同级一层奖励
@@ -198,7 +201,7 @@ class Sales extends Model
 	}
 
 	//重复购买奖励
-	public function repeat_reward($parents_id,$user_level)
+	public function repeat_reward($parents_id,$user_level,$is_repeat)
 	{
 		$order = $this->order();
 		
@@ -212,7 +215,7 @@ class Sales extends Model
 		$all_user = $this->all_user($parents_id);	//获取所有用户信息
 		$level = $this->get_level();				//获取等级信息
 		
-		$comm = $this->get_goods_prize($order_num);
+		$comm = $this->get_goods_prize($is_repeat);
 		$basic_reward = $comm['basic'];  //直推奖励
 		$poor_prize = $comm['poor_prize'];//极差奖励
 		$first_layer = $comm['first_layer'];//同级一层奖励
@@ -228,8 +231,35 @@ class Sales extends Model
 		$layer = 0;
 		$msg = "";
 		$is_prize = false;
-		$have_prize = false;
+		$data = array();
 		
+		//第二次购买返佣
+		if ($is_repeat) {
+			$my_prize = floatval($comm['preferential'][$user_level]);
+			if ($my_prize > 0) {
+				
+				M('users')->where('user_id',$this->user_id)->setInc('user_money',$my_prize);
+				M('users')->where('user_id',$this->user_id)->setInc('distribut_money',$my_prize);
+				$msg = "重复购买奖励 ".$my_prize."（元），商品：".$order['goods_num']." 件";
+
+				// $data[] = array(
+				// 	'user_id'=>$this->user_id,
+				// 	'to_user_id'=>$this->user_id,
+				// 	'money'=>$my_prize,
+				// 	'order_sn'=>$order['order_sn'],
+				// 	'order_id'=>$this->order_id,
+				// 	'goods_id'=>$this->goods_id,
+				// 	'num'=>$num,
+				// 	'type'=>1,
+				// 	'create_time'=>time(),
+				// 	'desc'=>$msg
+				// );
+
+				$this->writeLog($this->user_id,$my_prize,$order['order_sn'],$msg,$order['goods_num'],2,false);
+			}
+		}
+		
+		//第二次购买上级返佣
 		foreach ($all_user as $key => $value) {
 			$money = 0;
 			// //没有等级没有奖励
@@ -302,25 +332,13 @@ class Sales extends Model
 			if (!$money) {
 				continue;
 			}
-
-			if (!$have_prize) {
-				$my_prize = $money;
-				if ($my_prize > 0) {
-					M('users')->where('user_id',$this->user_id)->setInc('user_money',$my_prize);
-					M('users')->where('user_id',$this->user_id)->setInc('distribut_money',$my_prize);
-					$msg = "重复购买奖励 ".$my_prize."（元），商品：".$order['goods_num']." 件";
-					$this->writeLog($this->user_id,$my_prize,$order['order_sn'],$msg,$order['goods_num'],1,false);
-				}
-
-				$have_prize = true;
-			}
 			
 			$user_money = $money+$value['user_money'];
 			$distribut_money = $money+$value['distribut_money'];
 			
 			M('users')->where('user_id',$value['user_id'])->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
 
-			$this->writeLog($value['user_id'],$money,$order['order_sn'],$msg,$order['goods_num'],1,false);
+			$this->writeLog($value['user_id'],$money,$order['order_sn'],$msg,$order['goods_num'],2,false);
 		}
 		
 		return array('code'=>1);
@@ -359,30 +377,33 @@ class Sales extends Model
 		// $per = M('agent_performance_log')->where(['user_id'=>$user_id,'order_id'=>$order_id])->find();
 		// $level = $this->get_level();
 		$money = $goods['shop_price'] * $order['goods_num'] * ($goods['prize_ratio'] / 100);
+		
 		// $money = $per['money'] * ($level[$leader['distribut_level']]['team_bonus'] / 100);
-		// if(!$money){
-		// 	return ['code'=>0];
-		// }
+		if(!$money){
+			return ['code'=>0];
+		}
+
+		$money = rand($money,2); //四色五入保留两位小数
 
 		$user_money = $money + $leader['user_money'];
 		$distribut_money = $money + $leader['distribut_money'];
 		$msg = "团队分红 ". $money . "（元），商品：".$order['goods_num']." 件，比率：".$goods['prize_ratio']."%";
 
 		$bool = M('users')->where('user_id',$first_leader)->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
-		$this->writeLog($first_leader,$money,$order['order_sn'],$msg,$order['goods_num'],2,true);
+		$this->writeLog($first_leader,$money,$order['order_sn'],$msg,$order['goods_num'],3,true);
 		$result = $bool ? array('code' => 1) : array('code'=>0);
 
 		return $result;
 	}
 	
 	//获取返佣配置信息
-	public function get_goods_prize($order_num)
+	public function get_goods_prize($is_repeat)
 	{
 		$goods_prize = M('goods')->where('goods_id',$this->goods_id)->value('goods_prize');
 		$ids = json_decode($goods_prize,true);
 		
-		if($order_num > 1){
-			$fields = 'level,self_buying as basic,self_poor_prize as poor_prize,self_reword as first_layer,self_reword2 as second_layer';
+		if($is_repeat){
+			$fields = 'level,preferential,self_buying as basic,self_poor_prize as poor_prize,self_reword as first_layer,self_reword2 as second_layer';
 		} else {
 			$fields = 'level,reward as basic,poor_prize,same_reword as first_layer,same_reword2 as second_layer';
 		}
@@ -391,6 +412,7 @@ class Sales extends Model
 		$result['poor_prize'] = array();
 		$result['first_layer'] = array();
 		$result['second_layer'] = array();
+		$result['preferential'] = array();
 		
 		if($comm){
 			foreach($comm as $key => $value){
@@ -398,6 +420,7 @@ class Sales extends Model
 				$result['poor_prize'][$key] = $value['poor_prize'];
 				$result['first_layer'][$key] = $value['first_layer'];
 				$result['second_layer'][$key] = $value['second_layer'];
+				$result['preferential'][$key] = $is_repeat ? $value['preferential'] : 0;
 			}
 		}
 		

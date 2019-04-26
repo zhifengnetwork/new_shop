@@ -275,6 +275,7 @@
                           <th class="sal_tit">极差奖</th>
                           <th class="sal_tit">同级奖(一代)</th>
                           <th class="sal_tit">同级奖(二代)</th>
+                          <th class="sal_tit">自购优惠</th>
                           <th class="sal_tit">自购直推奖</th>
                           <th class="sal_tit">自购极差奖</th>
                           <th class="sal_tit">自购同级奖(一代)</th>
@@ -283,7 +284,7 @@
                     </thead>
                     <foreach name="sales" item="vo">
                       <tr>
-                        <td style="width: 80px;text-align: center;">
+                        <td style="width: 100px;text-align: center;">
                           <input type="hidden" name="level_{$key}" value="{$vo.level}"style="">
                           <label for="ac_sort" class="level_name">{$vo.level_name}</label>
                         </td>
@@ -304,6 +305,10 @@
                             <span class="err" id="err_same_reword2_{$key}" style="color:#F00; display:none;"></span>
                         </td>
                         <td>
+                            <input type="text" name="preferential_{$key}" value="{$vo.preferential}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
+                            <span class="err" id="err_preferential_{$key}" style="color:#F00; display:none;"></span>
+                        </td>
+                        <td>
                             <input type="text" name="self_buying_{$key}" value="{$vo.self_buying}" class="sal_bod" style="" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
                             <span class="err" id="err_self_buying_{$key}" style="color:#F00; display:none;" ></span>
                         </td>
@@ -322,6 +327,7 @@
                       </tr>
                     </foreach>
                   </table>
+                  <p class="notic">填写的前四列为第一购买奖励，后五列为第二次购买奖励，0即不奖励</p>
                 </dd>
             </dl>
             <!--<dl class="row">-->
@@ -470,7 +476,7 @@
                         <input name="prize_ratio" value="{$goods.prize_ratio ?: ''}" type="text" placeholder="%" style="margin-left:10px;width:50px;" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
                         <span class="err" id="err_prize_ratio"></span>
                     </div>
-                    <p class="notic">选是，用户购买该商品是，直推上级获得团队奖励。后面为奖励占比。</p>
+                    <p class="notic">选是，用户购买该商品是，直推上级获得团队奖励。后面为奖励占比，默认为0,0即不奖励。</p>
                 </dd>
             </dl>
             <dl class="row">
