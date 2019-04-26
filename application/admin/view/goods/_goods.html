@@ -87,7 +87,7 @@
 }
     .err{color:#F00; display:none;}
     .sal_tit{text-align: center;}
-    .sal_bod{width: 90px; margin-right: 6px;}
+    .sal_bod{width: 100px; margin-right: 6px;}
     .level_name{margin-right: 6px;}
 </style>
 <!--物流配置 css -end-->
@@ -283,7 +283,7 @@
                     </thead>
                     <foreach name="sales" item="vo">
                       <tr>
-                        <td style="width:50px;">
+                        <td style="width: 80px;text-align: center;">
                           <input type="hidden" name="level_{$key}" value="{$vo.level}"style="">
                           <label for="ac_sort" class="level_name">{$vo.level_name}</label>
                         </td>
@@ -467,8 +467,10 @@
                         <label for="is_team_prize2" class="cb-disable <if condition="$goods['is_team_prize'] eq 0">selected</if>"><span>否</span></label>
                         <input id="is_team_prize1" name="is_team_prize" value="1" type="radio" <if condition="$goods['is_team_prize'] eq 1">checked</if>>
                         <input id="is_team_prize2" name="is_team_prize" value="0" type="radio" <if condition="$goods['is_team_prize'] eq 0">checked</if>>
+                        <input name="prize_ratio" value="{$goods.prize_ratio ?: ''}" type="text" placeholder="%" style="margin-left:10px;width:50px;" onKeyUp="this.value=this.value.replace(/[^\d.]/g,'')">
+                        <span class="err" id="err_prize_ratio"></span>
                     </div>
-                    <p class="notic">选是，用户购买该商品是，直推上级获得团队奖励。</p>
+                    <p class="notic">选是，用户购买该商品是，直推上级获得团队奖励。后面为奖励占比。</p>
                 </dd>
             </dl>
             <dl class="row">
@@ -556,31 +558,31 @@
         <!-- 商品相册-->
 		<div class="ncap-form-default tab_div_2" style="display:none;">
             <dl class="row">
-                         <div class="tab-pane" id="tab_goods_images">
-                            <table class="table table-bordered">
-                                <tbody>
-                                <tr>
-                                    <td>
-                                    <volist name="goods['goods_images']" id="image">
-                                        <div style="width:100px; text-align:center; margin: 5px; display:inline-block;" class="goods_xc">
-                                            <input type="hidden" value="{$image['image_url']}" name="goods_images[]">
-                                            <a onClick="" href="{$image['image_url']}" target="_blank"><img width="100" height="100" src="{$image['image_url']}"></a>
-                                            <br>
-                                            <a href="javascript:void(0)" onClick="ClearPicArr2(this,'{$image.image_url}')">删除</a>
-                                        </div>
-                                    </volist>
+                <div class="tab-pane" id="tab_goods_images">
+                    <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                            <td>
+                            <volist name="goods['goods_images']" id="image">
+                                <div style="width:100px; text-align:center; margin: 5px; display:inline-block;" class="goods_xc">
+                                    <input type="hidden" value="{$image['image_url']}" name="goods_images[]">
+                                    <a onClick="" href="{$image['image_url']}" target="_blank"><img width="100" height="100" src="{$image['image_url']}"></a>
+                                    <br>
+                                    <a href="javascript:void(0)" onClick="ClearPicArr2(this,'{$image.image_url}')">删除</a>
+                                </div>
+                            </volist>
 
-                                        <div class="goods_xc" style="width:100px; text-align:center; margin: 5px; display:inline-block;">
-                                            <input type="hidden" name="goods_images[]" value="" />
-                                            <a href="javascript:void(0);" onClick="GetUploadify(10,'','goods','call_back2');"><img src="/public/images/add-button.jpg" width="100" height="100" /></a>
-                                            <br/>
-                                            <a href="javascript:void(0)">&nbsp;&nbsp;</a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                                <div class="goods_xc" style="width:100px; text-align:center; margin: 5px; display:inline-block;">
+                                    <input type="hidden" name="goods_images[]" value="" />
+                                    <a href="javascript:void(0);" onClick="GetUploadify(10,'','goods','call_back2');"><img src="/public/images/add-button.jpg" width="100" height="100" /></a>
+                                    <br/>
+                                    <a href="javascript:void(0)">&nbsp;&nbsp;</a>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
             </dl>             
         </div>   
         <!-- 商品相册-->
@@ -770,7 +772,7 @@
                 item_img_array[index] = parseInt($(value).attr('id').slice(9));
             })//所有选中item下面上传了图片的
             //判断：所有算中item上传的图片为空 或者所有选中item=所有选中的图片
-
+            
             if (item_array.sort().toString() != item_img_array.sort().toString() && item_img_array.length != 0) {
                 layer.alert("已选规格必须全部都传图或都不传图" , {icon:2, time:2000});
                 return;

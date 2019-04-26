@@ -345,7 +345,8 @@ class Sales extends Model
 		if ($goods['code'] == 0) {
 			return $goods;
 		}
-		if ($goods['goods']['is_team_prize'] != 1) {
+		$goods = $goods['goods'];
+		if ($goods['is_team_prize'] != 1) {
 			return ['code'=>0,'msg'=>"该商品不是团队奖励商品"];
 		}
 		
@@ -355,19 +356,17 @@ class Sales extends Model
 			return ['code'=>0,'msg'=>"该用户没有上级"];
 		}
 
-		$per = M('agent_performance_log')->where(['user_id'=>$user_id,'order_id'=>$order_id])->find();
-		$level = $this->get_level();
-
-		$money = $per['money'] * ($level[$leader['distribut_level']]['team_bonus'] / 100);
-		$money = rand($money,2);
-
-		if(!$money){
-			return ['code'=>0];
-		}
+		// $per = M('agent_performance_log')->where(['user_id'=>$user_id,'order_id'=>$order_id])->find();
+		// $level = $this->get_level();
+		$money = $goods['shop_price'] * $order['goods_num'] * ($goods['prize_ratio'] / 100);
+		// $money = $per['money'] * ($level[$leader['distribut_level']]['team_bonus'] / 100);
+		// if(!$money){
+		// 	return ['code'=>0];
+		// }
 
 		$user_money = $money + $leader['user_money'];
 		$distribut_money = $money + $leader['distribut_money'];
-		$msg = "团队分红 ". $money . "（元），商品：".$order['goods_num']." 件";
+		$msg = "团队分红 ". $money . "（元），商品：".$order['goods_num']." 件，比率：".$goods['prize_ratio']."%";
 
 		$bool = M('users')->where('user_id',$first_leader)->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
 		$this->writeLog($first_leader,$money,$order['order_sn'],$msg,$order['goods_num'],2,true);
@@ -451,7 +450,7 @@ class Sales extends Model
 	//商品信息
 	public function goods()
 	{
-		$goods = M('goods')->where('goods_id',$this->goods_id)->field('goods_id,is_team_prize')->find();
+		$goods = M('goods')->where('goods_id',$this->goods_id)->field('goods_id,shop_price,is_team_prize,prize_ratio')->find();
 
 		if (!$goods) {
 			return array('msg'=>"没有该商品的信息",'code'=>0);
