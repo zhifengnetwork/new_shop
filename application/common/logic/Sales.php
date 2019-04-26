@@ -113,6 +113,8 @@ class Sales extends Model
 		$layer = 0;
 		$msg = "";
 		$is_prize = false;
+		$total_money = 0;
+		$data = array();
 		
 		foreach ($all_user as $key => $value) {
 			$money = 0;
@@ -188,14 +190,39 @@ class Sales extends Model
 				continue;
 			}
 			
+			$total_money += $money;
 			$user_money = $money+$value['user_money'];
 			$distribut_money = $money+$value['distribut_money'];
 			
 			M('users')->where('user_id',$value['user_id'])->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
 
-			$this->writeLog($value['user_id'],$money,$order['order_sn'],$msg,$order['goods_num'],1,false);
+			$data[] = array(
+				'user_id' => $this->user_id,
+				'to_user_id' => $value['user_id'],
+				'money' => $money,
+				'order_sn' => $order['order_sn'],
+				'order_id' => $this->order_id,
+				'goods_id' => $this->goods_id,
+				'num' => $order['goods_num'],
+				'type' => 1,
+				'create_time' => time(),
+				'desc' => $msg
+			);
 		}
 		
+		if ($data) {
+			$divide = array(
+				'order_id'=>$this->order_id,
+				'user_id'=>$this->user_id,
+				'status'=>1,
+				'goods_id'=>$this->goods_id,
+				'money'=>$total_money,
+				'add_time'=>Date('Y-m-d H:m:s')
+			);
+
+			$this->writeLog($data,$divide);
+		}
+
 		return array('code'=>1);
 
 	}
@@ -231,31 +258,30 @@ class Sales extends Model
 		$layer = 0;
 		$msg = "";
 		$is_prize = false;
+		$total_money = 0;
 		$data = array();
 		
 		//第二次购买返佣
 		if ($is_repeat) {
 			$my_prize = floatval($comm['preferential'][$user_level]);
 			if ($my_prize > 0) {
-				
+				$total_money = $my_prize;
 				M('users')->where('user_id',$this->user_id)->setInc('user_money',$my_prize);
 				M('users')->where('user_id',$this->user_id)->setInc('distribut_money',$my_prize);
 				$msg = "重复购买奖励 ".$my_prize."（元），商品：".$order['goods_num']." 件";
 
-				// $data[] = array(
-				// 	'user_id'=>$this->user_id,
-				// 	'to_user_id'=>$this->user_id,
-				// 	'money'=>$my_prize,
-				// 	'order_sn'=>$order['order_sn'],
-				// 	'order_id'=>$this->order_id,
-				// 	'goods_id'=>$this->goods_id,
-				// 	'num'=>$num,
-				// 	'type'=>1,
-				// 	'create_time'=>time(),
-				// 	'desc'=>$msg
-				// );
-
-				$this->writeLog($this->user_id,$my_prize,$order['order_sn'],$msg,$order['goods_num'],2,false);
+				$data[] = array(
+					'user_id' => $this->user_id,
+					'to_user_id' => $this->user_id,
+					'money' => $my_prize,
+					'order_sn' => $order['order_sn'],
+					'order_id' => $this->order_id,
+					'goods_id' => $this->goods_id,
+					'num' => $order['goods_num'],
+					'type' => 2,
+					'create_time' => time(),
+					'desc' => $msg
+				);
 			}
 		}
 		
@@ -332,13 +358,38 @@ class Sales extends Model
 			if (!$money) {
 				continue;
 			}
-			
+
+			$total_money += $money;
 			$user_money = $money+$value['user_money'];
 			$distribut_money = $money+$value['distribut_money'];
+
+			$data[] = array(
+				'user_id' => $this->user_id,
+				'to_user_id' => $value['user_id'],
+				'money' => $money,
+				'order_sn' => $order['order_sn'],
+				'order_id' => $this->order_id,
+				'goods_id' => $this->goods_id,
+				'num' => $order['goods_num'],
+				'type' => 2,
+				'create_time' => time(),
+				'desc' => $msg
+			);
 			
 			M('users')->where('user_id',$value['user_id'])->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
+		}
 
-			$this->writeLog($value['user_id'],$money,$order['order_sn'],$msg,$order['goods_num'],2,false);
+		if ($data) {
+			$divide = array(
+				'order_id'=>$this->order_id,
+				'user_id'=>$this->user_id,
+				'status'=>1,
+				'goods_id'=>$this->goods_id,
+				'money'=>$total_money,
+				'add_time'=>Date('Y-m-d H:m:s')
+			);
+
+			$this->writeLog($data,$divide);
 		}
 		
 		return array('code'=>1);
@@ -374,11 +425,8 @@ class Sales extends Model
 			return ['code'=>0,'msg'=>"该用户没有上级"];
 		}
 
-		// $per = M('agent_performance_log')->where(['user_id'=>$user_id,'order_id'=>$order_id])->find();
-		// $level = $this->get_level();
 		$money = $goods['shop_price'] * $order['goods_num'] * ($goods['prize_ratio'] / 100);
 		
-		// $money = $per['money'] * ($level[$leader['distribut_level']]['team_bonus'] / 100);
 		if(!$money){
 			return ['code'=>0];
 		}
@@ -390,7 +438,22 @@ class Sales extends Model
 		$msg = "团队分红 ". $money . "（元），商品：".$order['goods_num']." 件，比率：".$goods['prize_ratio']."%";
 
 		$bool = M('users')->where('user_id',$first_leader)->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
-		$this->writeLog($first_leader,$money,$order['order_sn'],$msg,$order['goods_num'],3,true);
+
+		$data[] = array(
+			'user_id' => $this->user_id,
+			'to_user_id' => $first_leader,
+			'money' => $money,
+			'order_sn' => $order['order_sn'],
+			'order_id' => $this->order_id,
+			'goods_id' => $this->goods_id,
+			'num' => $order['goods_num'],
+			'type' => 3,
+			'create_time' => time(),
+			'desc' => $msg
+		);
+
+		$this->writeLog($data,'');
+
 		$result = $bool ? array('code' => 1) : array('code'=>0);
 
 		return $result;
@@ -483,34 +546,13 @@ class Sales extends Model
 	}
 
 	//记录日志
-	public function writeLog($user_id,$money,$order_sn,$desc,$num,$type = 0,$is_team)
+	public function writeLog($data,$divide)
 	{
-		$data = array(
-			'user_id'=>$this->user_id,
-			'to_user_id'=>$user_id,
-			'money'=>$money,
-			'order_sn'=>$order_sn,
-			'order_id'=>$this->order_id,
-			'goods_id'=>$this->goods_id,
-			'num'=>$num,
-			'type'=>$type,
-			'create_time'=>time(),
-			'desc'=>$desc
-		);
+		$bool = M('distrbut_commission_log')->insertAll($data);
 
-		$bool = M('distrbut_commission_log')->insert($data);
-
-		if($bool && !$is_team){
+		if($bool && $divide){
 			//分钱记录
-			$data = array(
-				'order_id'=>$this->order_id,
-				'user_id'=>$user_id,
-				'status'=>1,
-				'goods_id'=>$this->goods_id,
-				'money'=>$money,
-				'add_time'=>Date('Y-m-d H:m:s')
-			);
-			M('order_divide')->add($data);
+			M('order_divide')->add($divide);
 		}
 		
 		return $bool;
