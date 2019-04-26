@@ -10,7 +10,7 @@ class AgentLevel extends Validate
         ['ind_goods_sum', 'require|number'],
         ['agent_goods_sum', 'require|number'],
         ['team_nums', 'require|number'],
-		['team_bonus','require|number'],
+		// ['team_bonus','require|number'],
 		['ratio','require|number'],
     ];
     //错误信息
@@ -28,8 +28,8 @@ class AgentLevel extends Validate
         'team_nums.number'    => '团队同级人数是数字',
 		'ratio.require'  => '分红百分比比必填',
 		'ratio.number'    => '分红百分比是数字',
-		'team_bonus.require'  => '团队分红百分比必填',
-		'team_bonus.number'    => '团队分红百分比是数字',
+		// 'team_bonus.require'  => '团队分红百分比必填',
+		// 'team_bonus.number'    => '团队分红百分比是数字',
     ];
     //验证场景
     protected $scene = [
@@ -39,7 +39,7 @@ class AgentLevel extends Validate
             'ind_goods_sum'    =>'require|number',
             'agent_goods_sum'    =>'require|number',
             'team_nums'    =>'require|number',
-			'team_bonus' => 'require|number',
+			// 'team_bonus' => 'require|number',
 			'ratio' => 'require|number',
         ],
     ];
