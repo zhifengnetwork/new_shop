@@ -35,7 +35,7 @@ class Goods extends Base {
     /**
      *  商品分类列表
      */
-    public function categoryList(){                
+    public function categoryList(){     
         $GoodsLogic = new GoodsLogic();               
         $cat_list = $GoodsLogic->goods_cat_list();
         $this->assign('cat_list',$cat_list);        
@@ -173,7 +173,7 @@ class Goods extends Base {
     /**
      *  商品列表
      */
-    public function goodsList(){     
+    public function goodsList(){	
         $GoodsLogic = new GoodsLogic();        
         $brandList = $GoodsLogic->getSortBrands();
         $categoryList = $GoodsLogic->getSortCategory();
@@ -323,18 +323,12 @@ class Goods extends Base {
         $GoodsLogic = new GoodsLogic();
         $Goods = new \app\common\model\Goods();
         $goods_id = input('id');
-        // $basic_reward = array();
-        // $each_reward = array();
 
         if($goods_id){
             $goods = $Goods->where('goods_id', $goods_id)->find();
             $level_cat = $GoodsLogic->find_parent_cat($goods['cat_id']); // 获取分类默认选中的下拉框
             $level_cat2 = $GoodsLogic->find_parent_cat($goods['extend_cat_id']); // 获取分类默认选中的下拉框
             $brandList = $GoodsLogic->getSortBrands($goods['cat_id']);   //获取三级分类下的全部品牌
-            // $basic_reward = json_decode($goods['basic_reward'],true);
-            // $each_reward = json_decode($goods['each_reward'],true);
-            // $self_buying = json_decode($goods['self_buying'],true);
-            // $higher_commission = json_decode($goods['higher_commission'],true);
             $setting = json_decode($goods['goods_prize'],true);
 
             $this->assign('goods', $goods);
@@ -368,7 +362,7 @@ class Goods extends Base {
             );
             $num ++;
         }  
-
+		
         //返佣设置
         if ($setting) {
             $num = 0;
@@ -431,8 +425,6 @@ class Goods extends Base {
         }
 
         $level_name = $this->get_level_name();
-        // $num = 0;
-        // $setting = array();
         $ids = array();
         $is_setting = $goods->goods_prize;
 

@@ -34,6 +34,8 @@ class User extends Base
 {
     public function index()
     {
+		
+		
         return $this->fetch();
     }
 
@@ -58,16 +60,25 @@ class User extends Base
         $count = $usersModel->where($condition)->count();
         $Page = new AjaxPage($count, 10);
         $userList = $usersModel->where($condition)->order($sort_order)->limit($Page->firstRow . ',' . $Page->listRows)->select();
+		
         $user_id_arr = get_arr_column($userList, 'user_id');
         if (!empty($user_id_arr)) {
-            $first_leader = DB::query("select first_leader,count(1) as count  from __PREFIX__users where first_leader in(" . implode(',', $user_id_arr) . ")  group by first_leader");
-            $first_leader = convert_arr_key($first_leader, 'first_leader');
+			// dump($user_id_arr);exit;
+            // $first_leader = DB::query("select first_leader,count(1) as count  from __PREFIX__users where first_leader in(" . implode(',', $user_id_arr) . ")  group by first_leader");
+            // $first_leader = convert_arr_key($first_leader, 'first_leader');
 
-            $second_leader = DB::query("select second_leader,count(1) as count  from __PREFIX__users where second_leader in(" . implode(',', $user_id_arr) . ")  group by second_leader");
-            $second_leader = convert_arr_key($second_leader, 'second_leader');
+            // $second_leader = DB::query("select second_leader,count(1) as count  from __PREFIX__users where second_leader in(" . implode(',', $user_id_arr) . ")  group by second_leader");
+            // $second_leader = convert_arr_key($second_leader, 'second_leader');
 
-            $third_leader = DB::query("select third_leader,count(1) as count  from __PREFIX__users where third_leader in(" . implode(',', $user_id_arr) . ")  group by third_leader");
-            $third_leader = convert_arr_key($third_leader, 'third_leader');
+            // $third_leader = DB::query("select third_leader,count(1) as count  from __PREFIX__users where third_leader in(" . implode(',', $user_id_arr) . ")  group by third_leader");
+            // $third_leader = convert_arr_key($third_leader, 'third_leader');
+			
+			foreach($user_id_arr as $v){
+				$last_cout[$v]['direct'] = Db::name('users')->where('first_leader', $v)->count();
+				$last_cout[$v]['team'] = Db::query("select count(*) as count from `__PREFIX__users` where find_in_set('$v', parents)")[0]['count'];
+			}
+			
+			$this->assign('last_cout', $last_cout);
         }
 
         $agent_level = M('agent_level')->field('level,level_name')->select();
@@ -78,9 +89,7 @@ class User extends Base
             $this->assign('agnet_name', $agnet_name);
         }
         
-        $this->assign('first_leader', $first_leader);
-        $this->assign('second_leader', $second_leader);
-        $this->assign('third_leader', $third_leader);
+        
         $show = $Page->show();
         $this->assign('userList', $userList);
         $this->assign('level', M('user_level')->getField('level_id,level_name'));
@@ -88,6 +97,16 @@ class User extends Base
         $this->assign('pager', $Page);
         return $this->fetch();
     }
+	
+	# 直推下级列表
+	public function direct_list(){
+		$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+		
+		$list = Db::name('users')->field('')->where('first_leader', $id)->paginate(10);
+		
+		$this->assign('list',$list);
+		return $this->fetch();
+	}
 
     /**
      * 会员详细信息查看

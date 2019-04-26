@@ -97,7 +97,9 @@ class Distribution extends Base
             }
         }
         if ($data['act'] == 'del') {
+			$level = M('agent_level')->where('level_id',$data['level_id'])->value('level');
             $r = D('agent_level')->where('level_id=' . $data['level_id'])->delete();
+			M('goods_commission')->where('level',$level)->delete();
             if ($r !== false) {
                 $return = ['status' => 1, 'msg' => '删除成功', 'result' => ''];
             } else {

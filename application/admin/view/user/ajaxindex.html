@@ -42,13 +42,10 @@
                     <div style="text-align: center; width: 60px;"><eq name="$list.is_employees" value="1"> 是 <else/> 否 </eq></div>
                 </td>
                 <td align="left" class="">
-                    <div style="text-align: center; width: 60px;">{$first_leader[$list[user_id]]['count']|default="0"}</div>
+                    <div style="text-align: center; width: 80px;"><a href="{:U('Admin/user/direct_list',array('id'=>$list['user_id']))}">{$last_cout[$list.user_id]['direct']|default="0"}</a></div>
                 </td>
                 <td align="left" class="">
-                    <div style="text-align: center; width: 60px;">{$second_leader[$list[user_id]]['count']|default="0"}</div>
-                </td>
-                <td align="left" class="">
-                    <div style="text-align: center; width: 60px;">{$third_leader[$list[user_id]]['count']|default="0"}</div>
+                    <div style="text-align: center; width: 80px;">{$last_cout[$list.user_id]['team']|default="0"}</div>
                 </td>
                 <td align="left" class="">
                     <div style="text-align: center; width: 80px;">{$list.mobile}

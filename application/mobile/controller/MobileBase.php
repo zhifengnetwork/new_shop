@@ -56,7 +56,7 @@ class MobileBase extends Controller {
             if (empty($_SESSION['openid'])){
                 if(is_array($this->weixin_config) && $this->weixin_config['wait_access'] == 1){
                     $wxuser = $this->GetOpenid(); //授权获取openid以及微信用户信息
-                     
+                    
                     //过滤特殊字符串
                     $wxuser['nickname'] && $wxuser['nickname'] = replaceSpecialStr($wxuser['nickname']);
                     
@@ -88,7 +88,7 @@ class MobileBase extends Controller {
                         $cartLogic->doUserLoginHandle();  //用户登录后 需要对购物车 一些操作
                     }
                 }
-            }else{ 
+            }else{
                 setcookie('user_id',$user_temp['user_id'],null,'/');
                 setcookie('is_distribut',$user_temp['is_distribut'],null,'/');
             }
@@ -140,6 +140,12 @@ class MobileBase extends Controller {
 			if($cache){
 				Db::execute("update `tp_users` set `first_leader` = '".$cache['share_user']."' where `user_id` = '".$user_temp['user_id']."'");
 				Db::execute("delete from `tp_wxshare_cache` where `id` = '".$cache['id']."'");
+				$share_user_openid = Db::name('users')->field('id,openid')->where('user_id',$cache['share_user'])->value('openid');
+				if($share_user_openid){
+					$wx_content = "会员ID: ".$user_temp['user_id']." 成为了你的下级!";
+					$wechat = new \app\common\logic\wechat\WechatUtil();
+					$wechat->sendMsg($share_user_openid, 'text', $wx_content);
+				}
 			}
 		} 
 	}

@@ -35,12 +35,13 @@ class Sales extends Model
 		$user = M('users')->where('user_id',$this->user_id)->find();
 		$user_level = $user['distribut_level'];
 		if ($user['parents']) {
+			$order_num = Db::name('order')->where('user_id',$this->user_id)->count();
 			$parents_id = explode(',', $user['parents']);
 			$parents_id = array_filter($parents_id);  //去除0,倒序排列
 			
 			$this->cash_unlock($parents_id);	//提现解锁
 			
-			$reward = $this->reward($parents_id,$user_level);
+			$reward = $this->reward($parents_id,$user_level,$order_num);
 			return $reward;
 		} else {
 			return array('msg'=>"该用户没有上级",'code'=>0);
@@ -48,7 +49,7 @@ class Sales extends Model
 	}
 
 	//奖励
-	public function reward($parents_id,$user_level)
+	public function reward($parents_id,$user_level,$order_num)
 	{
 		$order = $this->order();
 		
@@ -65,27 +66,25 @@ class Sales extends Model
 		$parents_id = array_reverse($parents_id);	//按原数组倒序排列
 		$all_user = $this->all_user($parents_id);	//获取所有用户信息
 		$level = $this->get_level();				//获取等级信息
-
-		$basic_reward = json_decode($goods['goods']['basic_reward'],true);
-		$each_reward = json_decode($goods['goods']['each_reward'],true);
+		
+		$comm = $this->get_goods_prize($order_num);
+		$basic_reward = $comm['basic'];  //直推奖励
+		$poor_prize = $comm['poor_prize'];//极差奖励
+		$first_layer = $comm['first_layer'];//同级一层奖励
+		$second_layer = $comm['second_layer'];//同级二层奖励
 		
 		if(is_array($basic_reward)){
 			ksort($basic_reward );	//按键值升序排列
-		} else {
-			$basic_reward = array();
 		}
-		if (is_array($each_reward)) {
-			ksort($each_reward);
-		} else {
-			$each_reward = array();
+		if (is_array($poor_prize)) {
+			ksort($poor_prize);
 		}
-		
-		// $user_level = 0;
+		dump($order['goods_num']);
 		$min_level = 0;
 		$layer = 0;
 		$msg = "";
 		$is_prize = false;
-		
+		dump($all_user);
 		foreach ($all_user as $key => $value) {
 			$money = 0;
 			//没有等级没有奖励
@@ -116,10 +115,10 @@ class Sales extends Model
 				
 				switch($layer){
 					case 1:
-						$money = $level[$user_level]['same_reword'] * $order['goods_num'];
+						$money = $first_layer[$user_level] * $order['goods_num'];
 						break;
 					case 2:
-						$money = $level[$user_level]['same_reword2'] * $order['goods_num'];
+						$money = $second_layer[$user_level] * $order['goods_num'];
 						break;
 					default:
 						break;
@@ -137,10 +136,10 @@ class Sales extends Model
 					$is_prize = true;
 				}
 				
-				reset($each_reward);	//重置数组指针
+				reset($poor_prize);	//重置数组指针
 				
 				//计算极差奖金
-				while(list($k1,$v1) = each($each_reward)){
+				while(list($k1,$v1) = each($poor_prize)){
 					if ($user_level >= $k1) {
 						continue;
 					}
@@ -162,13 +161,42 @@ class Sales extends Model
 			$user_money = $money+$value['user_money'];
 			$distribut_money = $money+$value['distribut_money'];
 			
-			M('users')->where('user_id',$value['user_id'])->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
+			//M('users')->where('user_id',$value['user_id'])->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
 
-			$this->writeLog($value['user_id'],$money,$order['order_sn'],$msg,$order['goods_num']);
+			//$this->writeLog($value['user_id'],$money,$order['order_sn'],$msg,$order['goods_num']);
 		}
 		
 		return array('code'=>1);
 
+	}
+	
+	//获取返佣配置信息
+	public function get_goods_prize($order_num)
+	{
+		$goods_prize = M('goods')->where('goods_id',260)->value('goods_prize');
+		$ids = json_decode($goods_prize,true);
+		
+		if($order_num > 1){
+			$fields = 'level,self_buying as basic,self_poor_prize as poor_prize,self_reword as first_layer,self_reword2 as second_layer';
+		} else {
+			$fields = 'level,reward as basic,poor_prize,same_reword as first_layer,same_reword2 as second_layer';
+		}
+		$comm = M('goods_commission')->where('id','in',$ids)->column($fields);
+		$result['basic'] = array();
+		$result['poor_prize'] = array();
+		$result['first_layer'] = array();
+		$result['second_layer'] = array();
+		
+		if($comm){
+			foreach($comm as $key => $value){
+				$result['basic'][$key] = $value['basic'];
+				$result['poor_prize'][$key] = $value['poor_prize'];
+				$result['first_layer'][$key] = $value['first_layer'];
+				$result['second_layer'][$key] = $value['second_layer'];
+			}
+		}
+		dump($comm);
+		return $result;
 	}
 
 	//获取所有用户信息
@@ -186,7 +214,7 @@ class Sales extends Model
 	//获取等级信息
 	public function get_level()
 	{
-		$level = M('agent_level')->column('level,same_reword,same_reword2');
+		$level = M('agent_level')->column('level,team_bonus');
 
 		return $level;
 	}
@@ -217,7 +245,7 @@ class Sales extends Model
 	//商品信息
 	public function goods()
 	{
-		$goods = M('goods')->where('goods_id',$this->goods_id)->field('goods_id,basic_reward,each_reward')->find();
+		$goods = M('goods')->where('goods_id',$this->goods_id)->field('goods_id,goods_prize')->find();
 
 		if (!$goods) {
 			return array('msg'=>"没有该商品的信息",'code'=>0);

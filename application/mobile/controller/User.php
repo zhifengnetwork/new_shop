@@ -151,6 +151,7 @@ class User extends MobileBase
      */
     public function team_list()
     {
+		dump(sales(81));die;
         $user_id = $this->user_id;
         //获取下级id列表
         $d_info = Db::query("select `user_id`, `first_leader`,`parents` from `tp_users` where 'first_leader' = $user_id or parents like '%,$user_id,%'");

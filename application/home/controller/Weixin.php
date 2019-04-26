@@ -18,7 +18,7 @@ class Weixin
 
             $re = $this->xmlToArray($data);
             // $this->write_log(json_encode($re));
-			// Db::name('wx_temp')->insert(['content'=>json_encode($re)]);
+			Db::name('wx_temp')->insert(['content'=>json_encode($re)]);
 			
 			/**
 			* 微信扫描分享带参数的二维码
@@ -49,10 +49,12 @@ class Weixin
 			return false;
 		}
 		
-		$share_user = Db::query("select `user_id` from `tp_users` where `shareposter` like '%".$data['Ticket']."%' limit 1");
+		$share_user = Db::query("select `user_id`,`openid` from `tp_users` where `shareposter` like '%".$data['Ticket']."%' limit 1");
 
 		if(!empty($share_user[0])){
+			$share_user_openid = $share_user[0]['openid'];
 			$share_user = $share_user[0]['user_id'];
+			
 		}else{
 			return false;
 		}
@@ -71,6 +73,11 @@ class Weixin
 					return false;
 				} else {
 					Db::execute("update `tp_users` set `first_leader` = '".$share_user."' where `user_id` = '".$user['user_id']."'");
+					if($share_user_openid){
+						$wx_content = "会员ID: ".$user['user_id']." 成为了你的下级!";
+						$wechat = new \app\common\logic\wechat\WechatUtil();
+						$wechat->sendMsg($share_user_openid, 'text', $wx_content);
+					}
 				}
 			}	
 		}else{
