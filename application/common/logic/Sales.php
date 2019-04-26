@@ -424,15 +424,15 @@ class Sales extends Model
 		if (!$leader) {
 			return ['code'=>0,'msg'=>"该用户没有上级"];
 		}
-
+		
 		$money = $goods['shop_price'] * $order['goods_num'] * ($goods['prize_ratio'] / 100);
 		
 		if(!$money){
 			return ['code'=>0];
 		}
 
-		$money = rand($money,2); //四色五入保留两位小数
-
+		$money = round($money,2); //四色五入保留两位小数
+		
 		$user_money = $money + $leader['user_money'];
 		$distribut_money = $money + $leader['distribut_money'];
 		$msg = "团队分红 ". $money . "（元），商品：".$order['goods_num']." 件，比率：".$goods['prize_ratio']."%";
