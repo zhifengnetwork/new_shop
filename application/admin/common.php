@@ -28,7 +28,7 @@ function order_sn($order_id){
 function user_name($user_id){
 	$user_name = M('users')->where('user_id',$user_id)->value('nickname');
 
-	$user_name = $user_name ? $user_name : "暂无";
+	$user_name = $user_name ? $user_name : "无";
 
 	return $user_name;
 }

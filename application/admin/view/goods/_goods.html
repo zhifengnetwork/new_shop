@@ -459,6 +459,20 @@
             </dl>
             <dl class="row">
                 <dt class="tit">
+                    <label>团队奖励商品</label>
+                </dt>
+                <dd class="opt">
+                    <div class="onoff">
+                        <label for="is_team_prize1" class="cb-enable <if condition="$goods['is_team_prize'] eq 1">selected</if>"><span>是</span></label>
+                        <label for="is_team_prize2" class="cb-disable <if condition="$goods['is_team_prize'] eq 0">selected</if>"><span>否</span></label>
+                        <input id="is_team_prize1" name="is_team_prize" value="1" type="radio" <if condition="$goods['is_team_prize'] eq 1">checked</if>>
+                        <input id="is_team_prize2" name="is_team_prize" value="0" type="radio" <if condition="$goods['is_team_prize'] eq 0">checked</if>>
+                    </div>
+                    <p class="notic">选是，用户购买该商品是，直推上级获得团队奖励。</p>
+                </dd>
+            </dl>
+            <dl class="row">
+                <dt class="tit">
                     <label>是否为虚拟商品</label>
                 </dt>
                 <dd class="opt">

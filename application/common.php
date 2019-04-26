@@ -68,8 +68,8 @@ function sales($order_id){
     $user_id = $order['user_id'];
 
     $perfor = new PerformanceLogic;
-    //$add_perfor = $perfor->per($order_id);  //添加业绩
-
+    $add_perfor = $perfor->per($order_id);  //添加业绩
+    
     $goods_list = M('order_goods')->where(['order_id'=>$order_id])->select();
     
     foreach($goods_list as $k => $v){
