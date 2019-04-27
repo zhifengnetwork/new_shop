@@ -407,7 +407,7 @@ class Goods extends Base {
     public function save(){
         $data = input('post.');
         $spec_item = input('item/a');
-        $setting = array();
+        $setting = '';
         $validate = Loader::validate('Goods');// 数据验证
         if (!$validate->batch()->check($data)) {
             $error = $validate->getError();
