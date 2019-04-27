@@ -323,6 +323,7 @@ class Goods extends Base {
         $GoodsLogic = new GoodsLogic();
         $Goods = new \app\common\model\Goods();
         $goods_id = input('id');
+        $setting = array();
         
         if($goods_id){
             $goods = $Goods->where('goods_id', $goods_id)->find();
