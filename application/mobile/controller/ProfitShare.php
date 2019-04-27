@@ -132,7 +132,7 @@ class ProfitShare extends MobileBase
     }
     //后台记录
     private function set_log($user_id,$money,$desc){
-        $data=['to_user_id'=>$user_id,'money'=>$money,'create_time'=>time(),'desc'=>$desc];
+        $data=['to_user_id'=>$user_id,'money'=>$money,'create_time'=>time(),'desc'=>$desc,'type'=>4];
         M('distrbut_commission_log')->insert($data);
 
     }

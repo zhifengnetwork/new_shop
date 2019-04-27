@@ -22,7 +22,14 @@ class GoodsProfit extends Model
     public function get_goods_profit(){
         //今日起始时间戳
         $todaytime=strtotime(date('Y-m-d 00:00:00',time()));
-        return M('order_goods')->alias('og')->join('order o','og.order_id=o.order_id')->where('o.pay_time','>=',$todaytime)->field('goods_num,sum(og.final_price-og.cost_price) total')->find();
+        //算前一天的利润
+        $yestoday_start=strtotime(date('Y-m-d 00:00:00',time()-86400));
+        $yestoday_end=strtotime(date('Y-m-d 23:59:59',time()-86400));
+        $goods_profit=M('order_goods')->alias('og')->join('order o','og.order_id=o.order_id')->where('o.pay_time','>=',$yestoday_start)->where('o.pay_time','<=',$yestoday_end)->field('goods_num,sum(og.final_price-og.cost_price) total')->find();
+        if(isset($goods_profit) && !empty($goods_profit)){
+            return $goods_profit;
+        }
+        return 0;
     }
     //查询合伙人的个数   $level是要查询的等级
     public function get_partners_num($level){
