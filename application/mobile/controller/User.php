@@ -175,7 +175,8 @@ class User extends MobileBase
             $count = count($team_list);
         }
         $leader_id = M('users')->where('user_id',$user_id)->value('first_leader');
-        $leader = M('users')->where('user_id',$leader_id)->field('nickname,mobile')->find();
+        $leader = M('users')->where('user_id',$leader_id)->field('nickname,mobile,head_pic')->find();
+        
         $this->assign('leader',$leader);
         $this->assign('count',$count);
         $this->assign('team',$team_list);

@@ -33,15 +33,19 @@ class Sales extends Model
 
 	public function sales()
 	{
+		$user_id = $this->user_id;
 		$user = $this->get_user();
 		$bonus_products_id = ($user['bonus_products_id'] > 0) ? $user['bonus_products_id'] : 0;
 		if (!$user) {
 			return array('msg'=>"该用户不存在",'code'=>0);
 		}
-		
+		//获取下级id列表
+		$d_info = Db::query("select `user_id`, `first_leader`,`parents` from `tp_users` where 'first_leader' = $user_id or parents like '%,$user_id,%'");
+		$d_info = $d_info ? array_column($d_info,'user_id') : '';
 		$goods = $this->goods($this->goods_id);
 		if (($goods['code'] == 1) && ($goods['goods']['is_team_prize'] == 1) && ($user['bonus_products_id'] != $goods['goods']['goods_id'])) {
 			$bonus_products_id = $goods['goods']['goods_id'];
+			M('users')->where('user_id','in',$d_info)->where('bonus_products_id','>',0)->update(['bonus_products_id'=>0]);
 			$bool = M('users')->where('user_id',$this->user_id)->update(['bonus_products_id'=>$goods['goods']['goods_id']]);
 			
 			if (!$bool && self::$the_count < 3) {
@@ -57,6 +61,8 @@ class Sales extends Model
 			if (!$parents_id) {
 				return array('msg'=>"该用户没有上级",'code'=>0);
 			}
+
+			M('users')->where('user_id','in',$parents_id)->where('bonus_products_id','>',0)->update(['bonus_products_id'=>0]);
 			
 			$this->cash_unlock($parents_id);	//提现解锁
 			$is_repeat = $this->repeat_buy();
