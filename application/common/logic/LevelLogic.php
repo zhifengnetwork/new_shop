@@ -184,8 +184,8 @@ class LevelLogic extends Model
     {
         //获取直推下级id
         $ids = Db::name('users')->where('first_leader',$agent_id)->field('user_id')->select();
+        $id_array = [];
         if($ids){
-            $id_array =[];
             foreach($ids as $k=>$v){
                 array_push($id_array ,$v['user_id']);
             }
@@ -200,6 +200,3 @@ class LevelLogic extends Model
     }
 
 }
-
-
-?>
