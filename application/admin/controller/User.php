@@ -48,9 +48,17 @@ class User extends Base
         $condition = array();
         $nickname = I('nickname');
         $account = I('account');
+        $id = intval(I('id'));
+        $distribut_level = I('dist_level');
+        if ($distribut_level) {
+            $level = M('agent_level')->where('level_name', 'like', "%$distribut_level%")->column('level');
+            $level ? $condition['distribut_level'] = ['in',$level] : $condition['user_id'] = ['<',0];
+            $this->assign('dist_level',$distribut_level);
+        }
         $account ? $condition['email|mobile'] = ['like', "%$account%"] : false;
         $nickname ? $condition['nickname'] = ['like', "%$nickname%"] : false;
-
+        $id ? $condition['user_id'] = $id : false;
+        
         I('first_leader') && ($condition['first_leader'] = I('first_leader')); // 查看一级下线人有哪些
         I('second_leader') && ($condition['second_leader'] = I('second_leader')); // 查看二级下线人有哪些
         I('third_leader') && ($condition['third_leader'] = I('third_leader')); // 查看三级下线人有哪些
@@ -89,6 +97,9 @@ class User extends Base
             $this->assign('agnet_name', $agnet_name);
         }
         
+        if ($id) {
+            $this->assign('id',$id);
+        }
         
         $show = $Page->show();
         $this->assign('userList', $userList);
