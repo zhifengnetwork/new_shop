@@ -65,19 +65,46 @@ function sales($order_id){
     if (!$order) {
         return array('msg'=>"该商品还没付款",'code'=>0);
     }
+    
     $user_id = $order['user_id'];
+    $bool = true;
+    $result = array();
+    
+    $goods_list = M('order_goods')->where(['order_id'=>$order_id])->field('goods_id')->select();
+    //是否确认收货后才返佣
+    if ($goods_list) {
+        $bool = is_receiving_commission($goods_list);
+        
+        if (!$bool) {
+            if ($order['order_status'] == 2) {
+                $bool = true;
+            } else {
+                $bool = false;
+            }
+        }
+    }
 
-    $perfor = new PerformanceLogic;
-    $add_perfor = $perfor->per($order_id);  //添加业绩
-    
-    $goods_list = M('order_goods')->where(['order_id'=>$order_id])->select();
-    
-    foreach($goods_list as $k => $v){
-        $model = new Sales($user_id,$order_id,$v['goods_id']);
-        $result = $model->sales();  //销售奖励
+    if ($bool) {
+        $perfor = new PerformanceLogic;
+        $add_perfor = $perfor->per($order_id);  //添加业绩
+
+        foreach($goods_list as $k => $v){
+            $model = new Sales($user_id,$order_id,$v['goods_id']);
+            $result = $model->sales();  //销售奖励
+        }
     }
     
     return $result;
+}
+
+/**
+ * 是否确认收货后才返佣
+ */
+function is_receiving_commission($goods_id){
+    $ids = $goods_id ? array_column($goods_id,'goods_id') : 0;
+    $goods = M('goods')->whereIn('goods_id',$ids)->where('is_receiving_commission',1)->find();
+    $bool = $goods ? false : true;
+    return $bool;
 }
 
 /**
@@ -980,6 +1007,8 @@ function confirm_order($id,$user_id = 0){
     $row = M('order')->where(array('order_id'=>$id))->save($data);
     if(!$row)
         return array('status'=>-3,'msg'=>'操作失败');
+
+    $sales = sales($id);  //确认收货后返佣
 
     // 商品待评价提醒
     $order_goods = M('order_goods')->field('goods_id,goods_name,rec_id')->where(["order_id" => $id])->find();

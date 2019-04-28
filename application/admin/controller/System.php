@@ -478,7 +478,7 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
         foreach($order_id_arr as $k => $v)
         {
             confirm_order($v);
-        }      
+        }
         
         // 多少天后自动分销记录自动分成
          $switch = tpCache('distribut.switch');         
