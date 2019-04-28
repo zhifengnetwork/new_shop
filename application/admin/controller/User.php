@@ -108,6 +108,30 @@ class User extends Base
         $this->assign('pager', $Page);
         return $this->fetch();
     }
+
+    #会员等级统计
+    public function level_count()
+    {
+        $level = M('agent_level')->column('level,level_name');
+        
+        ksort($level); //键值升序排列
+        $user = M('users')->column('user_id,distribut_level');
+
+        $count = count($user);
+        $count_level = array_count_values($user); //统计数组中值出现的次数
+        $count_list = array();
+
+        if ($level) {
+            foreach($level as $k => $v){
+                $num = $count_level[$k] ?: 0;
+                $count_list[] = array('level'=>$k,'level_name'=>$v,'num'=>$num);
+            }
+        }
+
+        $this->assign('count',$count);
+        $this->assign('count_list',$count_list);
+        return $this->fetch();
+    }
 	
 	# 直推下级列表
 	public function direct_list(){
