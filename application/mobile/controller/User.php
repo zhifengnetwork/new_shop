@@ -88,8 +88,25 @@ class User extends MobileBase
         }
         $MenuCfg = new MenuCfg();
         $menu_list = $MenuCfg->where('is_show', 1)->order('menu_id asc')->select();
+        $comm = $this->today_commission();
+        $this->user['today_comm'] = $comm;
         $this->assign('menu_list', $menu_list);
         return $this->fetch();
+    }
+
+    //获取今天佣金
+    public function today_commission()
+    {
+        $user_id = $this->user_id;
+        $where['to_user_id'] = $user_id;
+        $where['type'] = ['in',[1,2,3]];
+        
+        $comm1 = Db::name('distrbut_commission_log')->where($where)->order('log_id','desc')->whereTime('create_time','today')->sum('money');
+        $where['type'] = 4;
+        $comm2 = Db::name('distrbut_commission_log')->where($where)->order('log_id','desc')->whereTime('create_time','yesterday')->sum('money');
+       
+        $money = $comm1 + $comm2;
+        return $money;
     }
 
     //  /**
