@@ -398,6 +398,41 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
     }
 
     /**
+     * 获取订单返佣记录
+     */
+    public function getOrderCommission()
+    {
+        $order_id = input('order_id/d',0);
+        $order_id <= 0 && $this->ajaxReturn(['status'=>1,'msg'=>'参数错误！！']);
+        
+        $commission_log = M('distrbut_commission_log')->where(['order_id'=>$order_id,'type'=>['in',[1,2,3]]])->select();
+        
+        if ($commission_log) {
+            $goods_id = array_column($commission_log,'goods_id');
+            $goods_ids = array_unique($goods_id);
+            $user_id = $commission_log[0]['user_id'];
+            $to_user_ids = array_column($commission_log,'to_user_id');
+            
+            array_unshift($to_user_ids,$user_id);
+            $all_ids = array_unique($to_user_ids);
+            
+            $user = M('users')->where('user_id','in',$all_ids)->column('user_id,nickname,mobile');
+            $goods = M('goods')->whereIn('goods_id',$goods_ids)->column('goods_id,goods_name');
+            
+            if ($user) {
+                foreach($commission_log as $key => $value){
+                    $commission_log[$key]['goods_name'] = $goods[$value['goods_id']];
+                    $commission_log[$key]['date'] = date('Y-m-d H:i:s',$value['create_time']);
+                    $commission_log[$key]['user_name'] = $user[$value['user_id']]['nickname'] ?: $user[$value['user_id']]['mobile'];
+                    $commission_log[$key]['to_user_name'] = $user[$value['to_user_id']]['nickname'] ?: $user[$value['to_user_id']]['mobile'];
+                }
+            }
+        }
+
+        $this->ajaxReturn(['status'=>1,'data'=>$commission_log]);
+    }
+
+    /**
      * 获取订单操作记录
      */
     public function getOrderAction(){
@@ -422,7 +457,7 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
             $action_log["$k"]["pay_status"] = $this->pay_status[$v['pay_status']];
             $action_log["$k"]["shipping_status"] = $this->shipping_status[$v['shipping_status']];
         }
-        $this->ajaxReturn(['status'=>1,'msg'=>'参数错误！！','data'=>$action_log]);
+        $this->ajaxReturn(['status'=>1,'data'=>$action_log]);
     }
 
     /**
