@@ -1,7 +1,7 @@
 <include file="public/header" title="个人中心" body=""/>
 <link rel="stylesheet" type="text/css" href="__STATIC__/css/personal.css"/>
 <div class="z_user_vs">
-    <div class="z_user_head">
+    <div class="z_user_head" style="height:9.38rem;">
         <div class="z_user_top">
             <div class="user_top_tx">
                 <notempty name="$user.head_pic"><img src="{$user.head_pic}"/><else/><img src="/public/images/user_default_icon.jpg"/></notempty>
@@ -20,13 +20,15 @@
                 <a href="javascript:void(0);">ID：{$user['user_id']}</a>
             </div>
         </div>
-        <div class="z_user_down">
+        <div class="z_user_down" style="height:3.4rem;">
             <div class="user_down_bg"></div>
             <ul>
                 <li style="width:100%;">
                     <a href="{:U('Mobile/User/account')}">
-                        <div class="user_down_yue"  style="color: #ffffff;font-size:0.64rem;margin-top: 0.4266666666666667rem">{$user['user_money']}</div>
-                        <div class="user_down_name">余额</div>
+                        <div class="user_down_yue" style="color: #ffffff;font-size:0.64rem;margin-top: 0.4266666666666667rem">余额：{$user['user_money']}</div>
+                        <!-- <div class="user_down_name">余额</div> -->
+                        <div class="user_down_yue" style="color: #ffffff;font-size:0.64rem;margin-top: 0.4266666666666667rem">总佣金：{$user['distribut_money']}</div>
+                        <div class="user_down_yue" style="color: #ffffff;font-size:0.64rem;margin-top: 0.4266666666666667rem">今日佣金：{$user['today_comm']}</div>
                     </a>
                 </li>
                 <!-- <li>

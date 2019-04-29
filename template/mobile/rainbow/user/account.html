@@ -13,7 +13,7 @@
         width: 100%;
         height: 100%;
     }
-    .hh #nickname{
+    .hh .text-bottom{
         margin-bottom: 0.3rem;
     }
 </style>
@@ -22,9 +22,9 @@
         <div class="user_top_tx">
             <img src="{$user.head_pic}"/>
         </div>
-        <h2 id="nickname">{$user['nickname']}</h2>
-        <h2>可用余额</h2>
-        <h1>{$user['user_money']}</h1>
+        <h2 class="text-bottom">{$user['nickname']}</h2>
+        <h2 class="text-bottom">可用余额</h2>
+        <h2>{$user['user_money']}</h1>
     </div>
     <div class="scgz">
         <ul>

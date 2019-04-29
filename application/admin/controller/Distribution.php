@@ -124,8 +124,10 @@ class Distribution extends Base
 
         if($user_name){
             $user['nickname'] = ['like', "%$user_name%"];
+            
             $id_list = M('users')->where($user)->column('user_id');
-            $where['user_id'] = $id_list ? ['in',$id_list] : [];
+            
+            $where['user_id'] = $id_list ? ['in',$id_list] : '';
         }
         
         if($ctime){
@@ -154,7 +156,8 @@ class Distribution extends Base
         $this->assign('max',$max);
         $this->assign('per_type',$per_type);
         $this->assign('list', $list);
-        $count = $Ad->count();
+        $count = $Ad->where($where)->count();
+        // $count = $Ad->count();
         $Page = new Page($count, 20);
         $show = $Page->show();
         $this->assign('page', $show);
@@ -177,7 +180,7 @@ class Distribution extends Base
         if($user_name){
             $user['nickname'] = ['like', "%$user_name%"];
             $id_list = M('users')->where($user)->column('user_id');
-            $where['user_id'] = $id_list ? ['in',$id_list] : [];
+            $where['user_id'] = $id_list ? ['in',$id_list] : '';
         }
         if($ctime){
             $gap = explode(' - ', $ctime);
@@ -204,7 +207,7 @@ class Distribution extends Base
         $this->assign('permin',$permin);
         $this->assign('permax',$permax);
         $this->assign('list', $list);
-        $count = $Ad->count();
+        $count = $Ad->where($where)->count();
         $Page = new Page($count, 20);
         $show = $Page->show();
         $this->assign('count',$count);
@@ -238,7 +241,7 @@ class Distribution extends Base
         if($user_name){
             $user['nickname'] = ['like', "%$user_name%"];
             $id_list = M('users')->where($user)->column('user_id');
-            $where['user_id|to_user_id'] = $id_list ? ['in',$id_list] : [];
+            $where['user_id|to_user_id'] = $id_list ? ['in',$id_list] : '';
         }
         if($ctime){
             $gap = explode(' - ', $ctime);
@@ -256,6 +259,7 @@ class Distribution extends Base
             }
             $log_ids = implode(',',$id_lists);
         }
+        
         $this->assign('log_ids',$log_ids);
         $this->assign('user_name',$user_name);
         $this->assign('start_time',$gap[0]);
@@ -263,7 +267,7 @@ class Distribution extends Base
         $this->assign('ctime',$gap[0].' - '.$gap[1]);
         $this->assign('order_sn',$order_sn);
         $this->assign('list', $list);
-        $count = $Ad->count();
+        $count = $Ad->where($where)->count();
         $Page = new Page($count, 20);
         $show = $Page->show();
         $this->assign('count',$count);

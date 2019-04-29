@@ -134,7 +134,7 @@ return	array(
 					// array('name' => '分销商列表', 'act'=>'distributor_list', 'op'=>'Distribut'),
 					// array('name' => '分销关系', 'act'=>'tree', 'op'=>'Distribut'),
 					array('name' => '分销等级列表', 'act'=>'agent_level', 'op'=>'Distribution'),
-					array('name' => '等级关系', 'act'=>'tree', 'op'=>'Distribution'),
+					// array('name' => '等级关系', 'act'=>'tree', 'op'=>'Distribution'),
 					array('name' => '分销业绩', 'act'=>'per_list', 'op'=>'Distribution'),
 					array('name' => '业绩日志', 'act'=>'per_log', 'op'=>'Distribution'),
 					array('name' => '返佣日志', 'act'=>'commission_log', 'op'=>'Distribution'),
@@ -156,6 +156,7 @@ return	array(
  	'member'=>array('name'=>'会员','child'=>array(
 		array('name' => '会员管理','child'=>array(
 			array('name'=>'会员列表','act'=>'index','op'=>'User'),
+			array('name'=>'会员统计','act'=>'level_count','op'=>'User'),
 			// array('name'=>'会员等级','act'=>'levelList','op'=>'User'),
 		)),
 		array('name' => '充值提现','child'=>array(

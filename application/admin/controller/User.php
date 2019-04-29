@@ -48,9 +48,17 @@ class User extends Base
         $condition = array();
         $nickname = I('nickname');
         $account = I('account');
+        $id = intval(I('id'));
+        $distribut_level = I('dist_level');
+        if ($distribut_level) {
+            $level = M('agent_level')->where('level_name', 'like', "%$distribut_level%")->column('level');
+            $level ? $condition['distribut_level'] = ['in',$level] : $condition['user_id'] = ['<',0];
+            $this->assign('dist_level',$distribut_level);
+        }
         $account ? $condition['email|mobile'] = ['like', "%$account%"] : false;
         $nickname ? $condition['nickname'] = ['like', "%$nickname%"] : false;
-
+        $id ? $condition['user_id'] = $id : false;
+        
         I('first_leader') && ($condition['first_leader'] = I('first_leader')); // 查看一级下线人有哪些
         I('second_leader') && ($condition['second_leader'] = I('second_leader')); // 查看二级下线人有哪些
         I('third_leader') && ($condition['third_leader'] = I('third_leader')); // 查看三级下线人有哪些
@@ -89,12 +97,39 @@ class User extends Base
             $this->assign('agnet_name', $agnet_name);
         }
         
+        if ($id) {
+            $this->assign('id',$id);
+        }
         
         $show = $Page->show();
         $this->assign('userList', $userList);
         $this->assign('level', M('user_level')->getField('level_id,level_name'));
         $this->assign('page', $show);// 赋值分页输出
         $this->assign('pager', $Page);
+        return $this->fetch();
+    }
+
+    #会员等级统计
+    public function level_count()
+    {
+        $level = M('agent_level')->column('level,level_name');
+        
+        ksort($level); //键值升序排列
+        $user = M('users')->column('user_id,distribut_level');
+
+        $count = count($user);
+        $count_level = array_count_values($user); //统计数组中值出现的次数
+        $count_list = array();
+
+        if ($level) {
+            foreach($level as $k => $v){
+                $num = $count_level[$k] ?: 0;
+                $count_list[] = array('level'=>$k,'level_name'=>$v,'num'=>$num);
+            }
+        }
+
+        $this->assign('count',$count);
+        $this->assign('count_list',$count_list);
         return $this->fetch();
     }
 	

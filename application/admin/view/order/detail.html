@@ -316,23 +316,43 @@ a.green:hover { color: #FFF; background-color: #1BBC9D; border-color: #16A086; }
 	        </dd>
 	      </dl> 
         </div>
+        <div class="contact-info">
+            <div class="goods-info">
+            <h4>操作记录</h4>
+            <table>
+                <thead>
+                <tr>
+                    <th>操作者</th>
+                    <th>操作时间</th>
+                    <th>订单状态</th>
+                    <th>付款状态</th>
+                    <th>发货状态</th>
+                    <th>描述</th>
+                    <th>备注</th>
+                </tr>
+                </thead>
+                <tbody id="order_action">
+                </tbody>
+            </table>
+            </div>
+        </div>
         <div class="goods-info">
-          <h4>操作记录</h4>
-          <table>
-            <thead>
-              <tr>
-                <th>操作者</th>
-                <th>操作时间</th>
-                <th>订单状态</th>
-                <th>付款状态</th>
-                <th>发货状态</th>
-                <th>描述</th>
-                <th>备注</th>
-              </tr>
-            </thead>
-              <tbody id="order_action">
-              </tbody>
-          </table>
+            <h4>返佣记录</h4>
+            <table>
+                <thead>
+                <tr>
+                    <th>用户</th>
+                    <th>获得返佣用户</th>
+                    <th>金额</th>
+                    <th>商品</th>
+                    <th>数量</th>
+                    <th>时间</th>
+                    <th>描述</th>
+                </tr>
+                </thead>
+                <tbody id="order_commission">
+                </tbody>
+            </table>
         </div>
       </div>
       </form>
@@ -387,7 +407,42 @@ a.green:hover { color: #FFF; background-color: #1BBC9D; border-color: #16A086; }
 <script type="text/javascript">
     $(function () {
         getOrderAction();
+        getOrderCommission();
     })
+
+    //返佣记录
+    function getOrderCommission() {
+        var order_id = "{$order.order_id}";
+        $.ajax({
+            type : "get",
+            url  : "{:U('Admin/order/getOrderCommission')}",
+            data : {order_id:order_id},
+            dataType: 'json',
+            error: function(request) {
+                layer.msg("服务器繁忙, 请联系管理员!", {icon: 1, time: 2000});
+            },
+            success: function(data) {
+                // 验证成功提交表单
+                if(data.status == 1)
+                {
+                    var commission_html = '';
+                    for (var i=0; i<data.data.length;i++){
+                        commission_html +='<tr><td class="text-center" style="width:10%;">'+data.data[i].user_name+'</td>' +
+                                '<td class="text-center" style="width:10%;">'+data.data[i].to_user_name+'</td>' +
+                                '<td class="text-center" style="width:10%;">'+data.data[i].money+'</td>' +
+                                '<td class="text-center" style="width:25%;">'+data.data[i].goods_name+'</td>' +
+                                '<td class="text-center" style="width:5%;">'+data.data[i].num+'</td>' +
+                                '<td class="text-center" style="width:15%;">'+data.data[i].date+'</td>' +
+                                '<td class="" style="width:25%;text-align:left;">'+data.data[i].desc+'</td></tr>'
+                    }
+                    $('#order_commission').html(commission_html);
+                }else{
+                    layer.msg(data.msg, {icon: 2, time: 2000});
+                }
+            }
+        });
+    }
+
     function delfun() {
         // 删除按钮
         layer.confirm('确认删除？', {

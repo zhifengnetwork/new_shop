@@ -41,6 +41,14 @@
                 <input type="hidden" name="third_leader" value="{$_GET['third_leader']}">
                 <div class="sDiv">
                     <div class="sDiv2">
+                        <input type="text" name="id" id="id" size="30" class="qsbox" placeholder="ID"
+                                value="{$id}" style="width:80px;">
+                    </div>
+                    <div class="sDiv2">
+                        <input type="text" name="dist_level" id="dist_level" size="30" class="qsbox" placeholder="会员等级"
+                                value="{$dist_level}">
+                    </div>
+                    <div class="sDiv2">
                         <select class="select" name="search_type" id="search_type">
                             <option value="nickname">会员昵称</option>
                             <option value="search_key">会员账户</option>
@@ -61,15 +69,15 @@
                             <div style="width: 24px;"><i class="ico-check"></i></div>
                         </th>
                         <th align="left" abbr="user_id" axis="col3" class="">
-                            <div style="text-align: center; width: 40px;" class="">ID</div>
+                            <div style="text-align: center; width: 80px;" class="">ID</div>
                         </th>
                         <th align="left" abbr="nickname" axis="col4" class="">
                             <div style="text-align: center; width: 150px;" class="">会员昵称</div>
                         </th>
-                        <th align="left" abbr="avatar" axis="col4" class="">
+                        <th align="left" axis="col4" class="">
                             <div style="text-align: center; width: 50px;" class="">会员头像</div>
                         </th>
-                        <th align="center" abbr="level" axis="col5" class="">
+                        <th align="center" abbr="distribut_level" axis="col5" class="">
                             <div style="text-align: center; width: 100px;" class="">会员等级</div>
                         </th>
                         <th align="center" abbr="total_amount" axis="col6" class="">

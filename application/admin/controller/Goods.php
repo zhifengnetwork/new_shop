@@ -323,7 +323,8 @@ class Goods extends Base {
         $GoodsLogic = new GoodsLogic();
         $Goods = new \app\common\model\Goods();
         $goods_id = input('id');
-
+        $setting = array();
+        
         if($goods_id){
             $goods = $Goods->where('goods_id', $goods_id)->find();
             $level_cat = $GoodsLogic->find_parent_cat($goods['cat_id']); // 获取分类默认选中的下拉框
@@ -405,8 +406,8 @@ class Goods extends Base {
     //商品保存
     public function save(){
         $data = input('post.');
-        
         $spec_item = input('item/a');
+        $setting = '';
         $validate = Loader::validate('Goods');// 数据验证
         if (!$validate->batch()->check($data)) {
             $error = $validate->getError();
@@ -419,16 +420,16 @@ class Goods extends Base {
             $store_count_change_num = $data['store_count'] - $goods['store_count'];//库存变化量
             $cart_update_data = ['market_price'=>$data['market_price'],'goods_price'=>$data['shop_price'],'member_goods_price'=>$data['shop_price']];
             db('cart')->where(['goods_id'=>$data['goods_id'],'spec_key'=>''])->save($cart_update_data);
+            $is_setting = $goods['goods_prize'];
             //编辑商品的时候需清楚缓存避免图片失效问题
             clearCache();
         }else{
             $goods = new \app\common\model\Goods();
             $store_count_change_num = $data['store_count'];
         }
-
+        
         $level_name = $this->get_level_name();
         $ids = array();
-        $is_setting = $goods->goods_prize;
 
         $is_setting = $is_setting ? json_decode($setting,true) : array();
         $have_reward = M('goods_commission')->column('id,level');
