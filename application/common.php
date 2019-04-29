@@ -52,7 +52,7 @@ function share_deal_after($xiaji,$shangji){
 function sales($order_id){
     $order_id = intval($order_id);
     if(!$order_id){
-        return array('msg'=>"没有该商品的订单id",'code'=>0);
+        return array('msg'=>"参数错误",'code'=>0);
     }
     
     $is_reward = M('order_divide')->where('order_id',$order_id)->find();
@@ -1009,6 +1009,10 @@ function confirm_order($id,$user_id = 0){
         return array('status'=>-3,'msg'=>'操作失败');
 
     $sales = sales($id);  //确认收货后返佣
+
+    // 分销商升级, 根据order表查看消费id 达到条件就给他分销商等级升级
+    $Level =new \app\common\logic\LevelLogic();
+    $Level->user_in($order['user_id']);
 
     // 商品待评价提醒
     $order_goods = M('order_goods')->field('goods_id,goods_name,rec_id')->where(["order_id" => $id])->find();

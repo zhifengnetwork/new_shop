@@ -67,7 +67,7 @@ class Report extends Base
 		$result = array('order'=>$order_arr,'amount'=>$amount_arr,'sign'=>$sign_arr,'time'=>$day);
 		$this->assign('result',json_encode($result));
 		return $this->fetch();
-	}
+    }
 
     /**
      * 销量排行

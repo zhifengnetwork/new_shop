@@ -63,11 +63,13 @@
 	height: 100%;
 }
 .user_top_name{
-	padding-top: 0.256rem;
+	/* padding-top: 0.256rem; */
 	font-size: 0.64rem;
 }
 .user_top_title{
-	font-size: 0.4266666666666667rem;
+	/* font-size: 0.4266666666666667rem; */
+	margin: .1rem 0;
+	font-size: 0.64rem;
 }
 .user_top_name a,.user_top_title a{
 	width: 100%;
@@ -75,7 +77,7 @@
 	color: #FFFFFF;
 }
 .z_user_down{
-	height: 2.432rem;
+	height: 2.8rem;
 	position: relative;
 	padding: 0 0.4266666666666667rem;
 }
@@ -102,12 +104,17 @@
 .z_user_down ul li{
 	text-align: center;
 	width: 50%;
+	height: 100%;
 	float: left;
 	color: #ffffff;
 }
 .z_user_down ul li a{
 	width: 100%;
-	display: block;
+	height:	100%;
+	line-height: 1rem;
+	text-align: center;
+	display: flex;
+	justify-content: space-around;
 	color: #ffff !important;
 }
 

@@ -52,6 +52,28 @@ class Order extends MobileBase
         $this->assign('order_status_coment', $order_status_coment);
     }
 
+    // /**
+    //  * 订单是否已返佣
+    //  */
+    // public function is_commission($list)
+    // {
+    //     if ($list) {
+    //         $ids = array_column($list,'order_id');
+    //         $order_divide = M('order_divide')->whereIn('order_id',$ids)->column('order_id');
+    //         $order_divide = $order_divide ?: array();
+    //         foreach ($list as $k1 => $v1) {
+    //             $list[$k1]['is_comm'] = 0;
+    //             foreach ($order_divide as $k2 => $v2) {
+    //                 if ($v1['order_id'] == $v2['order_id']) {
+    //                     $list[$k1]['is_comm'] = 1;
+    //                 }
+    //             }
+    //         }
+    //     }
+        
+    //     return $list;
+    // }
+
     /**
      * 订单列表
      * @return mixed

@@ -122,7 +122,7 @@ class Sales extends Model
 		$all_user = $this->all_user($parents_id);	//获取所有用户信息
 		// $level = $this->get_level();				//获取等级信息
 		
-		$comm = $this->get_goods_prize($is_repeat);
+		$comm = $this->get_goods_prize($is_repeat,$this->goods_id);
 		$basic_reward = $comm['basic'];  //直推奖励
 		$poor_prize = $comm['poor_prize'];//极差奖励
 		$first_layer = $comm['first_layer'];//同级一层奖励
@@ -270,7 +270,7 @@ class Sales extends Model
 		$all_user = $this->all_user($parents_id);	//获取所有用户信息
 		// $level = $this->get_level();				//获取等级信息
 		
-		$comm = $this->get_goods_prize($is_repeat);
+		$comm = $this->get_goods_prize($is_repeat,$this->goods_id);
 		$basic_reward = $comm['basic'];  //直推奖励
 		$poor_prize = $comm['poor_prize'];//极差奖励
 		$first_layer = $comm['first_layer'];//同级一层奖励
@@ -465,8 +465,8 @@ class Sales extends Model
 			return ['code'=>0];
 		}
 
-		$money = round($money,2); //四色五入保留两位小数
-		
+		$money = round($money,2); //四舍五入保留两位小数
+		$result['code'] = 0;
 		$user_money = $money + $leader['user_money'];
 		$distribut_money = $money + $leader['distribut_money'];
 		$msg = "团队分红 ". $money . "（元），商品：".$order['goods_num']." 件，比率：".$goods['prize_ratio']."%";
@@ -487,10 +487,17 @@ class Sales extends Model
 		);
 
 		$this->writeLog($data,'');
-
-		$result = $bool ? array('code' => 1) : array('code'=>0);
+		if ($bool) {
+			$result['code'] = 1;
+			$this->is_distribut($order_id);
+		}
 
 		return $result;
+	}
+
+	public function is_distribut($order_id)
+	{
+		M('order')->where('order_id',$order_id)->update(['is_distribut'=>1]);
 	}
 
 	//获取用户信息
@@ -501,9 +508,9 @@ class Sales extends Model
 	}
 	
 	//获取返佣配置信息
-	public function get_goods_prize($is_repeat)
+	public function get_goods_prize($is_repeat,$goods_id)
 	{
-		$goods_prize = M('goods')->where('goods_id',$this->goods_id)->value('goods_prize');
+		$goods_prize = M('goods')->where('goods_id',$goods_id)->value('goods_prize');
 		$ids = json_decode($goods_prize,true);
 		
 		if($is_repeat){

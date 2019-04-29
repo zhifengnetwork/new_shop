@@ -1,7 +1,7 @@
 <include file="public/header" title="个人中心" body=""/>
 <link rel="stylesheet" type="text/css" href="__STATIC__/css/personal.css"/>
 <div class="z_user_vs">
-    <div class="z_user_head" style="height:9.38rem;">
+    <div class="z_user_head" style="height:8.74rem;">
         <div class="z_user_top">
             <div class="user_top_tx">
                 <notempty name="$user.head_pic"><img src="{$user.head_pic}"/><else/><img src="/public/images/user_default_icon.jpg"/></notempty>
@@ -20,15 +20,15 @@
                 <a href="javascript:void(0);">ID：{$user['user_id']}</a>
             </div>
         </div>
-        <div class="z_user_down" style="height:3.4rem;">
-            <div class="user_down_bg"></div>
+        <div class="z_user_down">
+            <div class="user_down_bg" style="background:url(__STATIC__/images/user_info.png) no-repeat"></div>
             <ul>
                 <li style="width:100%;">
                     <a href="{:U('Mobile/User/account')}">
-                        <div class="user_down_yue" style="color: #ffffff;font-size:0.64rem;margin-top: 0.4266666666666667rem">余额：{$user['user_money']}</div>
+                        <div class="user_down_yue" style="color: #ffffff;font-size:0.64rem;margin-top: 0.4266666666666667rem">余额<p>{$user['user_money']}</p></div>
                         <!-- <div class="user_down_name">余额</div> -->
-                        <div class="user_down_yue" style="color: #ffffff;font-size:0.64rem;margin-top: 0.4266666666666667rem">总佣金：{$user['distribut_money']}</div>
-                        <div class="user_down_yue" style="color: #ffffff;font-size:0.64rem;margin-top: 0.4266666666666667rem">今日佣金：{$user['today_comm']}</div>
+                        <div class="user_down_yue" style="color: #ffffff;font-size:0.64rem;margin-top: 0.4266666666666667rem">总佣金<p>{$user['distribut_money']}</p></div>
+                        <div class="user_down_yue" style="color: #ffffff;font-size:0.64rem;margin-top: 0.4266666666666667rem">今日佣金<p>{$user['today_comm']}</p></div>
                     </a>
                 </li>
                 <!-- <li>
@@ -128,7 +128,9 @@
 <include file="public/footer_nav"/>
 <!--底部导航-end-->
 <script>
-    $('.z_user_head').css("background-color", "{$tpshop_config['basic_header_background']}");
+    // $('.z_user_head').css("background-color", "{$tpshop_config['basic_header_background']}");
+    $('.z_user_head').css("background", "url(__STATIC__/images/user_bg.png) no-repeat");	
+    $('.z_user_head').css("background-size", "cover");
     $(function(){		
         var ua = window.navigator.userAgent.toLowerCase();
         if(ua.match(/MicroMessenger/i) == 'micromessenger'){

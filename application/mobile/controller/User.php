@@ -109,6 +109,155 @@ class User extends MobileBase
         return $money;
     }
 
+    //待收益
+    public function wait_earnings()
+    {
+        $user_id = $this->user_id;
+        $user = M('users')->where('user_id',$user_id)->find();
+        // if (($user['is_distribut'] != 1) || $user['is_lock'] == 1) {
+        //     $list = array();
+        // } else {
+        //     $user_comm = $this->self_wait($user_id,$user);
+        //     $lower_comm = $this->lower_wait($user_id,$user);
+        // }
+        
+        die;
+        $this->assign('list',$list);
+        return $this->fetch();
+    }
+
+    //自己待收益
+    public function self_wait($user_id)
+    {
+        $money = 0;
+        return $money;
+    }
+
+    //下级待收益
+    public function lower_wait($user_id)
+    {
+        $lower_ids = $this->lower_id($user_id);  //获取下级id列表
+        $sales = new \app\common\logic\Sales(0,0,0);
+        
+        $leader_list = M('users')->whereIn('user_id',$lower_ids)->column('user_id,parents,first_leader,distribut_level,is_distribut,bonus_products_id,is_lock');
+        
+        $order_divide = M('order_divide')->where('user_id','in',$lower_ids)->column('order_id');  //获取已返佣的订单
+        //获取还没返佣的订单
+        $order = M('order')->where('user_id','in',$lower_ids)->where('order_id','not in',$order_divide)->field('order_id,user_id,order_status,pay_status')->select();
+        $result = array();
+        $money = 0;
+        $total_money = 0;
+        $is_me = false;
+        $layer = 0;
+        $level = 0;
+        $user_level = $user['distribut_level'];
+        
+        if ($order) {
+            foreach ($order as $k => $v) {
+                if (isset($leader_list[$v['user_id']])) {
+                    $leader = $leader_list[$v['user_id']];
+                    $is_reapat = ($leader['bonus_products_id'] > 0) ? true : false;
+                    $parents_id = $leader['parents'] ? explode(',',$leader['parents']) : 0;
+                    $parent_id = $leader_list[$v['user_id']]['first_leader'];
+                    $is_exist = in_array($parent_id,$parents_id);
+                    if (!$is_exist) {
+                        array_unshift($parents_id,$leader_list[$parent_id]);
+                    }
+                    $parents_id = array_filter($parents_id);  //去除0
+                    
+                    if (!$parents_id) {
+                        continue;
+                    }
+                    
+                    $order_goods = M('order_goods')->whereIn('order_id',$order_ids)->where('is_send','<>',3)->field('order_id,goods_id,goods_name,goods_num')->select();
+                
+                    foreach ($order_goods as $k1 => $v1) {
+                        $goods = M('goods')->where('goods',$v1['goods_id'])->column('goods_id,prize_ratio,is_team_prize,goods_prize');
+                        $basic_reward = $comm['basic'];  //直推奖励
+                        $poor_prize = $comm['poor_prize'];//极差奖励
+                        $first_layer = $comm['first_layer'];//同级一层奖励
+                        $second_layer = $comm['second_layer'];//同级二层奖励
+
+                        if ($is_reapat) {
+                            $goods_prize = $sales->get_goods_prize(true,$v1['goods_id']);
+                        } else {
+                            $goods_prize = $sales->get_goods_prize(false,$v1['goods_id']);
+                            foreach ($parents_id as $k2 => $v2) {
+                                if ($user_level < $leader_list[$v2]['distribut_level']) {
+                                    break;
+                                }
+                                if ($is_me) {
+                                    break;
+                                }
+                                if ($leader_list[$v2]['user_id'] == $leader_list[$v2]['user_id']) {
+                                    $is_me = true;
+                                }
+                                //账号冻结了没有奖励
+                                if ($leader_list[$v2]['is_lock'] == 1) {
+                                    continue;
+                                }
+                                //不是分销商不奖励
+                                if ($leader_list[$v2]['is_distribut'] != 1) {
+                                    continue;
+                                }
+                                //平级奖
+                                if ($user_level == $value['distribut_level']) {
+                                    $layer ++;
+                                    //超过设定层数没有奖励
+                                    if ($layer > 2) {
+                                        continue;
+                                    }
+                                    
+                                    switch($layer){
+                                        case 1:
+                                            $money = $first_layer[$leader_list[$v2]['is_distribut']] * $order['goods_num'];
+                                            break;
+                                        case 2:
+                                            $money = $second_layer[$leader_list[$v2]['is_distribut']] * $order['goods_num'];
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    
+                                    $is_prize = true;
+                                }
+                                //极差奖
+                                if ($level < $leader_list[$v2]['is_distribut']) {
+                                    $layer = 0;
+                    
+                                    //基本奖励已奖励的不再奖励
+                                    if (!$is_prize) {
+                                        $money = $basic_reward ? $basic_reward[$leader_list[$v2]['is_distribut']] : 0;
+                                        $is_prize = true;
+                                    }
+                                    
+                                    reset($poor_prize);	//重置数组指针
+                                    
+                                    //计算极差奖金
+                                    while(list($k1,$v1) = each($poor_prize)){
+                                        if ($user_level >= $k1) {
+                                            continue;
+                                        }
+                                        if ($k1 <= $leader_list[$v2]['is_distribut']) {
+                                            $v1 = $v1 ? $v1 : 0;
+                                            $money += $v1 * $order['goods_num'];
+                                            continue;
+                                        }
+                                        break;
+                                    }
+                                    
+                                    $level = $leader_list[$v2]['is_distribut'];
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $money;
+    }
+
     //  /**
     //  * 我的佣金
     //  * @author Rock
@@ -164,17 +313,26 @@ class User extends MobileBase
     // }
 
     /**
+     * 所有下级id
+     */
+    public function lower_id($user_id)
+    {
+        $d_info = Db::query("select `user_id`, `first_leader`,`parents` from `tp_users` where 'first_leader' = $user_id or parents like '%,$user_id,%'");
+        $ids = array();
+        if($d_info){
+            $ids = array_column($d_info,'user_id');
+        }
+
+        return $ids;
+    }
+
+    /**
      * 我的分销
      */
     public function team_list()
     {
         $user_id = $this->user_id;
-        //获取下级id列表
-        $d_info = Db::query("select `user_id`, `first_leader`,`parents` from `tp_users` where 'first_leader' = $user_id or parents like '%,$user_id,%'");
-        
-        if($d_info){
-            $id_array = array_column($d_info,'user_id');
-        }
+        $id_array = $this->lower_id($user_id); //获取下级id列表
         
         //获取对应下级id的数据
         $team_list = M('users')->where('user_id','in',$id_array)->field('user_id,nickname,mobile,distribut_level,distribut_money,head_pic')->select();
