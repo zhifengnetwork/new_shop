@@ -28,10 +28,10 @@ class ProfitShare extends MobileBase
         $goodsProfit=new GoodsProfit();
         //获取当天利润
         $today_profit=$goodsProfit->get_goods_profit();
-        if (!isset($today_profit['total'])){
-            $today_profit['total']=0;
-        }
-        $today_profit['total']=$today_profit['total']*$today_profit['goods_num'];
+//        if (!isset($today_profit['total'])){
+//            $today_profit['total']=0;
+//        }
+//        $today_profit['total']=$today_profit['total']*$today_profit['goods_num'];
 //        var_dump($today_profit);
         //获取合伙人个数   默认合伙人等级是5
         $partners=$goodsProfit->get_partners_num(5);
@@ -56,15 +56,15 @@ class ProfitShare extends MobileBase
         $today_ratio=$goodsProfit->get_config('today_ratio');
 
         //本日分红利润每人  $configs['today_ratio']['value']
-        if($today_profit['total']==0 || $today_ratio==0){
+        if($today_profit==0 || $today_ratio==0){
             $partnersPartProfit=0;
             $managersPartProfit=0;
             $inspectorPartProfit=0;
         }else{
 //            echo $today_profit['total']."````````````".$today_ratio;die;
-            $partnersPartProfit=$today_profit['total']*$today_ratio/100/$partners*$partners_ratio/100;
-            $managersPartProfit=$today_profit['total']*$today_ratio/100/$managers*$managers_ratio/100;
-            $inspectorPartProfit=$today_profit['total']*$today_ratio/100/$inspector*$inspector_ratio/100;
+            $partnersPartProfit=$today_profit*$today_ratio/100/$partners*$partners_ratio/100;
+            $managersPartProfit=$today_profit*$today_ratio/100/$managers*$managers_ratio/100;
+            $inspectorPartProfit=$today_profit*$today_ratio/100/$inspector*$inspector_ratio/100;
         }
         //写入记录表
         $data=array();
@@ -75,7 +75,7 @@ class ProfitShare extends MobileBase
                 $data['uid']=$value;
                 $data['bonus_money']=$partnersPartProfit;
                 $data['today_population']=$partners;
-                $data['today_profit']=$today_profit['total'];
+                $data['today_profit']=$today_profit;
                 $data['today_ratio']=$partners_ratio;
                 $data['add_time']=time();
                 Db::name('profit_dividend_log')->insert($data);
@@ -90,7 +90,7 @@ class ProfitShare extends MobileBase
                 $data['uid']=$val;
                 $data['bonus_money']=$managersPartProfit;
                 $data['today_population']=$managers;
-                $data['today_profit']=$today_profit['total'];
+                $data['today_profit']=$today_profit;
                 $data['today_ratio']=$managers_ratio;
                 $data['add_time']=time();
                 Db::name('profit_dividend_log')->insert($data);
@@ -105,7 +105,7 @@ class ProfitShare extends MobileBase
                 $data['uid']=$v;
                 $data['bonus_money']=$inspectorPartProfit;
                 $data['today_population']=$inspector;
-                $data['today_profit']=$today_profit['total'];
+                $data['today_profit']=$today_profit;
                 $data['today_ratio']=$inspector_ratio;
                 $data['add_time']=time();
                 Db::name('profit_dividend_log')->insert($data);
