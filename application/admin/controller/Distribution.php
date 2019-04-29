@@ -184,7 +184,7 @@ class Distribution extends Base
         }
         if($ctime){
             $gap = explode(' - ', $ctime);
-            $where['create_time'] = [['>= time',strtotime($gap[0])],['< time',strtotime($gap[1]." 23:59:59")],'and'];;
+            $where['create_time'] = [['>= time',strtotime($gap[0])],['< time',strtotime($gap[1]." 23:59:59")],'and'];
         }
         if ($order_sn) {
             $where['order_sn'] = ['like',"%$order_sn%"];

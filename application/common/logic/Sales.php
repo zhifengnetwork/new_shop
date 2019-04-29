@@ -62,10 +62,12 @@ class Sales extends Model
 				return array('msg'=>"该用户没有上级",'code'=>0);
 			}
 
-			M('users')->where('user_id','in',$parents_id)->where('bonus_products_id','>',0)->update(['bonus_products_id'=>0]);
+			if ($bonus_products_id > 0) {
+				M('users')->where('user_id','in',$parents_id)->where('bonus_products_id','>',0)->update(['bonus_products_id'=>0]);
+			}
 			
 			$this->cash_unlock($parents_id);	//提现解锁
-			$is_repeat = $this->repeat_buy();
+			$is_repeat = $this->repeat_buy($this->user_id,$this->goods_id);
 			
 			//是否重复购买
 			if ($is_repeat) {
@@ -85,7 +87,7 @@ class Sales extends Model
 	}
 
 	//是否重复购买
-	public function repeat_buy()
+	public function repeat_buy($user_id,$goods_id)
 	{
 		$is_repeat = false;
 		$order_num = 0;
@@ -95,10 +97,10 @@ class Sales extends Model
 		// 			 ->where(['goods.goods_id'=>$this->goods_id,'order.user_id'=>$this->user_id])
 		// 			 ->count();
 
-		$order_goods = M('order_goods')->where(['goods_id'=>$this->goods_id])->select();
+		$order_goods = M('order_goods')->where(['goods_id'=>$goods_id])->select();
 		if ($order_goods) {
 			$ids = array_column($order_goods,'order_id');
-			$order_num = M('order')->where('user_id',$this->user_id)->where('order_id','in',$ids)->count();
+			$order_num = M('order')->where('user_id',$user_id)->where('order_id','in',$ids)->count();
 		}
 		
 		if ($order_num > 1) {

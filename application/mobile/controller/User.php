@@ -113,149 +113,202 @@ class User extends MobileBase
     public function wait_earnings()
     {
         $user_id = $this->user_id;
-        $user = M('users')->where('user_id',$user_id)->find();
-        // if (($user['is_distribut'] != 1) || $user['is_lock'] == 1) {
-        //     $list = array();
-        // } else {
-        //     $user_comm = $this->self_wait($user_id,$user);
-        //     $lower_comm = $this->lower_wait($user_id,$user);
-        // }
-        
+        die;
+        $user = M('users')->where('user_id',$user_id)->field('user_id,first_leader,distribut_level,is_distribut,bonus_products_id,is_lock')->find();
+        if (($user['is_distribut'] != 1) || $user['is_lock'] == 1) {
+            $list = array();
+        } else {
+            $user_comm = $this->self_wait($user_id,$user);
+            $lower_comm = $this->lower_wait($user_id,$user);
+        }
+        dump($lower_comm);
         die;
         $this->assign('list',$list);
         return $this->fetch();
     }
 
     //自己待收益
-    public function self_wait($user_id)
+    public function self_wait($user_id,$user)
     {
-        $money = 0;
+        $order_ids = M('order_divide')->where('user_id',$user_id)->column('order_id');
+        if ($order_ids) {
+            $sales = new \app\common\logic\Sales(0,0,0);
+            $order = M('order')->where('user_id',$user_id)->where('order_id','not in',$order_ids)->field('order_id,user_id,order_status,pay_status')->select();
+
+            foreach($order as $k => $v){
+                $order_goods = M('order_goods')->whereIn('order_id',$v['order_id'])->where('is_send','<>',3)->field('order_id,goods_id,goods_name,goods_num,prize_ratio,is_team_prize')->select();
+                $is_reapat = $sales->repeat_buy($user_id,$v['goods_id']);
+                if ($is_reapat) {
+                    foreach ($order_goods as $k2 => $v2) {
+                        $comm = $sales->get_goods_prize($is_reapat,$v2['goods_id']);
+                        dump($comm);
+                    }
+                }
+            }
+        }
+        die;
+        if ($goods_id > 0) {
+            $sales = new \app\common\logic\Sales(0,0,0);
+            $comm = $sales->get_goods_prize(true,$goods_id);
+            $my_prize = floatval($comm['preferential'][$user_level]);
+			if ($my_prize > 0) {
+				$user_id = $this->user_id;
+                $total_money = $my_prize;
+            }
+        }
         return $money;
     }
 
     //下级待收益
-    public function lower_wait($user_id)
+    public function lower_wait($user_id,$user)
     {
         $lower_ids = $this->lower_id($user_id);  //获取下级id列表
         $sales = new \app\common\logic\Sales(0,0,0);
-        
+       
         $leader_list = M('users')->whereIn('user_id',$lower_ids)->column('user_id,parents,first_leader,distribut_level,is_distribut,bonus_products_id,is_lock');
-        
+        $leader_list[$user_id] = $user;
+        ksort($leader_list);
         $order_divide = M('order_divide')->where('user_id','in',$lower_ids)->column('order_id');  //获取已返佣的订单
         //获取还没返佣的订单
-        $order = M('order')->where('user_id','in',$lower_ids)->where('order_id','not in',$order_divide)->field('order_id,user_id,order_status,pay_status')->select();
+        $order = M('order')->where('user_id','in',$lower_ids)->where('order_id','not in',$order_divide)->where('user_id','<>',$user_id)->field('order_id,user_id,order_status,pay_status')->select();
+        
         $result = array();
         $money = 0;
         $total_money = 0;
-        $is_me = false;
-        $layer = 0;
-        $level = 0;
-        $user_level = $user['distribut_level'];
+        $user_level = intval($user['distribut_level']);
+        $num = 0;
         
         if ($order) {
             foreach ($order as $k => $v) {
                 if (isset($leader_list[$v['user_id']])) {
                     $leader = $leader_list[$v['user_id']];
-                    $is_reapat = ($leader['bonus_products_id'] > 0) ? true : false;
+                    $is_reapat = $sales->repeat_buy($order['user_id'],$v1['goods_id']);
+                    // $is_reapat = ($leader['bonus_products_id'] > 0) ? true : false;
                     $parents_id = $leader['parents'] ? explode(',',$leader['parents']) : 0;
                     $parent_id = $leader_list[$v['user_id']]['first_leader'];
                     $is_exist = in_array($parent_id,$parents_id);
                     if (!$is_exist) {
                         array_unshift($parents_id,$leader_list[$parent_id]);
                     }
+                    krsort($parents_id);
                     $parents_id = array_filter($parents_id);  //去除0
                     
                     if (!$parents_id) {
                         continue;
                     }
+                    $order_goods = M('order_goods')->whereIn('order_id',$v['order_id'])->where('is_send','<>',3)->field('order_id,goods_id,goods_name,goods_num')->select();
                     
-                    $order_goods = M('order_goods')->whereIn('order_id',$order_ids)->where('is_send','<>',3)->field('order_id,goods_id,goods_name,goods_num')->select();
-                
                     foreach ($order_goods as $k1 => $v1) {
-                        $goods = M('goods')->where('goods',$v1['goods_id'])->column('goods_id,prize_ratio,is_team_prize,goods_prize');
+                        $goods = M('goods')->where('goods_id',$v1['goods_id'])->column('goods_id,prize_ratio,is_team_prize,goods_prize');
+
+                        if ($is_reapat) {
+                            $comm = $sales->get_goods_prize(true,$v1['goods_id']);
+                        } else {
+                            $comm = $sales->get_goods_prize(false,$v1['goods_id']);
+                        }
+
+                        $is_me = false;
+                        $layer = 0;
+                        $level = 0;
+                        $is_prize = false;
                         $basic_reward = $comm['basic'];  //直推奖励
                         $poor_prize = $comm['poor_prize'];//极差奖励
                         $first_layer = $comm['first_layer'];//同级一层奖励
                         $second_layer = $comm['second_layer'];//同级二层奖励
+                        
+                        foreach ($parents_id as $k2 => $v2) {
+                            $money = 0;
+                            if (!isset($leader_list[$v2])) {
+                                continue;
+                            }
+                            if ($user_level < $leader_list[$v2]['distribut_level']) {
+                                break;
+                            }
+                            if ($is_me) {
+                                break;
+                            }
+                            if ($user_id == $leader_list[$v2]['user_id']) {
+                                $is_me = true;
+                            }
+                            //账号冻结了没有奖励
+                            if ($leader_list[$v2]['is_lock'] == 1) {
+                                continue;
+                            }
+                            //不是分销商不奖励
+                            if ($leader_list[$v2]['is_distribut'] != 1) {
+                                continue;
+                            }
+                            
+                            //平级奖
+                            if ($level == $leader_list[$v2]['distribut_level']) {
+                                $level = $leader_list[$v2]['distribut_level'];
+                                $layer ++;
+                                //超过设定层数没有奖励
+                                if ($layer > 2) {
+                                    continue;
+                                }
+                                //不是自己没有奖金
+                                if ($v2 != $user_id) {
+                                    continue;
+                                }
 
-                        if ($is_reapat) {
-                            $goods_prize = $sales->get_goods_prize(true,$v1['goods_id']);
-                        } else {
-                            $goods_prize = $sales->get_goods_prize(false,$v1['goods_id']);
-                            foreach ($parents_id as $k2 => $v2) {
-                                if ($user_level < $leader_list[$v2]['distribut_level']) {
-                                    break;
+                                switch($layer){
+                                    case 1:
+                                        $money = $first_layer[$leader_list[$v2]['distribut_level']] * $v1['goods_num'];
+                                        break;
+                                    case 2:
+                                        $money = $second_layer[$leader_list[$v2]['distribut_level']] * $v1['goods_num'];
+                                        break;
+                                    default:
+                                        break;
                                 }
-                                if ($is_me) {
-                                    break;
-                                }
-                                if ($leader_list[$v2]['user_id'] == $leader_list[$v2]['user_id']) {
-                                    $is_me = true;
-                                }
-                                //账号冻结了没有奖励
-                                if ($leader_list[$v2]['is_lock'] == 1) {
-                                    continue;
-                                }
-                                //不是分销商不奖励
-                                if ($leader_list[$v2]['is_distribut'] != 1) {
-                                    continue;
-                                }
-                                //平级奖
-                                if ($user_level == $value['distribut_level']) {
-                                    $layer ++;
-                                    //超过设定层数没有奖励
-                                    if ($layer > 2) {
-                                        continue;
-                                    }
-                                    
-                                    switch($layer){
-                                        case 1:
-                                            $money = $first_layer[$leader_list[$v2]['is_distribut']] * $order['goods_num'];
-                                            break;
-                                        case 2:
-                                            $money = $second_layer[$leader_list[$v2]['is_distribut']] * $order['goods_num'];
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                    
+                                
+                                $is_prize = true;
+                            }
+                            
+                            //极差奖
+                            if ($level < $leader_list[$v2]['distribut_level']) {
+                                $layer = 0;
+                                //基本奖励已奖励的不再奖励
+                                if (!$is_prize && ($v2 == $user_id)) {
+                                    $money = $basic_reward ? floatval($basic_reward[$leader_list[$v2]['distribut_level']]) : 0;
                                     $is_prize = true;
                                 }
-                                //极差奖
-                                if ($level < $leader_list[$v2]['is_distribut']) {
-                                    $layer = 0;
-                    
-                                    //基本奖励已奖励的不再奖励
-                                    if (!$is_prize) {
-                                        $money = $basic_reward ? $basic_reward[$leader_list[$v2]['is_distribut']] : 0;
-                                        $is_prize = true;
+
+                                reset($poor_prize);	//重置数组指针
+                                
+                                //计算极差奖金
+                                while(list($pk,$pv) = each($poor_prize)){
+                                    if ($level >= $pk) {
+                                        continue;
                                     }
-                                    
-                                    reset($poor_prize);	//重置数组指针
-                                    
-                                    //计算极差奖金
-                                    while(list($k1,$v1) = each($poor_prize)){
-                                        if ($user_level >= $k1) {
-                                            continue;
-                                        }
-                                        if ($k1 <= $leader_list[$v2]['is_distribut']) {
-                                            $v1 = $v1 ? $v1 : 0;
-                                            $money += $v1 * $order['goods_num'];
-                                            continue;
-                                        }
-                                        break;
+                                    if (($pk <= $leader_list[$pv]['distribut_level']) && ($v2 == $user_id)) {
+                                        $pk = $pv ? $pv : 0;
+                                        $money += $pv * $v1['goods_num'];
+                                        continue;
                                     }
-                                    
-                                    $level = $leader_list[$v2]['is_distribut'];
+                                    break;
                                 }
                             }
+                            if ($money == 0) {
+                                continue;
+                            }
+                            $total_money += $money;
+                            $level = $leader_list[$v2]['distribut_level'];
+
+                            $result[$num]['goods_id'] = $v1['goods_id'];
+                            $result[$num]['order_id'] = $v1['order_id'];
+                            $result[$num]['goods_name'] = $v1['goods_name'];
+                            $result[$num]['goods_num'] = $v1['goods_num'];
+                            $result[$num]['money'] = $money;
+                            $num ++;
                         }
                     }
                 }
             }
         }
-
-        return $money;
+        
+        return ['total_money'=>$total_money,'data'=>$result];
     }
 
     //  /**
