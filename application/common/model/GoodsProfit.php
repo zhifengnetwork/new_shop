@@ -25,7 +25,9 @@ class GoodsProfit extends Model
         //算前一天的利润
         $yestoday_start=strtotime(date('Y-m-d 00:00:00',time()-86400));
         $yestoday_end=strtotime(date('Y-m-d 23:59:59',time()-86400));
-        $goods_profit=M('order_goods')->alias('og')->join('order o','og.order_id=o.order_id')->where('o.pay_time','>=',$yestoday_start)->where('o.pay_time','<=',$yestoday_end)->field('goods_num,sum(og.final_price-og.cost_price) total')->find();
+        $goods_profit=M('order_goods')->alias('og')->join('order o','og.order_id=o.order_id')->join('goods g','og.goods_id=g.goods_id')->where('o.pay_time','>=',$yestoday_start)->where('o.pay_time','<=',$yestoday_end)->field('goods_num,sum(og.final_price-og.cost_price) total')->find();
+        //查有需要确认收货之后再返佣的商品的订单
+        $comfirm_profit=M('order')->alias('o')->join('order_goods og','og.order_id=o.order_id')->join('goods g','og.goods_id=g.goods_id')->where(['g.is_receiving_commission'=>1])->where('o.confirm_time','>=',$yestoday_start)->where('o.confirm_time','<=',$yestoday_end)->column('o.order_id');
         if(isset($goods_profit) && !empty($goods_profit)){
             return $goods_profit;
         }
