@@ -12,12 +12,12 @@ class Weixin
      */
     public function index()
     {
-        $data = file_get_contents("php://input");
 		
+		$data = file_get_contents("php://input");
     	if ($data) {
 
-            $re = $this->xmlToArray($data);
-            // $this->write_log(json_encode($re));
+			$re = $this->xmlToArray($data);
+			
 			Db::name('wx_temp')->insert(['content'=>json_encode($re)]);
 			
 			/**
@@ -38,6 +38,35 @@ class Weixin
         $logic = new WechatLogic($config);
         $logic->handleMessage();
     }
+
+	public function test(){
+
+		$header[] = "Content-type: text/xml";//定义content-type为xml
+		$xmlxx = '<?xml version="1.0" encoding="UTF-8"?><param><siteId>123</siteId><mtgTitle>测试数据</mtgTitle><startTime>2016-10-30 18:08:30</startTime><endTime>2016-10-30 19:08:30<endTime></param>';
+        $post_data = $xmlxx;
+
+        $url = "http://newshop.zhifengwangluo.c3w.cc/home/weixin/index";      
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        // post数据
+        curl_setopt($ch, CURLOPT_POST, 1);
+        // post的变量
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+
+        $response = curl_exec($ch);
+        if (curl_errno($ch)) {
+            print curl_error($ch);
+        }
+        curl_close($ch);
+        
+        $xml = simplexml_load_string($response);
+        echo "<h3>接收</h3>";
+        //dump($response);
+		dump($xml);
+		exit;
+	}
 
 	/**
 	* 微信扫描分享带参数的二维码
