@@ -76,7 +76,7 @@
 <div class="application-record">
     <div class="hh" style="padding-top: 1rem;">
         <div class="user_top_tx">
-            <notempty name="leader.head_pic"><img src="{$leader.head_pic}"/><else/><img src="/public/images/user_default_icon.jpg"/></notempty>
+            <notempty name="$leader.head_pic"><img src="{$leader.head_pic}"/><else/><img src="/public/images/user_default_icon.jpg"/></notempty>
         </div>
         <h2 id="nickname">上级名称：{$leader.nickname}</h2>
         <h2 id="">上级联系方式：{$leader.mobile}</h2>
@@ -117,8 +117,8 @@
                 <ul class="ul_liebiao">
                     <li class="li1" style="margin:line-height;">
                         <span>
-                            <notempty name="$v[head_pic]">
-                                <img src="$v[head_pic]" style="border-radius:50%;" class="touxiang">
+                            <notempty name="$v.head_pic">
+                                <img src="{$v.head_pic}" style="border-radius:50%;" class="touxiang">
                             <else/>
                                 <img src="/public/images/user_default_icon.jpg" style="border-radius:50%;" class="touxiang">
                             </notempty>

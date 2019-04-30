@@ -62,6 +62,8 @@ class Sales extends Model
 				return array('msg'=>"该用户没有上级",'code'=>0);
 			}
 
+			krsort($parents_id);
+
 			if ($bonus_products_id > 0) {
 				M('users')->where('user_id','in',$parents_id)->where('bonus_products_id','>',0)->update(['bonus_products_id'=>0]);
 			}
@@ -98,7 +100,7 @@ class Sales extends Model
 		// 			 ->count();
 
 		$order_goods = M('order_goods')->where(['goods_id'=>$goods_id])->select();
-		// dump($order_goods);
+
 		if ($order_goods) {
 			$ids = array_column($order_goods,'order_id');
 			$order_num = M('order')->where('user_id',$user_id)->where('order_id','in',$ids)->count();
@@ -123,7 +125,6 @@ class Sales extends Model
 		
 		$parents_id = array_reverse($parents_id);	//按原数组倒序排列
 		$all_user = $this->all_user($parents_id);	//获取所有用户信息
-		// $level = $this->get_level();				//获取等级信息
 		
 		$comm = $this->get_goods_prize($is_repeat,$this->goods_id);
 		$basic_reward = $comm['basic'];  //直推奖励
@@ -172,20 +173,27 @@ class Sales extends Model
 				if ($layer > 2) {
 					continue;
 				}
+
+				if (!$is_prize) {
+					$money = $basic_reward ? $basic_reward[$value['distribut_level']] : 0;
+					$is_prize = true;
+					$msg = "直推奖 ";
+				} else {
+					$msg = "同级奖 ";
+				}
 				
 				switch($layer){
 					case 1:
-						$money = $first_layer[$value['distribut_level']] * $order['goods_num'];
+						$money += $first_layer[$value['distribut_level']] * $order['goods_num'];
 						break;
 					case 2:
-						$money = $second_layer[$value['distribut_level']] * $order['goods_num'];
+						$money += $second_layer[$value['distribut_level']] * $order['goods_num'];
 						break;
 					default:
 						break;
 				}
 				
-				$is_prize = true;
-				$msg = "同级奖 ".$money."（元），商品：".$order['goods_num']." 件";
+				$msg = $msg.$money."（元），商品：".$order['goods_num']." 件";
 			}
 			//极差奖
 			if ($user_level < $value['distribut_level']) {
@@ -271,7 +279,6 @@ class Sales extends Model
 		
 		$parents_id = array_reverse($parents_id);	//按原数组倒序排列
 		$all_user = $this->all_user($parents_id);	//获取所有用户信息
-		// $level = $this->get_level();				//获取等级信息
 		
 		$comm = $this->get_goods_prize($is_repeat,$this->goods_id);
 		$basic_reward = $comm['basic'];  //直推奖励
@@ -351,19 +358,27 @@ class Sales extends Model
 				if ($layer > 2) {
 					continue;
 				}
+
+				if (!$is_prize) {
+					$money = $basic_reward ? $basic_reward[$value['distribut_level']] : 0;
+					$is_prize = true;
+					$msg = "重复购买直推奖 ";
+				} else {
+					$msg = "重复购买同级奖 ";
+				}
 				
 				switch($layer){
 					case 1:
-						$money = $first_layer[$user_level] * $order['goods_num'];
+						$money += $first_layer[$user_level] * $order['goods_num'];
 						break;
 					case 2:
-						$money = $second_layer[$user_level] * $order['goods_num'];
+						$money += $second_layer[$user_level] * $order['goods_num'];
 						break;
 					default:
 						break;
 				}
-				$is_prize = true;
-				$msg = "重复购买同级奖 ".$money."（元），商品：".$order['goods_num']." 件";
+				
+				$msg = $msg.$money."（元），商品：".$order['goods_num']." 件";
 			}
 			//极差奖
 			if ($user_level < $value['distribut_level']) {
@@ -492,15 +507,9 @@ class Sales extends Model
 		$this->writeLog($data,'');
 		if ($bool) {
 			$result['code'] = 1;
-			$this->is_distribut($order_id);
 		}
 
 		return $result;
-	}
-
-	public function is_distribut($order_id)
-	{
-		M('order')->where('order_id',$order_id)->update(['is_distribut'=>1]);
 	}
 
 	//获取用户信息
@@ -552,14 +561,6 @@ class Sales extends Model
 		}
 		return $result;
 	}
-
-	// //获取等级信息
-	// public function get_level()
-	// {
-	// 	$level = M('agent_level')->column('level,team_bonus');
-
-	// 	return $level;
-	// }
 
 	//订单信息
 	public function order()
