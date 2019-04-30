@@ -98,6 +98,7 @@ class Sales extends Model
 		// 			 ->count();
 
 		$order_goods = M('order_goods')->where(['goods_id'=>$goods_id])->select();
+		// dump($order_goods);
 		if ($order_goods) {
 			$ids = array_column($order_goods,'order_id');
 			$order_num = M('order')->where('user_id',$user_id)->where('order_id','in',$ids)->count();
