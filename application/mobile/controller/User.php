@@ -282,7 +282,7 @@ class User extends MobileBase
                 foreach ($all_order_goods as $k2 => $v2) {
                     if ($v2 == $k1) {
                         $result['all_ids'][] = $k2;
-                        unset($all_order_goods[$k2]);   //
+                        unset($all_order_goods[$k2]);
                     }
                 }
             } else {
@@ -312,7 +312,6 @@ class User extends MobileBase
         })->where('is_send','<>',3)->column('rec_id,goods_id');
 
         $repeat_ids = $this->repeat_buy($goods_ids);
-        // $all_ids = $repeat_ids['all_ids'];
         $second_ids = $repeat_ids['goods_ids'];
         $first_ids = $repeat_ids['first'];
         
@@ -433,7 +432,7 @@ class User extends MobileBase
                             $money = 0;
                             continue;
                         }
-
+                        //同级层数
                         switch($layer){
                             case 1:
                                 $money += floatval($first_layer[$leader_list[$v2]['distribut_level']] * $v1['goods_num']);
