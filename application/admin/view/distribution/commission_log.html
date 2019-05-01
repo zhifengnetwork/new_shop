@@ -78,8 +78,14 @@
 						<th align="center" abbr="article_time" axis="col4" class="">
 							<div style="text-align: center; width: 150px;" class="">用户名称</div>
 						</th>
+						<th align="center" axis="col4" class="">
+							<div style="text-align: center; width: 50px;" class="">用户头像</div>
+						</th>
 						<th align="center" abbr="article_time" axis="col4" class="">
 							<div style="text-align: center; width: 150px;" class="">获得返利用户</div>
+						</th>
+						<th align="center" axis="col4" class="">
+							<div style="text-align: center; width: 100px;" class="">获得返利用户头像</div>
 						</th>
 						<th align="center" abbr="article_time" axis="col5" class="">
 							<div style="text-align: center; width: 100px;" class="">所得金额</div>
@@ -120,11 +126,29 @@
 								<div style="text-align: center; width: 80px;">{$vo.log_id}</div>
 							</td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 150px;">{$vo.user_id|user_name}</div>
+								<div style="text-align: center; width: 150px;">{$vo.user_name}</div>
 							</td>
+							<td align="left" class="">
+			                    <div style="text-align: center; width: 50px;">
+			                        <if condition="!empty($vo.user_name) and !empty($vo.user_head_pic)">
+			                        	<img src="{$vo.user_head_pic}" style="width:30px;height:30px;" alt="">
+			                        <elseif condition="!empty($vo.user_name)"/>
+			                            <img src="/public/images/user_default_icon.jpg" style="width:30px;height:30px;" alt="">
+			                        </if>
+			                    </div>
+			                </td>
 							<td align="center" class="">
-								<div style="text-align: center; width: 150px;">{$vo.to_user_id|user_name}</div>
+								<div style="text-align: center; width: 150px;">{$vo.to_user_name}</div>
 							</td>
+							<td align="left" class="">
+			                    <div style="text-align: center; width: 100px;">
+			                        <if condition="!empty($vo.to_user_name) and !empty($vo.to_user_head_pic)">
+			                        	<img src="{$vo.to_user_head_pic}" style="width:30px;height:30px;" alt="">
+			                        <elseif condition="!empty($vo.to_user_name)"/>
+			                            <img src="/public/images/user_default_icon.jpg" style="width:30px;height:30px;" alt="">
+			                        </if>
+			                    </div>
+			                </td>
 							<td align="center" class="">
 								<div style="text-align: center; width: 100px;">{$vo.money|default='0'}</div>
 							</td>

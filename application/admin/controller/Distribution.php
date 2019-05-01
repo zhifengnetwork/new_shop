@@ -147,6 +147,12 @@ class Distribution extends Base
                 $list[] = $val;
             }
         }
+        $user_ids = array_column($list, 'user_id');
+        $avatar = get_avatar($user_ids);
+
+        foreach ($list as $key => $value) {
+            $list[$key]['head_pic'] = $avatar[$value['user_id']];
+        }
         $this->assign('user_name',$user_name);
         $this->assign('start_time',$gap[0]);
         $this->assign('end_time',$gap[1]);
@@ -199,6 +205,12 @@ class Distribution extends Base
                 $list[] = $val;
             }
         }
+        $user_ids = array_column($list, 'user_id');
+        $avatar = get_avatar($user_ids);
+        foreach ($list as $key => $value) {
+            $list[$key]['head_pic'] = $avatar[$value['user_id']];
+        }
+
         $this->assign('user_name',$user_name);
         $this->assign('start_time',$gap[0]);
         $this->assign('end_time',$gap[1]);
@@ -259,7 +271,20 @@ class Distribution extends Base
             }
             $log_ids = implode(',',$id_lists);
         }
-        
+
+        $user_ids = array_column($list, 'user_id');
+        $to_user_ids = array_column($list, 'to_user_id');
+        $all_user_ids = array_merge($user_ids,$to_user_ids);
+        $user_name = M('users')->whereIn('user_id',$all_user_ids)->column('user_id,nickname,mobile');
+        $avatar = get_avatar($all_user_ids);
+
+        foreach ($list as $key => $value) {
+            $list[$key]['user_name'] = $user_name[$value['user_id']]['nickname'] ?: $user_name[$value['user_id']]['mobile'];
+            $list[$key]['to_user_name'] = $user_name[$value['to_user_id']]['nickname'] ?: $user_name[$value['to_user_id']]['mobile'];
+            $list[$key]['user_head_pic'] = $avatar[$value['user_id']];
+            $list[$key]['to_user_head_pic'] = $avatar[$value['to_user_id']];
+        }
+       
         $this->assign('log_ids',$log_ids);
         $this->assign('user_name',$user_name);
         $this->assign('start_time',$gap[0]);

@@ -12,41 +12,50 @@
         <td class="sign" axis="col0">
           <div style="width: 24px;"><i class="ico-check"></i></div>
         </td>
-        <td align="left" abbr="order_sn" axis="col3" class="">
-          <div style="text-align: left; width: 140px;" class="">{$list.order_sn}</div>
+        <td align="center" abbr="order_sn" axis="col1" class="">
+          <div style="text-align: center; width: 140px;" class="">{$list.order_sn}</div>
         </td>
-        <td align="left" abbr="consignee" axis="col4" class="">
-          <div style="text-align: left; width: 120px;" class="">{$list.consignee}:{$list.mobile}</div>
+        <td align="center" abbr="consignee" axis="col2" class="">
+          <div style="text-align: center; width: 120px;" class="">{$list.consignee}:{$list.mobile}</div>
         </td>
-        <td align="center" abbr="article_show" axis="col5" class="">
+        <td align="center" axis="col3" class="">
+            <div style="text-align: center; width: 60px;">
+                <empty name="$list.head_pic">
+                    <img src="/public/images/user_default_icon.jpg" style="width:30px;height:30px;" alt="">
+                <else/>
+                    <img src="{$list.head_pic}" style="width:30px;height:30px;" alt="">
+                </empty>
+            </div>
+        </td>
+        <td align="center" abbr="article_show" axis="col4" class="">
           <div style="text-align: center; width: 60px;" class="">{$list.goods_price}</div>
         </td>
-        <td align="center" abbr="article_time" axis="col6" class="">
+        <td align="center" abbr="article_time" axis="col5" class="">
           <div style="text-align: center; width: 60px;" class="">{$list.order_amount}</div>
         </td>
         <td align="center" abbr="article_time" axis="col6" class="">
           <div style="text-align: center; width: 60px;" class="">{$order_status[$list[order_status]]}<if condition="$list['is_cod'] eq '1'"><span style="color: red">(货到付款)</span></if></div>
         </td>
-        <td align="center" abbr="article_time" axis="col6" class="">
+        <td align="center" abbr="article_time" axis="col7" class="">
           <div style="text-align: center; width: 60px;" class="">{$pay_status[$list[pay_status]]}</div>
         </td>
-        <td align="center" abbr="article_time" axis="col6" class="">
+        <td align="center" abbr="article_time" axis="col8" class="">
           <div style="text-align: center; width: 60px;" class="">{$shipping_status[$list[shipping_status]]}</div>
         </td>
-        <td align="center" abbr="article_time" axis="col6" class="">
+        <td align="center" abbr="article_time" axis="col9" class="">
           <div style="text-align: center; width: 60px;" class="">{$list.pay_name|default='其他方式'}</div>
         </td>
-        <td align="center" abbr="article_time" axis="col6" class="">
+        <td align="center" abbr="article_time" axis="col10" class="">
             <if condition="$list.shipping_status egt 1 && $list.pay_status egt 1 && $list.shipping_name eq '' ">
                  <div style="text-align: center; width: 60px;" class="">无需物流</div>
                 <else />
                  <div style="text-align: center; width: 60px;" class="">{$list.shipping_name}</div>
             </if>
         </td>
-        <td align="center" abbr="article_time" axis="col6" class="">
+        <td align="center" abbr="article_time" axis="col11" class="">
           <div style="text-align: center; width: 120px;" class="">{$list.add_time|date='Y-m-d H:i',###}</div>
         </td>
-        <td align="left"  axis="col1" align="center">
+        <td align="left"  axis="col12" align="center">
             <div style="text-align: left; width: 150px;">{$list.invoice_title}</div>
         </td>
 		<td style="width: 100%;">

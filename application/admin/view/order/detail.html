@@ -60,6 +60,9 @@ a.green:hover { color: #FFF; background-color: #1BBC9D; border-color: #16A086; }
 .form_class i.fa{
   vertical-align: text-bottom;
 }
+.ncap-order-style{
+    width:1080px;
+}
 </style>
 <div class="page">
   <div class="fixed-bar">
@@ -342,7 +345,9 @@ a.green:hover { color: #FFF; background-color: #1BBC9D; border-color: #16A086; }
                 <thead>
                 <tr>
                     <th>用户</th>
+                    <th>用户头像</th>
                     <th>获得返佣用户</th>
+                    <th>获得返佣用户头像</th>
                     <th>金额</th>
                     <th>商品</th>
                     <th>数量</th>
@@ -426,14 +431,20 @@ a.green:hover { color: #FFF; background-color: #1BBC9D; border-color: #16A086; }
                 if(data.status == 1)
                 {
                     var commission_html = '';
+                    var user_head_pic = '';
                     for (var i=0; i<data.data.length;i++){
+                        user_head_pic = data.data[i].user_head_pic ? data.data[i].user_head_pic : '/public/images/user_default_icon.jpg';
+                        to_user_head_pic = data.data[i].user_head_pic ? data.data[i].to_user_head_pic : '/public/images/user_default_icon.jpg';
+                        
                         commission_html +='<tr><td class="text-center" style="width:10%;">'+data.data[i].user_name+'</td>' +
+                                '<td class="text-center" style="width:6%;"><img src="'+user_head_pic+'" style="width:2rem;height:2rem;" alt=""></td>' +
                                 '<td class="text-center" style="width:10%;">'+data.data[i].to_user_name+'</td>' +
-                                '<td class="text-center" style="width:10%;">'+data.data[i].money+'</td>' +
-                                '<td class="text-center" style="width:25%;">'+data.data[i].goods_name+'</td>' +
+                                '<td class="text-center" style="width:8%;"><img src="'+to_user_head_pic+'" style="width:2rem;height:2rem;" alt=""></td>' +
+                                '<td class="text-center" style="width:8%;">'+data.data[i].money+'</td>' +
+                                '<td class="text-center" style="width:20%;">'+data.data[i].goods_name+'</td>' +
                                 '<td class="text-center" style="width:5%;">'+data.data[i].num+'</td>' +
                                 '<td class="text-center" style="width:15%;">'+data.data[i].date+'</td>' +
-                                '<td class="" style="width:25%;text-align:left;">'+data.data[i].desc+'</td></tr>'
+                                '<td class="" style="width:20%;text-align:left;">'+data.data[i].desc+'</td></tr>'
                     }
                     $('#order_commission').html(commission_html);
                 }else{

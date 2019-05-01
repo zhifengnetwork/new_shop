@@ -441,6 +441,12 @@ class User extends Base
         $count = M('recharge')->where($map)->count();
         $page = new Page($count);
         $lists = M('recharge')->where($map)->order('ctime desc')->limit($page->firstRow . ',' . $page->listRows)->select();
+        $user_ids = array_column($lists, 'user_id');
+        $avatar = get_avatar($user_ids);
+
+        foreach ($lists as $key => $value) {
+            $lists[$key]['head_pic'] = $avatar[$value['user_id']];
+        }
         $this->assign('page', $page->show());
         $this->assign('pager', $page);
         $this->assign('lists', $lists);
@@ -801,6 +807,12 @@ class User extends Base
         $count = Db::name('withdrawals')->alias('w')->join('__USERS__ u', 'u.user_id = w.user_id', 'INNER')->where($where)->count();
         $Page = new Page($count, 20);
         $list = Db::name('withdrawals')->alias('w')->field('w.*,u.nickname')->join('__USERS__ u', 'u.user_id = w.user_id', 'INNER')->where($where)->order("w.id desc")->limit($Page->firstRow . ',' . $Page->listRows)->select();
+        $user_ids = array_column($list, 'user_id');
+        $avatar = get_avatar($user_ids);
+
+        foreach ($list as $key => $value) {
+            $lists[$key]['head_pic'] = $avatar[$value['user_id']];
+        }
         //$this->assign('create_time',$create_time2);
         $show = $Page->show();
         $this->assign('show', $show);
@@ -970,7 +982,7 @@ class User extends Base
                 $list[$k]['addtime'] = date('Y-m-d H:i:s',$v['addtime']);
             }
             $user_id_str = implode("','",$user_id_arr);
-            $user = Db::query("select `user_id`,`nickname`,`mobile` from `tp_users` where `user_id` in ('$user_id_str')");
+            $user = Db::query("select `user_id`,`nickname`,`mobile`,`head_pic` from `tp_users` where `user_id` in ('$user_id_str')");
             if($user){
                 foreach($user as $v){
                     $userinfo[$v['user_id']] = $v; 
@@ -978,6 +990,7 @@ class User extends Base
                 foreach($list as $k => $v){
                     $list[$k]['nickname'] = $userinfo[$v['user_id']]['nickname'];
                     $list[$k]['mobile'] = $userinfo[$v['user_id']]['mobile'];
+                    $list[$k]['head_pic'] = $userinfo[$v['user_id']]['head_pic'];
                 }
             }
             
@@ -1098,7 +1111,7 @@ class User extends Base
                 $list[$k]['addtime'] = date('Y-m-d H:i:s',$v['addtime']);
             }
             $user_id_str = implode("','",$user_id_arr);
-            $user = Db::query("select `user_id`,`nickname`,`mobile` from `tp_users` where `user_id` in ('$user_id_str')");
+            $user = Db::query("select `user_id`,`nickname`,`mobile`,`head_pic` from `tp_users` where `user_id` in ('$user_id_str')");
             if($user){
                 foreach($user as $v){
                     $userinfo[$v['user_id']] = $v; 
@@ -1108,6 +1121,7 @@ class User extends Base
                     $list[$k]['addmobile'] = $userinfo[$v['add_user_id']]['mobile'];
                     $list[$k]['nickname'] = $userinfo[$v['user_id']]['nickname'];
                     $list[$k]['mobile'] = $userinfo[$v['user_id']]['mobile'];
+                    $list[$k]['head_pic'] = $userinfo[$v['user_id']]['head_pic'];
                 }
             }
             $invite_id = implode(',',$invite_ids);

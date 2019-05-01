@@ -70,6 +70,9 @@
 						<th align="center" abbr="article_time" axis="col4" class="">
 							<div style="text-align: center; width: 150px;" class="">用户名称</div>
 						</th>
+						<th align="center" axis="col4" class="">
+							<div style="text-align: center; width: 50px;" class="">用户头像</div>
+						</th>
 						<th align="center" abbr="article_time" axis="col5" class="">
 							<div style="text-align: center; width: 100px;" class="">业绩</div>
 						</th>
@@ -111,6 +114,15 @@
 							<td align="center" class="">
 								<div style="text-align: center; width: 150px;">{$vo.user_id|user_name}</div>
 							</td>
+							<td align="left" class="">
+			                    <div style="text-align: center; width: 50px;">
+			                        <empty name="$vo.head_pic">
+			                            <img src="/public/images/user_default_icon.jpg" style="width:30px;height:30px;" alt="">
+			                        <else/>
+			                            <img src="{$vo.head_pic}" style="width:30px;height:30px;" alt="">
+			                        </empty>
+			                    </div>
+			                </td>
 							<td align="center" class="">
 								<div style="text-align: center; width: 100px;">{$vo.money|default='0'}</div>
 							</td>

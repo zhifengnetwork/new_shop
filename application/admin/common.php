@@ -45,6 +45,16 @@ function goods_name($goods_id){
 }
 
 /**
+ * 获取头像
+ */
+function get_avatar($ids){
+	$ids = array_unique($ids);
+	$avatar = M('users')->whereIn('user_id',$ids)->column('user_id,head_pic');
+
+	return $avatar;
+}
+
+/**
  * 管理员操作记录
  * @param $log_info string 记录信息
  */

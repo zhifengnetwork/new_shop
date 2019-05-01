@@ -13,14 +13,23 @@
             <td class="sign" axis="col0">
               <div style="width: 24px;"><i class="ico-check"></i></div>
             </td>
-             <td align="left" abbr="order_sn" axis="col3" class="">
-               <div style="text-align: left; width: 140px;" class="">{$list.order_sn}</div>
+             <td align="center" abbr="order_sn" axis="col3" class="">
+               <div style="text-align: center; width: 140px;" class="">{$list.order_sn}</div>
              </td>
-             <td align="left" abbr="add_time" axis="col4" class="">
-               <div style="text-align: left; width: 120px;" class="">{$list.add_time|date='Y-m-d H:i',###}</div>
+             <td align="center" abbr="add_time" axis="col4" class="">
+               <div style="text-align: center; width: 120px;" class="">{$list.add_time|date='Y-m-d H:i',###}</div>
              </td>
-             <td align="left" abbr="consignee" axis="col4" class="">
-               <div style="text-align: left; width: 120px;" class="">{$list.consignee}</div>
+             <td align="center" abbr="consignee" axis="col4" class="">
+               <div style="text-align: center; width: 120px;" class="">{$list.consignee}</div>
+             </td>
+             <td align="center" axis="col4" class="">
+              <div style="text-align: center; width: 50px;" class="">
+                <empty name="$list.head_pic">
+                    <img src="/public/images/user_default_icon.jpg" style="width:30px;height:30px;" alt="">
+                <else/>
+                    <img src="{$list.head_pic}" style="width:30px;height:30px;" alt="">
+                </empty>
+              </div>
              </td>
              <td align="center" abbr="mobile" axis="col5" class="">
                <div style="text-align: center; width: 100px;" class="">{$list.mobile}</div>
