@@ -811,7 +811,7 @@ class User extends Base
         $avatar = get_avatar($user_ids);
 
         foreach ($list as $key => $value) {
-            $lists[$key]['head_pic'] = $avatar[$value['user_id']];
+            $list[$key]['head_pic'] = $avatar[$value['user_id']];
         }
         //$this->assign('create_time',$create_time2);
         $show = $Page->show();
