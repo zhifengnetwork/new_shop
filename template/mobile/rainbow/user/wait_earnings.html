@@ -6,14 +6,18 @@
 <div class="application-record">
     <div class="maleri30">
         <ul class="re_tit">
-            <li class="li2"><span>头像</span></li>
+            <li class="li2"><span>图片</span></li>
             <li class="li2" ><span>名称</span></li>
             <li class="li3"><span>佣金</span></li>
         </ul>
         <foreach name="list" item="v">
             <ul>   
-                <li class="li2"><span><notempty name="$v.images"><img src="{$v.images}"/></notempty></span></li> 
-                <li class="li1" style="width:30%"><span>{$v.goods_name}</span></li>  
+                <li class="li2">
+                    <span><notempty name="$v.images">
+                        <img src="{$v.images}" style="width:1.5rem;height:1.5rem;border-radius:50%;"/>
+                    </notempty></span>
+                </li> 
+                <li class="li3" style="width:30%"><span>{$v.goods_name}</span></li>  
                 <li class="li3" style=""><span>{$v.money}</span></li>
             </ul>
         </foreach>
