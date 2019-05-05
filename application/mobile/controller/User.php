@@ -318,24 +318,19 @@ class User extends MobileBase
         ksort($leader_list);
         $order_divide = M('order_divide')->where('user_id','in',$lower_ids)->column('order_id');  //获取已返佣的订单
         //获取还没返佣的订单
-        // $order = M('order')->where('user_id','in',$lower_ids)
-        //                     ->where('order_id','not in',$order_divide)
-        //                     ->where('order_id','not in',$old_order_id)
-        //                     ->where('user_id','<>',$user_id)
-        //                     ->field('order_id,user_id,order_status,pay_status')
-        //                     ->select();
                             
         $goods_ids = M('order_goods')->whereIn('order_id',function($query) use ($order_divide,$lower_ids,$old_order_id) {
             $query->name('order')->where('order_id','not in',$order_divide)->where('user_id','in',$lower_ids)->where('order_id','not in',$old_order_id)->field('order_id');
         })->where('is_send','<>',3)->column('rec_id,goods_id');
         
-        $repeat_ids = $this->repeat_buy($goods_ids);
+        $repeat_ids = $this->repeat_buy($goods_ids); //是否重复购买
         $second_ids = $repeat_ids['goods_ids'];
         $first_ids = $repeat_ids['first'];
         
+        //获取商品返佣设置
         $comm1 = self::get_comm_setting(false,$first_ids);
         $comm2 = self::get_comm_setting(true,$second_ids);
-        $rec_ids = array_flip($goods_ids);
+        $rec_ids = array_flip($goods_ids);//交换数组的键和值
         
         //计算佣金
         $result = $this->calculate_commission($comm1,$rec_ids,$leader_list,['total_money'=>0,'data'=>[]],$user);
@@ -349,6 +344,7 @@ class User extends MobileBase
     {
         $total_money = $result['total_money'];
         $list = $result['data'];
+        //是否有返佣设置
         if ($comm) {
             $user_id = $user['user_id'];
             $user_level = intval($user['distribut_level']);
