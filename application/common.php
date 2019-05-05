@@ -947,6 +947,17 @@ function update_pay_status($order_sn,$ext=array())
         $sales = sales($order['order_id']);  //购买返佣
         
         // 分销商升级, 根据order表查看消费id 达到条件就给他分销商等级升级
+        // $ch = curl_init();
+        // curl_setopt($ch, CURLOPT_URL, $url);
+ 
+        // curl_setopt($ch, CURLOPT_POST, 1);
+        // curl_setopt($ch, CURLOPT_HTTPHEADER, Array("Content-Type:application/json; charset=utf-8"));
+ 
+        // curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));//post方式数据为json格式
+        // curl_setopt($ch, CURLOPT_TIMEOUT, 1);//设置超时时间为1s
+ 
+        // $result = curl_exec($ch);
+        // curl_close($ch);
         $Level =new \app\common\logic\LevelLogic();
         $Level->user_in($order['user_id']);
 
