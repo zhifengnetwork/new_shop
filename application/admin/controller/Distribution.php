@@ -246,14 +246,24 @@ class Distribution extends Base
         $ctime = urldecode(I('ctime'));
         $user_name = I('user_name');
         $order_sn = I('order_sn');
+        $user_type = I('user_type');
         
         $where = [];
         $log_ids = '';
-
+        
         if($user_name){
             $user['nickname'] = ['like', "%$user_name%"];
             $id_list = M('users')->where($user)->column('user_id');
-            $where['user_id|to_user_id'] = $id_list ? ['in',$id_list] : '';
+            
+            switch($user_type){
+                case 1:
+                    $where['user_id'] = [['in',$id_list],['neq',0],'and'];
+                    break;
+                case 2:
+                    $where['to_user_id'] = [['in',$id_list],['neq',0],'and'];
+                    break;
+                default: break;
+            }
         }
         if($ctime){
             $gap = explode(' - ', $ctime);
@@ -264,6 +274,7 @@ class Distribution extends Base
         }
         
         $res = $Ad->where($where)->order('log_id','desc')->page($p . ',20')->select();
+        $list = array();
         if ($res) {
             foreach ($res as $val) {
                 $id_lists[] = $val['log_id'];
@@ -275,16 +286,17 @@ class Distribution extends Base
         $user_ids = array_column($list, 'user_id');
         $to_user_ids = array_column($list, 'to_user_id');
         $all_user_ids = array_merge($user_ids,$to_user_ids);
-        $user_name = M('users')->whereIn('user_id',$all_user_ids)->column('user_id,nickname,mobile');
+        $all_user_name = M('users')->whereIn('user_id',$all_user_ids)->column('user_id,nickname,mobile');
         $avatar = get_avatar($all_user_ids);
 
         foreach ($list as $key => $value) {
-            $list[$key]['user_name'] = $user_name[$value['user_id']]['nickname'] ?: $user_name[$value['user_id']]['mobile'];
-            $list[$key]['to_user_name'] = $user_name[$value['to_user_id']]['nickname'] ?: $user_name[$value['to_user_id']]['mobile'];
+            $list[$key]['user_name'] = $all_user_name[$value['user_id']]['nickname'] ?: $all_user_name[$value['user_id']]['mobile'];
+            $list[$key]['to_user_name'] = $all_user_name[$value['to_user_id']]['nickname'] ?: $all_user_name[$value['to_user_id']]['mobile'];
             $list[$key]['user_head_pic'] = $avatar[$value['user_id']];
             $list[$key]['to_user_head_pic'] = $avatar[$value['to_user_id']];
         }
-       
+        
+        $this->assign('user_type',$user_type);
         $this->assign('log_ids',$log_ids);
         $this->assign('user_name',$user_name);
         $this->assign('start_time',$gap[0]);

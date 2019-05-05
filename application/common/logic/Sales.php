@@ -350,7 +350,7 @@ class Sales extends Model
 			}
 			
 			//平级奖
-			if (($user_level == $value['distribut_level']) && $is_prize) {
+			if ($user_level == $value['distribut_level']) {
 				$layer ++;
 				//超过设定层数没有奖励
 				if ($layer > 2) {

@@ -89,13 +89,8 @@ class User extends Base
 			$this->assign('last_cout', $last_cout);
         }
 
-        $agent_level = M('agent_level')->field('level,level_name')->select();
-        if($agent_level){
-            foreach($agent_level as $v){
-                $agnet_name[$v['level']] = $v['level_name'];
-            }
-            $this->assign('agnet_name', $agnet_name);
-        }
+        $agnet_name = M('agent_level')->column('level,level_name');
+        $this->assign('agnet_name', $agnet_name);
         
         if ($id) {
             $this->assign('id',$id);
@@ -152,9 +147,16 @@ class User extends Base
         
         $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
         
-
         $list = Db::query("select * from `tp_users` where `first_leader` > 0 and find_in_set('$id',parents)");
         $count = count($list);
+
+        $agent_level = M('agent_level')->field('level,level_name')->select();
+        if($agent_level){
+            foreach($agent_level as $v){
+                $agnet_name[$v['level']] = $v['level_name'];
+            }
+            $this->assign('agnet_name', $agnet_name);
+        }
 
         $this->assign('list',$list);
         $this->assign('count',$count);

@@ -93,6 +93,12 @@ function sales($order_id){
             $result = $model->sales();  //销售奖励
         }
     }
+
+    $is_reward = M('order_divide')->where('order_id',$order_id)->find();
+    
+    if ($is_reward) {
+       M('order')->where('order_id',$order_id)->update(['is_distribut'=>1]);
+    }
     
     return $result;
 }

@@ -102,31 +102,38 @@ class User extends MobileBase
         $where['to_user_id'] = $user_id;
         $where['type'] = ['in',[1,2,3]];
         
-        $comm1 = Db::name('distrbut_commission_log')->where($where)->order('log_id','desc')->whereTime('create_time','today')->sum('money');
-        $where['type'] = 4;
-        $comm2 = Db::name('distrbut_commission_log')->where($where)->order('log_id','desc')->whereTime('create_time','yesterday')->sum('money');
+        $comm = Db::name('distrbut_commission_log')->where($where)->order('log_id','desc')->whereTime('create_time','today')->sum('money');
+        
+        // $where['type'] = 4;
+        // $comm2 = Db::name('distrbut_commission_log')->where($where)->order('log_id','desc')->whereTime('create_time','yesterday')->sum('money');
        
-        $money = $comm1 + $comm2;
-        return $money;
+        // $money = $comm1 + $comm2;
+        return $comm;
     }
 
     //待收益
     public function wait_earnings()
     {
         $user_id = $this->user_id;
-        $Earnings = new Earnings;
         $where['user_id'] = $user_id;
 
+        $Earnings = new Earnings;
+        $earnings_info = $Earnings->where($where)->find();
+        $obj = $earnings_info->obj;
+        $obj = json_decode($obj,true);
+        
         $user = M('users')->where('user_id',$user_id)->field('user_id,first_leader,distribut_level,is_distribut,bonus_products_id,is_lock')->find();
+        //不是分销商、冻结账号没有待收益
         if (($user['is_distribut'] != 1) || $user['is_lock'] == 1) {
             $lists = array();
         } else {
-            $user_comm = $this->self_wait($user);
-            $lower_comm = $this->lower_wait($user);
-
+            $order_id = $obj ? array_column($obj,'o') : array();
+            $user_comm = $this->self_wait($user,$order_id);//自己的待收益
+            $lower_comm = $this->lower_wait($user,$order_id);//下级的待收益
+            
             $total_money = $user_comm['total_money'] + $lower_comm['total_money'];
             $list = array();
-
+            
             if ($user_comm['data'] && $lower_comm['data']) {
                 $list = array_merge($user_comm['data'],$lower_comm['data']);
             } elseif ($user_comm['data']) {
@@ -135,15 +142,20 @@ class User extends MobileBase
                 $list = $lower_comm['data'];
             }
             
+            //是否有待收益
             if ($list) {
                 foreach ($list as $key => $value) {
                     $result[] = ['o'=>$value['order_id'],'g'=>$value['goods_id'],'m'=>$value['money']];
-                    $goods_ids[] = $value['goods_id'];
                     $money[] = $value['money'];
                 }
-                $obj = json_encode($result);
-                $total_money = ($total_money = array_sum($money)) ? $total_money : array_sum($money);
                 
+                $total_money = ($total_money = array_sum($money)) ? $total_money : array_sum($money);//重新统计
+                if ($order_id) {
+                    $result = array_merge($obj,$result);
+                    $total_money += $earnings_info->money;
+                }
+                
+                $obj = json_encode($result);
                 $Earnings = $Earnings->where($where)->find() ?: $Earnings;
                 
                 $Earnings->user_id = $user_id;
@@ -151,13 +163,13 @@ class User extends MobileBase
                 $Earnings->obj = $obj;
 
                 $Earnings->save();
+
+                $earnings_info = $Earnings->where($where)->find();
+                $obj = $earnings_info->obj;
+                $obj = json_decode($obj,true);
             }
         }
 
-        $earnings_info = $Earnings->where($where)->find();
-
-        $obj = $earnings_info->obj;
-        $obj = json_decode($obj,true);
         $lists = array();
         
         if ($obj) {
@@ -181,7 +193,7 @@ class User extends MobileBase
     }
 
     //自己购买商品待收益
-    public function self_wait($user)
+    public function self_wait($user,$old_order_id)
     {
         $user_id = $user['user_id'];
         $total_money = 0;
@@ -189,10 +201,10 @@ class User extends MobileBase
         $result = array();
         $order_ids = M('order_divide')->where('user_id',$user_id)->column('order_id');
 
-        $all_order_goods = M('order_goods')->whereIn('order_id',function($query) use ($user_id,$order_ids){
-            $query->name('order')->where('user_id',$user_id)->where('order_id','not in',$order_ids)->field('order_id');
-        })->where('is_send','<>',3)->column('rec_id,goods_id');
-
+        $all_order_goods = M('order_goods')->whereIn('order_id',function($query) use ($user_id,$order_ids,$old_order_id){
+                                $query->name('order')->where('user_id',$user_id)->where('order_id','not in',$order_ids)->where('order_id','not in',$old_order_id)->field('order_id');
+                            })->where('is_send','<>',3)->column('rec_id,goods_id');
+        
         $repeat_ids = $this->repeat_buy($all_order_goods); //重复购买商品id
         $all_ids = $repeat_ids['all_ids'];
         $goods_ids = $repeat_ids['goods_ids'];
@@ -295,7 +307,7 @@ class User extends MobileBase
     }
 
     //下级购买待收益
-    public function lower_wait($user)
+    public function lower_wait($user,$old_order_id)
     {
         $user_id = $user['user_id'];
         $lower_ids = $this->lower_id($user_id);  //获取下级id列表
@@ -306,11 +318,17 @@ class User extends MobileBase
         ksort($leader_list);
         $order_divide = M('order_divide')->where('user_id','in',$lower_ids)->column('order_id');  //获取已返佣的订单
         //获取还没返佣的订单
-        $order = M('order')->where('user_id','in',$lower_ids)->where('order_id','not in',$order_divide)->where('user_id','<>',$user_id)->field('order_id,user_id,order_status,pay_status')->select();
-        $goods_ids = M('order_goods')->whereIn('order_id',function($query) use ($order_divide,$lower_ids) {
-            $query->name('order')->where('order_id','not in',$order_divide)->where('user_id','in',$lower_ids)->field('order_id');
+        // $order = M('order')->where('user_id','in',$lower_ids)
+        //                     ->where('order_id','not in',$order_divide)
+        //                     ->where('order_id','not in',$old_order_id)
+        //                     ->where('user_id','<>',$user_id)
+        //                     ->field('order_id,user_id,order_status,pay_status')
+        //                     ->select();
+                            
+        $goods_ids = M('order_goods')->whereIn('order_id',function($query) use ($order_divide,$lower_ids,$old_order_id) {
+            $query->name('order')->where('order_id','not in',$order_divide)->where('user_id','in',$lower_ids)->where('order_id','not in',$old_order_id)->field('order_id');
         })->where('is_send','<>',3)->column('rec_id,goods_id');
-
+        
         $repeat_ids = $this->repeat_buy($goods_ids);
         $second_ids = $repeat_ids['goods_ids'];
         $first_ids = $repeat_ids['first'];
@@ -320,7 +338,7 @@ class User extends MobileBase
         $rec_ids = array_flip($goods_ids);
         
         //计算佣金
-        $result = $this->calculate_commission($comm1,$rec_ids,$leader_list,$result,$user);
+        $result = $this->calculate_commission($comm1,$rec_ids,$leader_list,['total_money'=>0,'data'=>[]],$user);
         $result2 = $this->calculate_commission($comm2,$rec_ids,$leader_list,$result,$user);
         
         return $result2;
