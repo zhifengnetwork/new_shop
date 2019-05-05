@@ -926,16 +926,45 @@ class User extends MobileBase
 
     public function account_list()
     {
-    	$type = I('type','all');
-    	$usersLogic = new UsersLogic;
-    	$result = $usersLogic->account($this->user_id, $type);
-    
-    	$this->assign('type', $type);
-    	$this->assign('account_log', $result['account_log']);
-    	if ($_GET['is_ajax']) {
-    		return $this->fetch('ajax_account_list');
-    	}
+        // $type = I('type','income');
+        // $distribut_type = I('distribut_type','0');
+        
+    	// // $usersLogic = new UsersLogic;
+    	// // $result = $usersLogic->account($this->user_id, $type);
+        // if ($type == 'income') {
+        //     dump($type);
+        // } else {
+        //     $result = M('account_log')->where('user_money','<',0)->select();
+        // }
+        
+        // $this->assign('type', $type);
+        // $this->assign('distribut_type',$distribut_type);
+    	
+    	// if ($_GET['is_ajax']) {
+    	// 	return $this->fetch('ajax_account_list');
+    	// }
     	return $this->fetch();
+    }
+
+    public function get_record()
+    {
+        $user_id = $this->user_id;
+        $type = I('type','income');
+        $distribut_type = I('distribut_type','0');
+        $result['data'] = '';
+        
+        if ($type == 'income') {
+            $result['data'] = '';
+        } else {
+            $result['data'] = M('account_log')->where('user_money','<',0)->where('user_id',$user_id)->field('log_id as id,user_money as money,change_time as create_time,order_id')->select();
+
+            foreach ($result['data'] as $key => $value) {
+                $result['data'][$key]['create_time'] = date('Y-m-d H:i');
+                $result['data'][$key]['status'] = 1;
+            }
+        }
+        
+        return json($result);
     }
 
     public function account_detail(){
