@@ -62,8 +62,6 @@ class Sales extends Model
 				return array('msg'=>"该用户没有上级",'code'=>0);
 			}
 
-			krsort($parents_id);
-
 			if ($bonus_products_id > 0) {
 				M('users')->where('user_id','in',$parents_id)->where('bonus_products_id','>',0)->update(['bonus_products_id'=>0]);
 			}
