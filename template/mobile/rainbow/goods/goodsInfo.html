@@ -7,6 +7,21 @@
         pointer-events:none;
     }
     .layermbox0 .layermchild{min-width: .375rem !important;}
+    .share_icon{
+        height:1.5rem;
+        width:1.5rem;
+        display:inline-block;
+        position:fixed;
+        top:2rem;
+        right:0.1rem;
+        z-index:9999;
+        padding:10px;
+        background:black; 
+        border-radius:0.4rem;
+        color:#fff;
+        opacity: 0.5;
+
+    }
 </style>
 <div class="he_sustain">
     <div class="classreturn loginsignup detail">
@@ -42,6 +57,10 @@
                 <!--图片-e-->
             </ul>
         </div>
+        <!-- <a class="share_icon" onclick="share_icon();">分享</a> -->
+        <a  class="share_icon" onclick="share_icon();">
+        <img src="/public/static/images/fengxiang2.png" />
+        </a>  
     </div>
     <div class="de_font p">
         <div class="thirty">
@@ -573,6 +592,7 @@
 <script type="text/javascript" src="__STATIC__/js/mobile-location.js"></script>
 <include file="public/wx_share"/>
 <!--优惠卷弹窗打开和关闭-->
+<script type="text/javascript" src="/public/static/js/layui/layui.js"></script>
 <script type="text/javascript">
 	$(document).on("click","#zYHJ-POP",function  () {
 		$("#recive_aready_pop").show();
@@ -583,6 +603,7 @@
 	
 </script>
 <script type="text/javascript">
+    
     $(function(){
         if(isWeiXin()){
             $('.contact').attr('href',"tel:{$tpshop_config['shop_info_phone']}");
@@ -1315,6 +1336,34 @@
             }
         });
     }
+
+    function share_icon(){
+        layui.use('layer', function(){
+            var layerer = layui.layer;
+            var share_url = "{$share_url}";
+            var src = "{$goods['original_img']}";
+            var name = "{$goods['goods_name']}";
+            var price = "{$goods['shop_price']}";
+            var _tpl = `
+                <div style="width:100%;height:100%;">
+                    <img style="width:100%; height:40%;" src="`+src+`" />
+                    <p>`+name+`</p>
+                    <p style="display:inline-block;color:red;hieght:10%;line-height:10%;">￥ `+price+`</p>
+                    <img style="width:50%; height:40%;position:absolute; right:20px;bottom:20px;" src="/Mobile/Goods/goods_share_qrcode?url=`+share_url+`" />
+                </div>
+                `;
+            
+            layerer.open({
+                title:'二维码分享商品',
+                btn:false,
+                shade:0.5,
+                shadeClose:true,
+                content:_tpl,
+                area:['90%','60%'],
+            });
+        });              
+       
+    };
 
 
     /**

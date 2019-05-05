@@ -23,6 +23,7 @@ use app\common\util\TpshopException;
 use think\AjaxPage;
 use think\Page;
 use think\Db;
+use think\Session;
 
 class Goods extends MobileBase
 {
@@ -212,6 +213,7 @@ class Goods extends MobileBase
         C('TOKEN_ON', true);
         $goodsLogic = new GoodsLogic();
         $goods_id = I("get.id/d");
+        $share_user = I("get.share_user/d");
         $goodsModel = new \app\common\model\Goods();
         $goods = $goodsModel::get($goods_id);
         if (empty($goods) || ($goods['is_on_sale'] == 0)) {
@@ -228,11 +230,52 @@ class Goods extends MobileBase
             $this->assign('collect', $collect);
         }
 
+        # 用户通过二维码进来，且自身没有上级推荐人时，自动成为分享者的下级，发送微信消息推送通知分享者
+        if($share_user && $user_id){
+            $first_leader = Db::name('users')->where('user_id',$user_id)->value('first_leader');
+            if(!$first_leader){
+                $share_user_info = Db::name('users')->field('user_id,openid')->find($share_user);
+                if($share_user_info){
+                    Db::name('users')->where('user_id', $user_id)->update(['first_leader' => $share_user]);
+                    // if($share_user_info['openid']){
+                    //     $wx_content = "会员ID: ".$user_id." 成为了你的下级!";
+                    //     $wechat = new \app\common\logic\wechat\WechatUtil();
+                    //     $share_openid = $share_user_info['openid'];
+                    //     $wechat->sendMsg($share_openid, 'text', $wx_content);
+                    // }
+                }
+            }
+        }
+
+
+
         $recommend_goods = M('goods')->where("is_recommend=1 and is_on_sale=1 and cat_id = {$goods['cat_id']}")->cache(7200)->limit(9)->field("goods_id, goods_name, shop_price")->select();
+        
+        # 二维码分享商品
+        $share_url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . '/index.php/Mobile/Goods/goodsInfo/id/' . $goods_id;
+        
+        if($user_id){
+           
+            $share_url .= '/share_user/'.$user_id.'.html';
+        }else{
+            $share_url .= '.html';
+        }
+
+        
         $this->assign('recommend_goods', $recommend_goods);
         $this->assign('goods', $goods);
+        $this->assign('share_url', urldecode($share_url));
         return $this->fetch();
     }
+
+    # 商品分享二维码
+    public function goods_share_qrcode(){
+        $url = I('get.url');
+        vendor('phpqrcode.phpqrcode');
+        \QRcode::png($url);
+        exit;
+    }
+
 
     public function goodsInfo2()
     {
