@@ -294,7 +294,7 @@ body{
             </div>
       </div>       
             <div class="box1">
-                <div class="tit"></div>
+               
             </div>
         </div>
         <!-- tab切换结束 -->
@@ -330,6 +330,7 @@ body{
     // }
     function all_record(type,distribut_type){
         $(".box_box .box2").empty();
+        $(".box1").empty();
         $.ajax({
             type: "POST",
             data: {'type':type,'distribut_type':distribut_type},
@@ -350,6 +351,7 @@ body{
 //                 $('.tit').html(html);
 //                 $('.box_box').find("div:eq(distribut_type)");
                    $(".box_box .box2").eq(distribut_type).html(html)
+                   $(".box1").html(html)
                     console.log(html);
                 }
             },
