@@ -161,26 +161,26 @@ body{
 
         <!-- tab切换开始 -->
 
-        <div id="tab1" class="wrap">
-            <!-- 最外层导航 -->
-            <ul id="tab11">
-                <li class="active titles titles1" onclick="all_record('income',0)">进账记录</li>
-                <li class="titles titles2" onclick="all_record('spending',0)">支出记录</li>
-            </ul>
-            <div class="box1" style="display:block;">
-                <!-- 默认选中哪个，就让哪个block -->
-              
-                <div id="tab2" class="wrap wrap2">
-                    <!-- 第二层导航 -->
-                    <ul id="tab22">
-                        <li class="active" onclick="all_record('income',0)">全部</li> <!-- 默认选中哪个，就让哪个active -->
-                        <li onclick="all_record('income',1)">级别利润</li>
-                        <li onclick="all_record('income',2)">每台奖励</li>
-                        <li onclick="all_record('income',3)">同级奖励</li>
-                        <li onclick="all_record('income',4)">分红</li>
-                        <li onclick="all_record('income',5)">全球分红</li>
-                    </ul>
-                  <div class="box_box"> 
+    <div id="tab1" class="wrap">
+        <!-- 最外层导航 -->
+        <ul id="tab11">
+            <li class="active titles titles1" onclick="all_record('income',0)">进账记录</li>
+            <li class="titles titles2" onclick="all_record('spending',0)">支出记录</li>
+        </ul>
+        <div class="box1" style="display:block;">
+            <!-- 默认选中哪个，就让哪个block -->
+          
+            <div id="tab2" class="wrap wrap2">
+                <!-- 第二层导航 -->
+                <ul id="tab22">
+                    <li class="active" onclick="all_record('income',0)">全部</li> <!-- 默认选中哪个，就让哪个active -->
+                    <li onclick="all_record('income',1)">级别利润</li>
+                    <li onclick="all_record('income',2)">每台奖励</li>
+                    <li onclick="all_record('income',3)">同级奖励</li>
+                    <li onclick="all_record('income',4)">分红</li>
+                    <li onclick="all_record('income',5)">全球分红</li>
+                </ul>
+                <div class="box_box"> 
                     <div class="box2" style="display:block;">
                       
                     </div>
@@ -201,11 +201,11 @@ body{
                     </div>
                 </div>
             </div>
-      </div>       
+        </div>       
             <div class="box1">
-               <div class="tit"></div>
-            </div>
+                <div class="tit"></div>
         </div>
+    </div>
         <!-- tab切换结束 -->
     <!-- </div>
 </div> -->
@@ -215,9 +215,9 @@ body{
 <script type="text/javascript">
     //    var record=$('.record').val();   //获取记录类型
     //加载更多记录
-    var type = '{$type}';
-    var page = 1;
-    var before_request = 1
+    // var type = '{$type}';
+    // var page = 1;
+    // var before_request = 1
     
     // function ajax_sourch_submit() {
     //     if (before_request == 0) return false;
@@ -241,7 +241,17 @@ body{
     var type_1 = '';
     var distribut_type_1 = '';
     var page = 1;
+    var temp = 0;
+    var bool = true;
+
     function all_record(type,distribut_type){
+        if (type != type_1 || distribut_type != distribut_type_1) {
+            temp = 0;
+            page = 1;
+            $(".box_box .box2").eq(distribut_type).empty();
+            $(".box1 .tit").empty();
+        }
+        bool = false;
         type_1 = type;
         distribut_type_1 = distribut_type;
         
@@ -250,9 +260,11 @@ body{
             data: {'type':type,'distribut_type':distribut_type,'page':page},
             url: '/mobile/user/get_record',
             success: function(data){
+                // console.log(data);
             	$(".box_box .box2").removeClass("wu")
             	$(".box1 .tit").removeClass("wu")
                 if (data.length > 0) {
+                    bool = true;
                     page ++;
                     var html = '<ul class="tit_ul">';
                     var str = '';
@@ -265,15 +277,18 @@ body{
                     }
                     html += '</ul>';
                    
-                   $(".box_box .box2").eq(distribut_type).html(html)
-                   $(".box1 .tit").html(html);
+                   $(".box_box .box2").eq(distribut_type).append(html)
+                   $(".box1 .tit").append(html);
                     // console.log(html);
                 }else{
-                    page = 0;
-                	$(".box_box .box2").addClass("wu")
-                	$(".box_box .box2").eq(distribut_type).html("暂无数据")
-                     $(".box1 .tit").addClass("wu")
-                    $(".box1 .tit").html("暂无数据");
+                    if ($(".box_box .box2").eq(distribut_type).children().length == 0) {
+                        $(".box_box .box2").addClass("wu")
+                        $(".box_box .box2").eq(distribut_type).html("暂无数据")
+                    }
+                	if ($(".box1 .tit").children().length == 0) {
+                        $(".box1 .tit").addClass("wu")
+                        $(".box1 .tit").html("暂无数据");
+                    }
                 }
             },
             error:function(){
@@ -286,10 +301,15 @@ body{
             var scrollTop = parseInt($(this).scrollTop());
             var scrollHeight = parseInt($(document).height());
             var windowHeight = parseInt($(this).height());
-            if (page == 0) {
+            
+            if (!bool) {
+                return false;
+            }
+            if (temp > scrollTop) {
                 return false;
             }
             if (scrollTop + windowHeight >= scrollHeight-60) {
+                temp = scrollTop ;
                 all_record(type_1,distribut_type_1);//调用加载更多
             }
         }
