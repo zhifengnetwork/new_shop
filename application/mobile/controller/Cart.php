@@ -59,7 +59,19 @@ class Cart extends MobileBase {
         }
     }
 
-    
+    //异步调用升级
+    public function curls()
+    {
+        ignore_user_abort(true);
+        set_time_limit(0);
+        $data = file_get_contents("php://input");//接收json数据
+
+        $leaderId=input('leaderId');
+        $le = new LevelLogic();
+        $ll = $le->user_in($leaderId);//dump($ll);//die;
+    }
+
+
 
     public function index()
     {
