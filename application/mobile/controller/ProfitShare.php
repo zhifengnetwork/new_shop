@@ -57,14 +57,14 @@ class ProfitShare extends MobileBase
 
         //本日分红利润每人  $configs['today_ratio']['value']
         if($today_profit==0 || $today_ratio==0){
-            $partnersPartProfit=0;
-            $managersPartProfit=0;
-            $inspectorPartProfit=0;
+            $partnersPartProfit=0.00;
+            $managersPartProfit=0.00;
+            $inspectorPartProfit=0.00;
         }else{
 //            echo $today_profit['total']."````````````".$today_ratio;die;
-            $partnersPartProfit=$today_profit*$today_ratio/100/$partners*$partners_ratio/100;
-            $managersPartProfit=$today_profit*$today_ratio/100/$managers*$managers_ratio/100;
-            $inspectorPartProfit=$today_profit*$today_ratio/100/$inspector*$inspector_ratio/100;
+            $partnersPartProfit=round($today_profit*$today_ratio/100/$partners*$partners_ratio/100,2);
+            $managersPartProfit=round($today_profit*$today_ratio/100/$managers*$managers_ratio/100,2);
+            $inspectorPartProfit=round($today_profit*$today_ratio/100/$inspector*$inspector_ratio/100,2);
         }
         //写入记录表
         $data=array();
