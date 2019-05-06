@@ -237,15 +237,23 @@ body{
     //         }
     //     });
     // }
+    //滚动加载更多
+    var type_1 = '';
+    var distribut_type_1 = '';
+    var page = 1;
     function all_record(type,distribut_type){
+        type_1 = type;
+        distribut_type_1 = distribut_type;
+        
         $.ajax({
             type: "POST",
-            data: {'type':type,'distribut_type':distribut_type},
+            data: {'type':type,'distribut_type':distribut_type,'page':page},
             url: '/mobile/user/get_record',
             success: function(data){
             	$(".box_box .box2").removeClass("wu")
             	$(".box1 .tit").removeClass("wu")
                 if (data.length > 0) {
+                    page ++;
                     var html = '<ul class="tit_ul">';
                     var str = '';
                     for (let i = 0; i < data.length; i++) {
@@ -259,8 +267,9 @@ body{
                    
                    $(".box_box .box2").eq(distribut_type).html(html)
                    $(".box1 .tit").html(html);
-                    console.log(html);
+                    // console.log(html);
                 }else{
+                    page = 0;
                 	$(".box_box .box2").addClass("wu")
                 	$(".box_box .box2").eq(distribut_type).html("暂无数据")
                      $(".box1 .tit").addClass("wu")
@@ -272,6 +281,19 @@ body{
             }
         });
     }
+    $(window).scroll(
+        function() {
+            var scrollTop = parseInt($(this).scrollTop());
+            var scrollHeight = parseInt($(document).height());
+            var windowHeight = parseInt($(this).height());
+            if (page == 0) {
+                return false;
+            }
+            if (scrollTop + windowHeight >= scrollHeight-60) {
+                all_record(type_1,distribut_type_1);//调用加载更多
+            }
+        }
+    );
     function ajax_account_detail(obj) {
         window.location.href = $(obj).data('url');
     }

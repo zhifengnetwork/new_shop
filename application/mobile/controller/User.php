@@ -945,6 +945,7 @@ class User extends MobileBase
         $user_id = $this->user_id;
         $type = I('type','income');
         $distribut_type = I('distribut_type','0');
+        $page = I('page',1);
         $result = array();
         
         if ($type == 'income') {
@@ -974,13 +975,13 @@ class User extends MobileBase
                     break;
             }
 
-            $result = M('distrbut_commission_log')->where('to_user_id',$user_id)->where($where)->order('create_time','desc')->field('log_id,money,status,order_id,create_time')->select();
+            $result = M('distrbut_commission_log')->where('to_user_id',$user_id)->where($where)->order('create_time','desc')->field('log_id,money,status,order_id,create_time')->page($page,10)->select();
 
             foreach ($result as $key => $value) {
                 $result[$key]['create_time'] = date('Y-m-d H:i',$value['create_time']);
             }
         } else {
-            $result = M('account_log')->where('user_money','<',0)->where('user_id',$user_id)->order('create_time','desc')->field('log_id,user_money as money,change_time as create_time,order_id')->select();
+            $result = M('account_log')->where('user_money','<',0)->where('user_id',$user_id)->order('create_time','desc')->field('log_id,user_money as money,change_time as create_time,order_id')->page($page,10)->select();
 
             foreach ($result as $key => $value) {
                 $result[$key]['create_time'] = date('Y-m-d H:i',$value['create_time']);
