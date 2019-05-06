@@ -39,9 +39,9 @@
     </div>
     <div class="maleri30">
         <ul class="re_tit">
-            <li class="li2"><span>下单时间</span></li>
-            <li class="li2" ><span>金额</span></li>
-            <li class="li2" ><span>数量</span></li>
+            <li class="li3" style="width:40%"><span>下单时间</span></li>
+            <li class="li2" style="width:30%"><span>金额</span></li>
+            <li class="li2" style="width:30%"><span>数量</span></li>
         </ul>
         <empty name="log">
             <div class="no_log">
@@ -50,7 +50,7 @@
         <else/>
             <foreach name="log" item="v">
                 <ul>
-                    <li class="li2" style=""><span>{$v[pay_time]|date="Y-m-d H:i:s",###}</span></li>
+                    <li class="li3" style="width:40%"><span>{$v[pay_time]|date="Y-m-d H:i",###}</span></li>
                     <li class="li2" style="width:30%"><span>{$v[goods_price]}</span></li>
                     <li class="li2" style="width:30%"><span>{$v[goods_num]}</span></li> 
                 </ul>

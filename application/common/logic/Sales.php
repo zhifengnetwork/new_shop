@@ -137,6 +137,7 @@ class Sales extends Model
 			ksort($poor_prize);
 		}
 		
+		$distribut_type = 0;
 		$layer = 0;
 		$msg = "";
 		$is_prize = false;
@@ -176,8 +177,10 @@ class Sales extends Model
 					$money = $basic_reward ? $basic_reward[$value['distribut_level']] : 0;
 					$is_prize = true;
 					$msg = "直推奖 ";
+					$distribut_type = 2;
 				} else {
 					$msg = "同级奖 ";
+					$distribut_type = 4;
 				}
 				
 				switch($layer){
@@ -197,12 +200,14 @@ class Sales extends Model
 			if ($user_level < $value['distribut_level']) {
 				$layer = 0;
 				$msg = "极差奖 ";
+				$distribut_type = 3;
 
 				//基本奖励已奖励的不再奖励
 				if (!$is_prize) {
 					$money = $basic_reward ? $basic_reward[$value['distribut_level']] : 0;
 					$is_prize = true;
 					$msg = "直推奖 ";
+					$distribut_type = 2;
 				}
 				
 				reset($poor_prize);	//重置数组指针
@@ -232,7 +237,13 @@ class Sales extends Model
 			$distribut_money = $money+$value['distribut_money'];
 			
 			$bool = M('users')->where('user_id',$value['user_id'])->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
-			$bool ? $result['code'] = 1 : 0;
+			
+			$result['code'] = 0;
+			$status = 0;
+			if ($bool) {
+				$result['code'] = 1;
+				$status = 1;
+			} 
 
 			$data[] = array(
 				'user_id' => $this->user_id,
@@ -243,6 +254,8 @@ class Sales extends Model
 				'goods_id' => $this->goods_id,
 				'num' => $order['goods_num'],
 				'type' => 1,
+				'distribut_type' => $distribut_type,
+				'status' => $status,
 				'create_time' => time(),
 				'desc' => $msg
 			);
@@ -291,6 +304,7 @@ class Sales extends Model
 			ksort($poor_prize);
 		}
 		
+		$distribut_type = 0;
 		$layer = 0;
 		$msg = "";
 		$is_prize = false;
@@ -310,7 +324,13 @@ class Sales extends Model
 				$bool = M('users')->where('user_id',$user_id)->update(['user_money'=>$my_user_money,'distribut_money'=>$my_distribut_money]);
 				// M('users')->where('user_id',$this->user_id)->setInc('user_money',$my_prize);
 				// M('users')->where('user_id',$this->user_id)->setInc('distribut_money',$my_prize);
-				$bool ? $result['code'] = 1 : 0;
+				$result['code'] = 0;
+				$status = 0;
+				if ($bool) {
+					$result['code'] = 1;
+					$status = 1;
+				}
+				
 				$msg = "自购优惠 ".$my_prize."（元），商品：".$order['goods_num']." 件";
 
 				$data[] = array(
@@ -322,6 +342,8 @@ class Sales extends Model
 					'goods_id' => $this->goods_id,
 					'num' => $order['goods_num'],
 					'type' => 2,
+					'distribut_type' => 1,
+					'status' => $status,
 					'create_time' => time(),
 					'desc' => $msg
 				);
@@ -361,8 +383,10 @@ class Sales extends Model
 					$money = $basic_reward ? $basic_reward[$value['distribut_level']] : 0;
 					$is_prize = true;
 					$msg = "重复购买直推奖 ";
+					$distribut_type = 2;
 				} else {
 					$msg = "重复购买同级奖 ";
+					$distribut_type = 4;
 				}
 				
 				switch($layer){
@@ -382,12 +406,14 @@ class Sales extends Model
 			if ($user_level < $value['distribut_level']) {
 				$layer = 0;
 				$msg = "重复购买极差奖 ";
+				$distribut_type = 3;
 
 				//基本奖励已奖励的不再奖励
 				if (!$is_prize) {
 					$money = $basic_reward ? $basic_reward[$value['distribut_level']] : 0;
 					$is_prize = true;
 					$msg = "重复购买直推奖 ";
+					$distribut_type = 2;
 				}
 				
 				reset($poor_prize);	//重置数组指针
@@ -415,6 +441,15 @@ class Sales extends Model
 			$total_money += $money;
 			$user_money = $money+$value['user_money'];
 			$distribut_money = $money+$value['distribut_money'];
+			
+			$bool = M('users')->where('user_id',$value['user_id'])->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
+			
+			$result['code'] = 0;
+			$status = 0;
+			if ($bool) {
+				$result['code'] = 1;
+				$status = 1;
+			}
 
 			$data[] = array(
 				'user_id' => $this->user_id,
@@ -425,12 +460,11 @@ class Sales extends Model
 				'goods_id' => $this->goods_id,
 				'num' => $order['goods_num'],
 				'type' => 2,
+				'distribut_type' => $distribut_type,
+				'status' => $status,
 				'create_time' => time(),
 				'desc' => $msg
 			);
-			
-			$bool = M('users')->where('user_id',$value['user_id'])->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
-			$bool ? $result['code'] = 1 : 0;
 		}
 
 		if ($data) {
@@ -502,7 +536,16 @@ class Sales extends Model
 			'desc' => $msg
 		);
 
-		$this->writeLog($data,'');
+		$divide = array(
+			'order_id'=>$this->order_id,
+			'user_id'=>$this->user_id,
+			'status'=>1,
+			'goods_id'=>$this->goods_id,
+			'money'=>$total_money,
+			'add_time'=>Date('Y-m-d H:m:s')
+		);
+
+		$this->writeLog($data,$divide);
 		if ($bool) {
 			$result['code'] = 1;
 		}
@@ -600,9 +643,12 @@ class Sales extends Model
 	{
 		$bool = M('distrbut_commission_log')->insertAll($data);
 
-		if($bool && $divide){
-			//分钱记录
-			M('order_divide')->add($divide);
+		if($divide){
+			$order_divide = M('order_divide')->where('user_id',$divide['user_id'])->where('order_id',$divide['order_id'])->where('goods_id',$divide['goods_id'])->find();
+			if (!$order_divide) {
+				//分钱记录日志
+				M('order_divide')->insert($divide);
+			}
 		}
 		
 		return $bool;

@@ -926,16 +926,76 @@ class User extends MobileBase
 
     public function account_list()
     {
-    	$type = I('type','all');
-    	$usersLogic = new UsersLogic;
-    	$result = $usersLogic->account($this->user_id, $type);
-    
-    	$this->assign('type', $type);
-    	$this->assign('account_log', $result['account_log']);
-    	if ($_GET['is_ajax']) {
-    		return $this->fetch('ajax_account_list');
-    	}
+        // $type = I('type','income');
+        // $distribut_type = I('distribut_type','0');
+        
+    	// // $usersLogic = new UsersLogic;
+    	// // $result = $usersLogic->account($this->user_id, $type);
+        // if ($type == 'income') {
+        //     dump($type);
+        // } else {
+        //     $result = M('account_log')->where('user_money','<',0)->select();
+        // }
+        
+        // $this->assign('type', $type);
+        // $this->assign('distribut_type',$distribut_type);
+    	
+    	// if ($_GET['is_ajax']) {
+    	// 	return $this->fetch('ajax_account_list');
+    	// }
     	return $this->fetch();
+    }
+
+    public function get_record()
+    {
+        $user_id = $this->user_id;
+        $type = I('type','income');
+        $distribut_type = I('distribut_type','0');
+        $result = array();
+        
+        if ($type == 'income') {
+            $where = [];
+            //查询条件
+            switch ($distribut_type) {
+                case 0:
+                    break;
+                case 1:
+                    $where['type'] = ['in',[1,2]];
+                    $where['distribut_type'] = ['in',[2,3]];
+                    break;
+                case 2:
+                    $where['type'] = ['in',[1,2,3]];
+                    break;
+                case 3:
+                    $where['type'] = ['in',[1,2]];
+                    $where['distribut_type'] = 4;
+                    break;
+                case 4:
+                    $where['type'] = 3;
+                    break;
+                case 5:
+                    $where['type'] = 4;
+                    break;
+                default:
+                    break;
+            }
+
+            $result = M('distrbut_commission_log')->where('to_user_id',$user_id)->where($where)->order('create_time','desc')->field('log_id,money,status,order_id,create_time')->select();
+
+            foreach ($result as $key => $value) {
+                $result[$key]['create_time'] = date('Y-m-d H:i',$value['create_time']);
+            }
+        } else {
+            $result = M('account_log')->where('user_money','<',0)->where('user_id',$user_id)->order('create_time','desc')->field('log_id,user_money as money,change_time as create_time,order_id')->select();
+
+            foreach ($result as $key => $value) {
+                $result[$key]['create_time'] = date('Y-m-d H:i',$value['create_time']);
+                // $result[$key]['money'] = abs($value['money']);
+                $result[$key]['status'] = 1;
+            }
+        }
+        
+        return json($result);
     }
 
     public function account_detail(){
