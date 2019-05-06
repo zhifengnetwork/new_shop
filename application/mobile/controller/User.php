@@ -926,9 +926,6 @@ class User extends MobileBase
 
     public function account_list()
     {
-        // $type = I('type','income');
-        // $distribut_type = I('distribut_type','0');
-        
     	// // $usersLogic = new UsersLogic;
     	// // $result = $usersLogic->account($this->user_id, $type);
         // if ($type == 'income') {
@@ -937,9 +934,6 @@ class User extends MobileBase
         //     $result = M('account_log')->where('user_money','<',0)->select();
         // }
         
-        // $this->assign('type', $type);
-        // $this->assign('distribut_type',$distribut_type);
-    	
     	// if ($_GET['is_ajax']) {
     	// 	return $this->fetch('ajax_account_list');
     	// }

@@ -113,19 +113,13 @@ body{
 .list_item span:last-child{
   display: inline-block;
   width: 20%;
-  
  /* ddddd */
-
 }
 .wu{
-	
 	color:gray;
 	margin-top:2rem;
 	font-size:.5rem;
 	text-align:center;
-	
-	
-	
 }
 </style>
 <!-- <div class="allaccounted">
@@ -170,8 +164,8 @@ body{
         <div id="tab1" class="wrap">
             <!-- 最外层导航 -->
             <ul id="tab11">
-                <li class="active titles titles1" onclick="all_record('income','{$distribut_type}')">进账记录</li>
-                <li class="titles titles2" onclick="all_record('spending','')">支出记录</li>
+                <li class="active titles titles1" onclick="all_record('income',0)">进账记录</li>
+                <li class="titles titles2" onclick="all_record('spending',0)">支出记录</li>
             </ul>
             <div class="box1" style="display:block;">
                 <!-- 默认选中哪个，就让哪个block -->
@@ -184,103 +178,11 @@ body{
                         <li onclick="all_record('income',2)">每台奖励</li>
                         <li onclick="all_record('income',3)">同级奖励</li>
                         <li onclick="all_record('income',4)">分红</li>
-                        <!-- <li onclick="all_record('income',5)">分销</li> -->
                         <li onclick="all_record('income',5)">全球分红</li>
                     </ul>
                   <div class="box_box"> 
                     <div class="box2" style="display:block;">
                       
-                             <!-- <ul class="tit_ul">
-                                <li class="list_item">
-                                    <span>
-                                        <p>分红0.20元</p>
-                                        <p>2019-04-23 11:42</p>
-                                    </span> 
-                                    <span>成功</span>
-                                </li>
-                                <li class="list_item">
-
-                                    <span>
-                                        <p>分红0.20元</p>
-                                        <p>2019-04-23 11:42</p>
-                                    </span> 
-                                    <span>成功</span>
-                                </li>
-                                <li class="list_item">
-
-                                    <span>
-                                        <p>分红0.20元</p>
-                                        <p>2019-04-23 11:42</p>
-                                    </span> 
-                                    <span>成功</span>
-                                </li>
-                                <li class="list_item">
-
-                                    <span>
-                                        <p>分红0.20元</p>
-                                        <p>2019-04-23 11:42</p>
-                                    </span> 
-                                    <span>成功</span>
-                                </li>
-                                <li class="list_item">
-
-                                    <span>
-                                        <p>分红0.20元</p>
-                                        <p>2019-04-23 11:42</p>
-                                    </span> 
-                                    <span>成功</span>
-                                </li>
-                                <li class="list_item">
-
-                                    <span>
-                                        <p>分红0.20元</p>
-                                        <p>2019-04-23 11:42</p>
-                                    </span> 
-                                    <span>成功</span>
-                                </li>
-                                <li class="list_item">
-
-                                    <span>
-                                        <p>分红0.20元</p>
-                                        <p>2019-04-23 11:42</p>
-                                    </span> 
-                                    <span>成功</span>
-                                </li>
-                                <li class="list_item">
-
-                                    <span>
-                                        <p>分红0.20元</p>
-                                        <p>2019-04-23 11:42</p>
-                                    </span> 
-                                    <span>成功</span>
-
-                                </li>
-                                <li class="list_item">
-
-                                    <span>
-                                        <p>分红0.20元</p>
-                                        <p>2019-04-23 11:42</p>
-                                    </span> 
-                                    <span>成功</span>
-                                </li>
-                                <li class="list_item">
-
-                                    <span>
-                                        <p>分红0.20元</p>
-                                        <p>2019-04-23 11:42</p>
-                                    </span> 
-                                    <span>成功</span>
-                                </li>
-                                <li class="list_item">
-
-                                    <span>
-                                        <p>分红0.20元</p>
-                                        <p>2019-04-23 11:42</p>
-                                    </span> 
-                                    <span>成功</span>
-                                </li>
-                             </ul> -->
-                         
                     </div>
                     <div class="box2">
                        
@@ -296,9 +198,6 @@ body{
                     </div>
                     <div class="box2">
                       
-                    </div>
-                    <div class="box2">
-                       
                     </div>
                 </div>
             </div>
@@ -339,8 +238,6 @@ body{
     //     });
     // }
     function all_record(type,distribut_type){
-//    $(".box_box .box2").eq(distribut_type).empty();
-//    $(".box1 .tit").empty();
         $.ajax({
             type: "POST",
             data: {'type':type,'distribut_type':distribut_type},
@@ -360,8 +257,6 @@ body{
                     }
                     html += '</ul>';
                    
-//                 $('.tit').html(html);
-//                 $('.box_box').find("div:eq(distribut_type)");
                    $(".box_box .box2").eq(distribut_type).html(html)
                    $(".box1 .tit").html(html);
                     console.log(html);
@@ -370,10 +265,6 @@ body{
                 	$(".box_box .box2").eq(distribut_type).html("暂无数据")
                      $(".box1 .tit").addClass("wu")
                     $(".box1 .tit").html("暂无数据");
-                   
-                   
-                   
-                	
                 }
             },
             error:function(){
