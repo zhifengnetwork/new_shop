@@ -536,7 +536,16 @@ class Sales extends Model
 			'desc' => $msg
 		);
 
-		$this->writeLog($data,'');
+		$divide = array(
+			'order_id'=>$this->order_id,
+			'user_id'=>$this->user_id,
+			'status'=>1,
+			'goods_id'=>$this->goods_id,
+			'money'=>$total_money,
+			'add_time'=>Date('Y-m-d H:m:s')
+		);
+
+		$this->writeLog($data,$divide);
 		if ($bool) {
 			$result['code'] = 1;
 		}
@@ -634,9 +643,12 @@ class Sales extends Model
 	{
 		$bool = M('distrbut_commission_log')->insertAll($data);
 
-		if($bool && $divide){
-			//分钱记录
-			M('order_divide')->add($divide);
+		if($divide){
+			$order_divide = M('order_divide')->where('user_id',$divide['user_id'])->where('order_id',$divide['order_id'])->where('goods_id',$divide['goods_id'])->find();
+			if (!$order_divide) {
+				//分钱记录日志
+				M('order_divide')->insert($divide);
+			}
 		}
 		
 		return $bool;

@@ -146,13 +146,14 @@ class Distribution extends Base
             foreach ($res as $val) {
                 $list[] = $val;
             }
-        }
-        $user_ids = array_column($list, 'user_id');
-        $avatar = get_avatar($user_ids);
+            $user_ids = array_column($list, 'user_id');
+            $avatar = get_avatar($user_ids);
 
-        foreach ($list as $key => $value) {
-            $list[$key]['head_pic'] = $avatar[$value['user_id']];
+            foreach ($list as $key => $value) {
+                $list[$key]['head_pic'] = $avatar[$value['user_id']];
+            }
         }
+        
         $this->assign('user_name',$user_name);
         $this->assign('start_time',$gap[0]);
         $this->assign('end_time',$gap[1]);
@@ -200,17 +201,20 @@ class Distribution extends Base
         }
 
         $res = $Ad->where($where)->order('performance_id','desc')->page($p . ',20')->select();
+        $user_ids = array();
         if ($res) {
             foreach ($res as $val) {
                 $list[] = $val;
             }
+            $user_ids = array_column($list, 'user_id');
+            $avatar = get_avatar($user_ids);
+            foreach ($list as $key => $value) {
+                $list[$key]['head_pic'] = $avatar[$value['user_id']];
+            }
         }
-        $user_ids = array_column($list, 'user_id');
-        $avatar = get_avatar($user_ids);
-        foreach ($list as $key => $value) {
-            $list[$key]['head_pic'] = $avatar[$value['user_id']];
-        }
-
+        
+        $total_per = $Ad->where($where)->sum('money');
+        $this->assign('total_per',$total_per);
         $this->assign('user_name',$user_name);
         $this->assign('start_time',$gap[0]);
         $this->assign('end_time',$gap[1]);
@@ -274,26 +278,25 @@ class Distribution extends Base
         }
         
         $res = $Ad->where($where)->order('log_id','desc')->page($p . ',20')->select();
-        $list = array();
+        
         if ($res) {
             foreach ($res as $val) {
                 $id_lists[] = $val['log_id'];
                 $list[] = $val;
             }
             $log_ids = implode(',',$id_lists);
-        }
+            $user_ids = array_column($list, 'user_id');
+            $to_user_ids = array_column($list, 'to_user_id');
+            $all_user_ids = array_merge($user_ids,$to_user_ids);
+            $all_user_name = M('users')->whereIn('user_id',$all_user_ids)->column('user_id,nickname,mobile');
+            $avatar = get_avatar($all_user_ids);
 
-        $user_ids = array_column($list, 'user_id');
-        $to_user_ids = array_column($list, 'to_user_id');
-        $all_user_ids = array_merge($user_ids,$to_user_ids);
-        $all_user_name = M('users')->whereIn('user_id',$all_user_ids)->column('user_id,nickname,mobile');
-        $avatar = get_avatar($all_user_ids);
-
-        foreach ($list as $key => $value) {
-            $list[$key]['user_name'] = $all_user_name[$value['user_id']]['nickname'] ?: $all_user_name[$value['user_id']]['mobile'];
-            $list[$key]['to_user_name'] = $all_user_name[$value['to_user_id']]['nickname'] ?: $all_user_name[$value['to_user_id']]['mobile'];
-            $list[$key]['user_head_pic'] = $avatar[$value['user_id']];
-            $list[$key]['to_user_head_pic'] = $avatar[$value['to_user_id']];
+            foreach ($list as $key => $value) {
+                $list[$key]['user_name'] = $all_user_name[$value['user_id']]['nickname'] ?: $all_user_name[$value['user_id']]['mobile'];
+                $list[$key]['to_user_name'] = $all_user_name[$value['to_user_id']]['nickname'] ?: $all_user_name[$value['to_user_id']]['mobile'];
+                $list[$key]['user_head_pic'] = $avatar[$value['user_id']];
+                $list[$key]['to_user_head_pic'] = $avatar[$value['to_user_id']];
+            }
         }
         
         $this->assign('user_type',$user_type);
