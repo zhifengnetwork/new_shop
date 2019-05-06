@@ -121,6 +121,8 @@ class Distribution extends Base
         $max = I('max');
         $per_type = I('per_type');
         $where = [];
+        $start_time = I('start_time');
+        $end_time = I('end_time');
 
         if($user_name){
             $user['nickname'] = ['like', "%$user_name%"];
@@ -133,7 +135,7 @@ class Distribution extends Base
         if($ctime){
             $gap = explode(' - ', $ctime);
             $time_val = array('1'=>"create_time",'2'=>"update_time");
-            $where[$time_val[$ttype]] = [['>= time',strtotime($gap[0])],['< time',strtotime($gap[1]." 23:59:59")],'and'];
+            $where[$time_val[$ttype]] = [['>= time',strtotime($start_time)],['< time',strtotime($end_time." 23:59:59")],'and'];
         }
         
         if ($min || $max) {
@@ -155,8 +157,8 @@ class Distribution extends Base
         }
         
         $this->assign('user_name',$user_name);
-        $this->assign('start_time',$gap[0]);
-        $this->assign('end_time',$gap[1]);
+        $this->assign('start_time',$start_time);
+        $this->assign('end_time',$end_time);
         $this->assign('ctime',$gap[0].' - '.$gap[1]);
         $this->assign('ttype',$ttype);
         $this->assign('min',$min);
@@ -181,9 +183,11 @@ class Distribution extends Base
         $order_sn = I('order_sn');
         $permin = I('permin');
         $permax = I('permax');
+        $start_time = I('start_time');
+        $end_time = I('end_time');
         
         $where = [];
-
+        
         if($user_name){
             $user['nickname'] = ['like', "%$user_name%"];
             $id_list = M('users')->where($user)->column('user_id');
@@ -191,7 +195,7 @@ class Distribution extends Base
         }
         if($ctime){
             $gap = explode(' - ', $ctime);
-            $where['create_time'] = [['>= time',strtotime($gap[0])],['< time',strtotime($gap[1]." 23:59:59")],'and'];
+            $where['create_time'] = [['>= time',strtotime($start_time)],['< time',strtotime($end_time." 23:59:59")],'and'];
         }
         if ($order_sn) {
             $where['order_sn'] = ['like',"%$order_sn%"];
@@ -216,8 +220,8 @@ class Distribution extends Base
         $total_per = $Ad->where($where)->sum('money');
         $this->assign('total_per',$total_per);
         $this->assign('user_name',$user_name);
-        $this->assign('start_time',$gap[0]);
-        $this->assign('end_time',$gap[1]);
+        $this->assign('start_time',$start_time);
+        $this->assign('end_time',$end_time);
         $this->assign('ctime',$gap[0].' - '.$gap[1]);
         $this->assign('order_sn',$order_sn);
         $this->assign('permin',$permin);
@@ -251,6 +255,8 @@ class Distribution extends Base
         $user_name = I('user_name');
         $order_sn = I('order_sn');
         $user_type = I('user_type');
+        $start_time = I('start_time');
+        $end_time = I('end_time');
         
         $where = [];
         $log_ids = '';
@@ -271,7 +277,7 @@ class Distribution extends Base
         }
         if($ctime){
             $gap = explode(' - ', $ctime);
-            $where['create_time'] = [['>= time',strtotime($gap[0])],['< time',strtotime($gap[1]." 23:59:59")],'and'];;
+            $where['create_time'] = [['>= time',strtotime($start_time)],['< time',strtotime($end_time." 23:59:59")],'and'];;
         }
         if ($order_sn) {
             $where['order_sn'] = ['like',"%$order_sn%"];
@@ -302,8 +308,8 @@ class Distribution extends Base
         $this->assign('user_type',$user_type);
         $this->assign('log_ids',$log_ids);
         $this->assign('user_name',$user_name);
-        $this->assign('start_time',$gap[0]);
-        $this->assign('end_time',$gap[1]);
+        $this->assign('start_time',$start_time);
+        $this->assign('end_time',$end_time);
         $this->assign('ctime',$gap[0].' - '.$gap[1]);
         $this->assign('order_sn',$order_sn);
         $this->assign('list', $list);
