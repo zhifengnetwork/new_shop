@@ -947,19 +947,9 @@ function update_pay_status($order_sn,$ext=array())
         $sales = sales($order['order_id']);  //购买返佣
         
         // 分销商升级, 根据order表查看消费id 达到条件就给他分销商等级升级
-        // $ch = curl_init();
-        // curl_setopt($ch, CURLOPT_URL, $url);
- 
-        // curl_setopt($ch, CURLOPT_POST, 1);
-        // curl_setopt($ch, CURLOPT_HTTPHEADER, Array("Content-Type:application/json; charset=utf-8"));
- 
-        // curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));//post方式数据为json格式
-        // curl_setopt($ch, CURLOPT_TIMEOUT, 1);//设置超时时间为1s
- 
-        // $result = curl_exec($ch);
-        // curl_close($ch);
-        $Level =new \app\common\logic\LevelLogic();
-        $Level->user_in($order['user_id']);
+        // $Level =new \app\common\logic\LevelLogic();
+        // $Level->user_in($order['user_id']);
+        curl($order['user_id']);
 
         // 记录订单操作日志
         $commonOrder = new \app\common\logic\Order();
@@ -998,6 +988,25 @@ function update_pay_status($order_sn,$ext=array())
     }
 }
 
+function curl($leaderId){
+    $url = 'http://'.$_SERVER['HTTP_HOST'].'/mobile/Cart/curls';
+    // // dump($url);
+    $data = array('leaderId'=>$leaderId);
+    // echo $data;
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, Array("Content-Type:application/json; charset=utf-8"));
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));//post方式数据为json格式
+    curl_setopt($ch, CURLOPT_TIMEOUT, 1);//设置超时时间为1s
+    // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    // curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1); //建立连接等待时间
+    // curl_setopt($ch, CURLOPT_TIMEOUT_MS, 10);//响应超时时间
+    $result = curl_exec($ch);
+    curl_close($ch);
+    // dump($result);
+}
+
 /**
  * 订单确认收货
  * @param $id 订单id
@@ -1028,8 +1037,9 @@ function confirm_order($id,$user_id = 0){
     $sales = sales($id);  //确认收货后返佣
 
     // 分销商升级, 根据order表查看消费id 达到条件就给他分销商等级升级
-    $Level =new \app\common\logic\LevelLogic();
-    $Level->user_in($order['user_id']);
+    curl($order['user_id']);
+    // $Level =new \app\common\logic\LevelLogic();
+    // $Level->user_in($order['user_id']);
 
     // 商品待评价提醒
     $order_goods = M('order_goods')->field('goods_id,goods_name,rec_id')->where(["order_id" => $id])->find();

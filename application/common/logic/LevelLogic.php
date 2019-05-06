@@ -40,9 +40,9 @@ class LevelLogic extends Model
                 $team_nums = Db::query("select `team_nums` from `tp_agent_level` where `level` = $agent_level+1");
                 $team_nums=$team_nums[0]['team_nums'];
                 $count = 0;
-                if(!isset($d_info) || empty($d_info)){
-                    continue;
-                }
+                // if(!isset($d_info) || empty($d_info)){
+                //     continue;
+                // }
                 foreach($d_info as $k1=>$v1){
                     //下级等级
                     $l = Db::name('users')->where('user_id',$v1['user_id'])->value('distribut_level');//dump($l);
@@ -61,7 +61,9 @@ class LevelLogic extends Model
                 if($count < $team_nums){
                     continue;
                 }else{
+                    dump($v.':'.$count);
                     $this->upgrade_agent($v,$max_level,$count);
+                    // Db::name('admin_log')->insert(['log_info'=>$v]);
                 }
                 // dump('111d   '.$count);
                 // $num = $this->get_down_nums($v,$d_info);dump($num);            
@@ -83,6 +85,10 @@ class LevelLogic extends Model
     }
     //升级
     public function upgrade_agent($agent_id,$max_level,$count){
+        ignore_user_abort(true);
+        set_time_limit(0);
+        $data = file_get_contents("php://input");
+
         global $list_test;
         //用户等级
         $agent_level = Db::name('users')->where('user_id',$agent_id)->value('distribut_level');
@@ -116,6 +122,7 @@ class LevelLogic extends Model
         if($bool == true){
             if($agent_level != $max_level){
                 Db::name('users')->where('user_id',$agent_id)->setInc('distribut_level');
+                // Db::name('admin_log')->insert(['log_info'=>$agent_id]);
             }
         }
     }

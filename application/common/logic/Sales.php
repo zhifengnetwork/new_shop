@@ -342,7 +342,7 @@ class Sales extends Model
 					'goods_id' => $this->goods_id,
 					'num' => $order['goods_num'],
 					'type' => 2,
-					'$distribut_type' => 1,
+					'distribut_type' => 1,
 					'status' => $status,
 					'create_time' => time(),
 					'desc' => $msg
