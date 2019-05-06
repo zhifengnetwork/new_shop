@@ -339,8 +339,8 @@ body{
     //     });
     // }
     function all_record(type,distribut_type){
-        $(".box_box .box2").empty();
-        $(".box1 .tit").empty();
+//    $(".box_box .box2").eq(distribut_type).empty();
+//    $(".box1 .tit").empty();
         $.ajax({
             type: "POST",
             data: {'type':type,'distribut_type':distribut_type},
