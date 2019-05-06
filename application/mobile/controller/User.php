@@ -974,10 +974,6 @@ class User extends MobileBase
                     $where['type'] = 3;
                     break;
                 case 5:
-                    $where['type'] = ['in',[1,2]];
-                    $where['distribut_type'] = ['in',[1,2,3,4]];
-                    break;
-                case 6:
                     $where['type'] = 4;
                     break;
                 default:
