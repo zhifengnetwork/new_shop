@@ -117,6 +117,16 @@ body{
  /* ddddd */
 
 }
+.wu{
+	
+	color:gray;
+	margin-top:2rem;
+	font-size:.5rem;
+	text-align:center;
+	
+	
+	
+}
 </style>
 <!-- <div class="allaccounted">
     <div class="maleri30"> -->
@@ -294,7 +304,7 @@ body{
             </div>
       </div>       
             <div class="box1">
-               
+               <div class="tit"></div>
             </div>
         </div>
         <!-- tab切换结束 -->
@@ -330,12 +340,14 @@ body{
     // }
     function all_record(type,distribut_type){
         $(".box_box .box2").empty();
-        $(".box1").empty();
+        $(".box1 .tit").empty();
         $.ajax({
             type: "POST",
             data: {'type':type,'distribut_type':distribut_type},
             url: '/mobile/user/get_record',
             success: function(data){
+            	$(".box_box .box2").removeClass("wu")
+            	$(".box1 .tit").removeClass("wu")
                 if (data.length > 0) {
                     var html = '<ul class="tit_ul">';
                     var str = '';
@@ -351,8 +363,17 @@ body{
 //                 $('.tit').html(html);
 //                 $('.box_box').find("div:eq(distribut_type)");
                    $(".box_box .box2").eq(distribut_type).html(html)
-                   $(".box1").html(html)
+                   $(".box1 .tit").html(html);
                     console.log(html);
+                }else{
+                	
+                	$(".box_box .box2").eq(distribut_type).html("暂无数据")
+                	$(".box_box .box2").addClass("wu")
+                    $(".box1 .tit").html("暂无数据");
+                    $(".box1 .tit").addClass("wu")
+                   
+                   
+                	
                 }
             },
             error:function(){
