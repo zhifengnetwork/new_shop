@@ -268,7 +268,7 @@ class Sales extends Model
 				'status'=>1,
 				'goods_id'=>$this->goods_id,
 				'money'=>$total_money,
-				'add_time'=>Date('Y-m-d H:m:s')
+				'add_time'=>Date('Y-m-d H:i:s')
 			);
 
 			$this->writeLog($data,$divide);
@@ -474,7 +474,7 @@ class Sales extends Model
 				'status'=>1,
 				'goods_id'=>$this->goods_id,
 				'money'=>$total_money,
-				'add_time'=>Date('Y-m-d H:m:s')
+				'add_time'=>Date('Y-m-d H:i:s')
 			);
 
 			$this->writeLog($data,$divide);
@@ -541,8 +541,8 @@ class Sales extends Model
 			'user_id'=>$this->user_id,
 			'status'=>1,
 			'goods_id'=>$this->goods_id,
-			'money'=>$total_money,
-			'add_time'=>Date('Y-m-d H:m:s')
+			'money'=>$money,
+			'add_time'=>Date('Y-m-d H:i:s')
 		);
 
 		$this->writeLog($data,$divide);
@@ -648,6 +648,8 @@ class Sales extends Model
 			if (!$order_divide) {
 				//分钱记录日志
 				M('order_divide')->insert($divide);
+			} else {
+				M('order_divide')->where('user_id',$divide['user_id'])->where('order_id',$divide['order_id'])->where('goods_id',$divide['goods_id'])->setInc('money',$divide['money']);
 			}
 		}
 		
