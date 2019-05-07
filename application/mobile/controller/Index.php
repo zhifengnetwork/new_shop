@@ -18,6 +18,9 @@ use app\common\logic\wechat\WechatUtil;
 
 class Index extends MobileBase {
 
+	public function index3(){
+		return $this->fetch();
+	}
     public function index(){
         $diy_index = M('mobile_template')->where('is_index=1')->field('template_html,block_info')->find();
         if($diy_index){
