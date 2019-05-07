@@ -541,7 +541,7 @@ class Sales extends Model
 			'user_id'=>$this->user_id,
 			'status'=>1,
 			'goods_id'=>$this->goods_id,
-			'money'=>$total_money,
+			'money'=>$money,
 			'add_time'=>Date('Y-m-d H:m:s')
 		);
 
@@ -648,6 +648,8 @@ class Sales extends Model
 			if (!$order_divide) {
 				//分钱记录日志
 				M('order_divide')->insert($divide);
+			} else {
+				M('order_divide')->where('user_id',$divide['user_id'])->where('order_id',$divide['order_id'])->where('goods_id',$divide['goods_id'])->setInc('money',$divide['money']);
 			}
 		}
 		
