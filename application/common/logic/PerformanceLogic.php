@@ -8,7 +8,10 @@
 namespace app\common\logic;
 
 use think\Model;
-use think\Db;
+use app\common\model\Users;
+use app\common\model\AgentPerformance as Performance;
+use app\common\model\AgentPerformanceLog as PerformanceLog;
+use think\Exception;
 
 /**
  * 业绩类逻辑
@@ -24,107 +27,110 @@ class PerformanceLogic extends Model
 		if (!$order) {
 			return false;
 		}
+		
+		$Performance = new Performance;
+		$Users = new Users;
 
 		$goods_num = M('order_goods')->where('order_id',$order_id)->sum('goods_num');
 		$price = $order['goods_price'];
 		$user_id = $order['user_id'];
 		$order_sn = $order['order_sn'];
 		
-		$user = M('users')->where('user_id',$user_id)->value('first_leader');
-		$is_per = M('agent_performance')->where('user_id',$order['user_id'])->find();
-
-		$log = array(
-			'money'=>$price,
-			'goods_num'=>$goods_num,
-			'order_id'=>$order_id,
-			'create_time'=>Date('Y-m-d H:m:s')
-		);
-
+		$user = $Users->where('user_id',$user_id)->value('first_leader');
+		$is_per = $Performance->where('user_id',$order['user_id'])->find();
+	
 		//购买者添加业绩
 		if ($is_per) {
-			$ind_per = array(
+			$per[] = array(
+				'performance_id'=>$is_per['performance_id'],
 				'ind_per'=>$is_per['ind_per']+$price,
 				'ind_goods_sum'=>$is_per['ind_goods_sum']+$goods_num,
-				'update_time'=>Date('Y-m-d H:m:s')
+				'update_time'=>Date('Y-m-d H:i:s')
 			);
-
-			$bool = M('agent_performance')->where('user_id',$user_id)->update($ind_per);
 		} else {
-			$ind_per = array(
+			$per[] = array(
 				'user_id'=>$user_id,
 				'ind_per'=>$price,
 				'ind_goods_sum'=>$goods_num,
-				'create_time'=>Date('Y-m-d H:m:s'),
-				'update_time'=>Date('Y-m-d H:m:s')
+				'create_time'=>Date('Y-m-d H:i:s'),
+				'update_time'=>Date('Y-m-d H:i:s')
 			);
+		}
+		
+		$log[] = array(
+			'user_id'=>$user_id,
+			'money'=>$price,
+			'goods_num'=>$goods_num,
+			'order_id'=>$order_id,
+			'create_time'=>Date('Y-m-d H:i:s'),
+			'note'=>'订单编号为 '.$order_sn.' 的业绩'
+		);
 
-			$bool = M('agent_performance')->insert($ind_per);
-		}
-		
-		//个人业绩日志
-		if ($bool) {
-			$log['user_id'] = $user_id;
-			$note = '订单编号为 '.$order_sn.' 的业绩';
-			$this->per_log($log,$note);
-		} else {
-			$log['user_id'] = $user_id;
-			$note = '订单编号为 '.$order_sn.' 的业绩增加失败';
-			
-			$this->per_log($log,$note);
-		}
-		
-		$id_list = M('users')->where('user_id',$user_id)->value('parents');
+		$id_list = $Users->where('user_id',$user_id)->value('parents');
 		$id_list = explode(',', $id_list);
-		$new_list = array_filter($id_list);
-
+		$new_list = array_reverse(array_filter($id_list));
+		
 		if (!$new_list) {
 			return false;
 		}
 		
 		foreach ($new_list as $key => $value) {
-			$is_team = M('agent_performance')->where('user_id',$value)->find();
+			$is_team = $Performance->where('user_id',$value)->find();
 			
 			//团队添加业绩
 			if ($is_team) {
-				$team_per = array(
+				$per[] = array(
+					'performance_id'=>$is_team['performance_id'],
 					'agent_per'=>$is_team['agent_per']+$price,
 					'agent_goods_sum'=>$is_team['agent_goods_sum']+$goods_num,
-					'update_time'=>Date('Y-m-d H:m:s')
+					'update_time'=>Date('Y-m-d H:i:s')
 				);
-				
-				$bool1 = M('agent_performance')->where('user_id',$value)->update($team_per);
 			} else {
-				$team_per = array(
+				$per[] = array(
 					'user_id'=>$value,
 					'agent_per'=>$price,
 					'agent_goods_sum'=>$goods_num,
-					'create_time'=>Date('Y-m-d H:m:s'),
-					'update_time'=>Date('Y-m-d H:m:s')
+					'create_time'=>Date('Y-m-d H:i:s'),
+					'update_time'=>Date('Y-m-d H:i:s')
 				);
-				
-				$bool1 = M('agent_performance')->insert($team_per);
 			}
-
-			$log['user_id'] = $value;
-
+			
 			//团队业绩日志
-			if ($bool1) {
-				$note = '订单编号为 '.$order_sn.' 的业绩';
-
-				$this->per_log($log,$note);
-			} else {
-				$note = '订单编号为 '.$order_sn.' 的业绩添加失败';
-
-				$this->per_log($log,$note);
-			}
+			$log[] = array(
+				'user_id'=>$value,
+				'money'=>$price,
+				'goods_num'=>$goods_num,
+				'order_id'=>$order_id,
+				'create_time'=>Date('Y-m-d H:i:s'),
+				'note'=>'订单编号为 '.$order_sn.' 的业绩'
+			);
 		}
+		
+		try {
+			$code = 1;
+			$Performance->saveAll($per);
+		} catch (\Exception $e) {
+			$code = 0;
+			$msg = $e->getMessage();
+		}
+		$log = $this->per_log($log);
+
+		return $code;
 	}
 
 	//业绩日志
-	public function per_log($data,$note)
+	public function per_log($data)
 	{
-		$data['note'] = $note;
+		$PerformanceLog = new PerformanceLog;
 
-		M('agent_performance_log')->insert($data);
+		try {
+			$code = 1;
+			$PerformanceLog->saveAll($data);
+		} catch (\Exception $e) {
+			$code = 0;
+			$msg = $e->getMessage();
+		}
+
+		return $code;
 	}
 }

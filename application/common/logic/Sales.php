@@ -268,7 +268,7 @@ class Sales extends Model
 				'status'=>1,
 				'goods_id'=>$this->goods_id,
 				'money'=>$total_money,
-				'add_time'=>Date('Y-m-d H:m:s')
+				'add_time'=>Date('Y-m-d H:i:s')
 			);
 
 			$this->writeLog($data,$divide);
@@ -474,7 +474,7 @@ class Sales extends Model
 				'status'=>1,
 				'goods_id'=>$this->goods_id,
 				'money'=>$total_money,
-				'add_time'=>Date('Y-m-d H:m:s')
+				'add_time'=>Date('Y-m-d H:i:s')
 			);
 
 			$this->writeLog($data,$divide);
@@ -542,7 +542,7 @@ class Sales extends Model
 			'status'=>1,
 			'goods_id'=>$this->goods_id,
 			'money'=>$money,
-			'add_time'=>Date('Y-m-d H:m:s')
+			'add_time'=>Date('Y-m-d H:i:s')
 		);
 
 		$this->writeLog($data,$divide);
