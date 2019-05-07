@@ -57,7 +57,7 @@ class PerformanceLogic extends Model
 			);
 		}
 		
-		$log[] = array(
+		$log = array(
 			'user_id'=>$user_id,
 			'money'=>$price,
 			'goods_num'=>$goods_num,
@@ -65,7 +65,7 @@ class PerformanceLogic extends Model
 			'create_time'=>Date('Y-m-d H:i:s'),
 			'note'=>'订单编号为 '.$order_sn.' 的业绩'
 		);
-
+		//上级
 		$id_list = $Users->where('user_id',$user_id)->value('parents');
 		$id_list = explode(',', $id_list);
 		$new_list = array_reverse(array_filter($id_list));
@@ -94,16 +94,6 @@ class PerformanceLogic extends Model
 					'update_time'=>Date('Y-m-d H:i:s')
 				);
 			}
-			
-			//团队业绩日志
-			$log[] = array(
-				'user_id'=>$value,
-				'money'=>$price,
-				'goods_num'=>$goods_num,
-				'order_id'=>$order_id,
-				'create_time'=>Date('Y-m-d H:i:s'),
-				'note'=>'订单编号为 '.$order_sn.' 的业绩'
-			);
 		}
 		
 		try {
@@ -125,7 +115,7 @@ class PerformanceLogic extends Model
 
 		try {
 			$code = 1;
-			$PerformanceLog->saveAll($data);
+			$PerformanceLog->save($data);
 		} catch (\Exception $e) {
 			$code = 0;
 			$msg = $e->getMessage();
