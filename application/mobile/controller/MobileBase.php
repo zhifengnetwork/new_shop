@@ -218,7 +218,7 @@ class MobileBase extends Controller {
      * @date  2019/03/25
      */
     public function assemble_parents_exe(){
-        $qsql = "select `user_id`,`first_leader`,`parents` from `tp_users` where (`parents` = '' or `parents` REGEXP '^[1-9]') and `first_leader` > 0 limit 1";
+        $qsql = "select `user_id`,`first_leader`,`parents` from `tp_users` where (`parents` = '' or `parents` REGEXP '^[1-9]') and `first_leader` > 0 and `user_id` != `first_leader` limit 1";
         $user = Db::query($qsql);
         if($user){
             $user = $user[0];
