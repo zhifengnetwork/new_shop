@@ -22,7 +22,6 @@ class Sales extends Model
 	private $user_id; //用户id
 	private $order_id;//订单id
 	private $goods_id;//商品id
-	public static $the_count = 0;
 
 	public function __construct($user_id,$order_id,$goods_id)
 	{	
@@ -40,9 +39,10 @@ class Sales extends Model
 		if (!$user) {
 			return array('msg'=>"该用户不存在",'code'=>0);
 		}
+		
 		//获取下级id列表
 		$d_info = Db::query("select `user_id`, `first_leader`,`parents` from `tp_users` where 'first_leader' = $user_id or parents like '%,$user_id,%'");
-		$d_info = $d_info ? array_column($d_info,'user_id') : '';
+		$d_info = $d_info ? array_column($d_info,'user_id') : array();
 		$goods = $this->order();
 		if (($goods['code'] == 1) && ($goods['data']['is_team_prize'] == 1)) {
 			$bonus_products_id = $goods['data']['goods_id'];
@@ -50,11 +50,6 @@ class Sales extends Model
 			M('users')->where('user_id','in',$d_info)->where('bonus_products_id','>',0)->update(['bonus_products_id'=>0]);
 			$first_leader_id = $user['first_leader'];
 			$bool = M('users')->where('user_id',$first_leader_id)->update(['bonus_products_id'=>$goods['data']['goods_id']]);
-			
-			if (!$bool && self::$the_count < 3) {
-				self::$the_count ++;
-				$this->sales();
-			}
 		}
 		
 		$user_level = $user['distribut_level'];
@@ -156,10 +151,10 @@ class Sales extends Model
 			if ($value['is_lock'] == 1) {
 				continue;
 			}
-			//不是分销商不奖励
-			if ($value['is_distribut'] != 1) {
-				continue;
-			}
+			// //不是分销商不奖励
+			// if ($value['is_distribut'] != 1) {
+			// 	continue;
+			// }
 			
 			//等级比下级低没有奖励
 			if ($user_level > $value['distribut_level']) {
@@ -323,8 +318,6 @@ class Sales extends Model
 				$my_user_money = $my_prize + $user['user_money'];
 				$my_distribut_money = $my_prize + $user['distribut_money'];
 				$bool = M('users')->where('user_id',$user_id)->update(['user_money'=>$my_user_money,'distribut_money'=>$my_distribut_money]);
-				// M('users')->where('user_id',$this->user_id)->setInc('user_money',$my_prize);
-				// M('users')->where('user_id',$this->user_id)->setInc('distribut_money',$my_prize);
 				$result['code'] = 0;
 				$status = 0;
 				if ($bool) {
@@ -362,10 +355,10 @@ class Sales extends Model
 			if ($value['is_lock'] == 1) {
 				continue;
 			}
-			//不是分销商不奖励
-			if ($value['is_distribut'] != 1) {
-				continue;
-			}
+			// //不是分销商不奖励
+			// if ($value['is_distribut'] != 1) {
+			// 	continue;
+			// }
 			
 			//等级比下级低没有奖励
 			if ($user_level > $value['distribut_level']) {
@@ -438,7 +431,7 @@ class Sales extends Model
 			if (!$money) {
 				continue;
 			}
-
+			
 			$total_money += $money;
 			$user_money = $money+$value['user_money'];
 			$distribut_money = $money+$value['distribut_money'];

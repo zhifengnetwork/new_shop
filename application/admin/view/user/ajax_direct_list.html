@@ -34,17 +34,17 @@
                 <td align="left" class="">
                     <div style="text-align: center; width: 150px;">{$list.email}
                         <if condition="($list['email_validated'] eq 0) AND ($list['email'])">
-                            (Œ¥—È÷§)
+                            (Êú™È™åËØÅ)
                         </if>
                     </div>
                 </td>
                 <td align="left" class="">
-                    <div style="text-align: center; width: 60px;"><eq name="$list.is_employees" value="1">  « <else/> ∑Ò </eq></div>
+                    <div style="text-align: center; width: 60px;"><eq name="$list.is_employees" value="1"> ÊòØ <else/> Âê¶ </eq></div>
                 </td>
                 <td align="left" class="">
                     <div style="text-align: center; width: 80px;">{$list.mobile}
                         <if condition="($list['mobile_validated'] eq 0) AND ($list['mobile'])">
-                            (Œ¥—È÷§)
+                            (Êú™È™åËØÅ)
                         </if>
                     </div>
                 </td>
@@ -59,9 +59,9 @@
                 </td>
                 <td align="center" class="handle">
                     <div style="text-align: center; width: 200px; max-width:250px;">
-                        <a class="btn blue" href="{:U('Admin/user/detail',array('id'=>$list['user_id']))}"><i class="fa fa-pencil-square-o"></i>œÍ«È</a>
-                        <a class="btn blue" href="{:U('Admin/user/account_log',array('id'=>$list['user_id']))}"><i class="fa fa-search"></i>◊ Ω</a>
-                        <a class="btn blue" href="{:U('Admin/user/address',array('id'=>$list['user_id']))}"><i class="fa fa-steam"></i> ’ªıµÿ÷∑</a>
+                        <a class="btn blue" href="{:U('Admin/user/detail',array('id'=>$list['user_id']))}"><i class="fa fa-pencil-square-o"></i>ÔøΩÔøΩÔøΩÔøΩ</a>
+                        <a class="btn blue" href="{:U('Admin/user/account_log',array('id'=>$list['user_id']))}"><i class="fa fa-search"></i>ÔøΩ ΩÔøΩ</a>
+                        <a class="btn blue" href="{:U('Admin/user/address',array('id'=>$list['user_id']))}"><i class="fa fa-steam"></i>ÔøΩ’ªÔøΩÔøΩÔøΩ÷∑</a>
                     </div>
                 </td>
                 <td align="" class="" style="width: 100%;">
@@ -72,7 +72,7 @@
         </tbody>
     </table>
 </div>
-<!--∑÷“≥Œª÷√-->
+<!--ÔøΩÔøΩ“≥ŒªÔøΩÔøΩ-->
 {$pager->show()}
 <script>
     $(".pagination  a").click(function(){
@@ -80,7 +80,7 @@
         ajax_get_table('search-form2',page);
     });
     $(document).ready(function(){
-        // ±Ì∏Ò––µ„ª˜—°÷–«–ªª
+        // ÔøΩÔøΩÔøΩÔøΩÔøΩ–µÔøΩÔøΩ—°ÔøΩÔøΩÔøΩ–ªÔøΩ
         $('#flexigrid >table>tbody>tr').click(function(){
             $(this).toggleClass('trSelected');
         });

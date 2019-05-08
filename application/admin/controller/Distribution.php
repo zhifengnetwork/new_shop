@@ -169,6 +169,7 @@ class Distribution extends Base
         // $count = $Ad->count();
         $Page = new Page($count, 20);
         $show = $Page->show();
+        $this->assign('count',$count);
         $this->assign('page', $show);
         return $this->fetch();
     }
