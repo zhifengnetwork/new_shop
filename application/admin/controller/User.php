@@ -443,12 +443,15 @@ class User extends Base
         $count = M('recharge')->where($map)->count();
         $page = new Page($count);
         $lists = M('recharge')->where($map)->order('ctime desc')->limit($page->firstRow . ',' . $page->listRows)->select();
-        $user_ids = array_column($lists, 'user_id');
-        $avatar = get_avatar($user_ids);
+        if ($lists) {
+            $user_ids = array_column($lists, 'user_id');
+            $avatar = get_avatar($user_ids);
 
-        foreach ($lists as $key => $value) {
-            $lists[$key]['head_pic'] = $avatar[$value['user_id']];
+            foreach ($lists as $key => $value) {
+                $lists[$key]['head_pic'] = $avatar[$value['user_id']];
+            }
         }
+        
         $this->assign('page', $page->show());
         $this->assign('pager', $page);
         $this->assign('lists', $lists);
@@ -809,12 +812,15 @@ class User extends Base
         $count = Db::name('withdrawals')->alias('w')->join('__USERS__ u', 'u.user_id = w.user_id', 'INNER')->where($where)->count();
         $Page = new Page($count, 20);
         $list = Db::name('withdrawals')->alias('w')->field('w.*,u.nickname')->join('__USERS__ u', 'u.user_id = w.user_id', 'INNER')->where($where)->order("w.id desc")->limit($Page->firstRow . ',' . $Page->listRows)->select();
-        $user_ids = array_column($list, 'user_id');
-        $avatar = get_avatar($user_ids);
+        if ($list) {
+            $user_ids = array_column($list, 'user_id');
+            $avatar = get_avatar($user_ids);
 
-        foreach ($list as $key => $value) {
-            $list[$key]['head_pic'] = $avatar[$value['user_id']];
+            foreach ($list as $key => $value) {
+                $list[$key]['head_pic'] = $avatar[$value['user_id']];
+            }
         }
+        
         //$this->assign('create_time',$create_time2);
         $show = $Page->show();
         $this->assign('show', $show);

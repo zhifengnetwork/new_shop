@@ -108,12 +108,15 @@ class Order extends Base {
         $Page  = new AjaxPage($count,20);
         $show = $Page->show();
         $orderList = Db::name('order')->where($condition)->limit($Page->firstRow,$Page->listRows)->order($sort_order)->select();
-        $user_ids = array_column($orderList, 'user_id');
-        $avatar = get_avatar($user_ids);
+        if ($orderList) {
+            $user_ids = array_column($orderList, 'user_id');
+            $avatar = get_avatar($user_ids);
 
-        foreach ($orderList as $key => $value) {
-            $orderList[$key]['head_pic'] = $avatar[$value['user_id']];
+            foreach ($orderList as $key => $value) {
+                $orderList[$key]['head_pic'] = $avatar[$value['user_id']];
+            }
         }
+        
         $this->assign('orderList',$orderList);
         $this->assign('page',$show);// 赋值分页输出
         $this->assign('pager',$Page);
@@ -310,12 +313,14 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
     	if($shipping_status)
     	    $orderList = M('order')->where($condition)->limit($Page->firstRow.','.$Page->listRows)->field("*,IF(shipping_name='','无需物流',shipping_name) as shipping_name")->order('add_time DESC')->select();
     	else
-    	    $orderList = M('order')->where($condition)->limit($Page->firstRow.','.$Page->listRows)->order('add_time DESC')->select();
-        $user_ids = array_column($orderList, 'user_id');
-        $avatar = get_avatar($user_ids);
+            $orderList = M('order')->where($condition)->limit($Page->firstRow.','.$Page->listRows)->order('add_time DESC')->select();
+        if ($orderList) {
+            $user_ids = array_column($orderList, 'user_id');
+            $avatar = get_avatar($user_ids);
 
-        foreach ($orderList as $key => $value) {
-            $orderList[$key]['head_pic'] = $avatar[$value['user_id']];
+            foreach ($orderList as $key => $value) {
+                $orderList[$key]['head_pic'] = $avatar[$value['user_id']];
+            }
         }
         
     	$this->assign('orderList',$orderList);
@@ -338,12 +343,14 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
     	$count = M('order')->where($condition)->count();
     	$Page  = new Page($count,10);
     	$show = $Page->show();
-    	$orderList = M('order')->where($condition)->limit($Page->firstRow.','.$Page->listRows)->order('add_time DESC')->select();
-        $user_ids = array_column($orderList, 'user_id');
-        $avatar = get_avatar($user_ids);
-        
-        foreach ($orderList as $key => $value) {
-            $orderList[$key]['head_pic'] = $avatar[$value['user_id']];
+        $orderList = M('order')->where($condition)->limit($Page->firstRow.','.$Page->listRows)->order('add_time DESC')->select();
+        if ($orderList) {
+            $user_ids = array_column($orderList, 'user_id');
+            $avatar = get_avatar($user_ids);
+            
+            foreach ($orderList as $key => $value) {
+                $orderList[$key]['head_pic'] = $avatar[$value['user_id']];
+            }
         }
         
     	$this->assign('orderList',$orderList);
@@ -1118,8 +1125,11 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
     	$show = $Page->show();
     	$list = M('order_action')->where($condition)->order('action_id desc')->limit($Page->firstRow.','.$Page->listRows)->select();
 
-    	//绑定订单类型是否虚拟，方便跳转对应订单详情
-        $order_id_array = array_unique(array_column($list,'order_id'));
+        //绑定订单类型是否虚拟，方便跳转对应订单详情
+        if ($list) {
+            $order_id_array = array_unique(array_column($list,'order_id'));
+        }
+        
         $order_type_list = db('order')->where('order_id','in',$order_id_array)->field('order_id,prom_type')->select();
         $new_arr = [];
         foreach ($order_type_list as $k => $v){

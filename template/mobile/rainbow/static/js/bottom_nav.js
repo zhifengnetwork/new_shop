@@ -33,7 +33,7 @@ var buttonNavTitle = [
 var buttonNavUrl = [];
 /*未-登陆路径*/
 var loginFalse = [
-	"'/mobile/Index/index.html'",
+	"'/mobile/Index/index3.html'",
 	"'/mobile/Goods/categoryList.html'",
 	"'/mobile/User/index.html'",
 ]
