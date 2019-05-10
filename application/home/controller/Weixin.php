@@ -18,7 +18,7 @@ class Weixin
 
 			$re = $this->xmlToArray($data);
 			
-			// Db::name('wx_temp')->insert(['content'=>json_encode($re)]);
+			Db::name('wx_temp')->insert(['content'=>json_encode($re)]);
 			
 			/**
 			* 微信扫描分享带参数的二维码

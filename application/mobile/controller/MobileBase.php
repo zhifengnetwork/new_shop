@@ -30,6 +30,7 @@ class MobileBase extends Controller {
      * 初始化操作
      */
     public function _initialize() {
+        
         session('user'); //不用这个在忘记密码不能获取session('validate_code');
 //        Session::start();
         header("Cache-control: private");  // history.back返回后输入框值丢失问题 参考文章 http://www.tp-shop.cn/article_id_1465.html  http://blog.csdn.net/qinchaoguang123456/article/details/29852881
@@ -54,9 +55,10 @@ class MobileBase extends Controller {
                 }
             } 
             if (empty($_SESSION['openid'])){
+                
                 if(is_array($this->weixin_config) && $this->weixin_config['wait_access'] == 1){
                     $wxuser = $this->GetOpenid(); //授权获取openid以及微信用户信息
-                    
+                    // dump($wxuser);exit;
                     //过滤特殊字符串
                     $wxuser['nickname'] && $wxuser['nickname'] = replaceSpecialStr($wxuser['nickname']);
                     
@@ -64,6 +66,7 @@ class MobileBase extends Controller {
                     setcookie('subscribe',$wxuser['subscribe']);
                     $logic = new UsersLogic(); 
                     $is_bind_account = tpCache('basic.is_bind_account');
+                    // dump($is_bind_account);exit;
                      if ($is_bind_account) {
                          if (CONTROLLER_NAME != 'User' || ACTION_NAME != 'bind_guide') {
                             $data = $logic->thirdLogin_new($wxuser);//微信自动登录
