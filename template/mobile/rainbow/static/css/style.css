@@ -826,7 +826,8 @@ footer .flool3 p {
 }
 .mslide {
 	position:relative;
-	overflow:hidden
+	overflow:hidden;
+	top: 1.8rem
 }
 .mslide:after {
 	content:'';
@@ -938,8 +939,8 @@ footer .flool3 p {
 	right:2.66667rem
 }
 .after_login {
-	width:1.024rem;
-	height:1.024rem
+	width:.9rem;
+	height:.9rem
 }
 @media screen and (min-width:1300px) {
 	.after_login {

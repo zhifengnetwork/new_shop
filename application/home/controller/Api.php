@@ -95,7 +95,7 @@ class Api extends Base {
             $list = M('goods_category')->where("parent_id", $parent_id)->select();
         
         foreach($list as $k => $v)
-            $html .= "<option value='{$v['id']}'>{$v['name']}</option>";        
+            $html .= "<option value='{$v['id']}'>{$v['name']}</option>"; 
         exit($html);
     }  
     
