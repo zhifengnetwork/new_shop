@@ -451,9 +451,9 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
                     $commission_log[$key]['goods_name'] = $goods[$value['goods_id']];
                     $commission_log[$key]['date'] = date('Y-m-d H:i:s',$value['create_time']);
                     $commission_log[$key]['user_name'] = $user[$value['user_id']]['nickname'] ?: $user[$value['user_id']]['mobile'];
-                    $commission_log[$key]['user_head_pic'] = $user[$value['user_id']]['user_head_pic'];
+                    $commission_log[$key]['user_head_pic'] = $user[$value['user_id']]['head_pic'];
                     $commission_log[$key]['to_user_name'] = $user[$value['to_user_id']]['nickname'] ?: $user[$value['to_user_id']]['mobile'];
-                    $commission_log[$key]['to_user_head_pic'] = $user[$value['to_user_id']]['to_user_head_pic'];
+                    $commission_log[$key]['to_user_head_pic'] = $user[$value['to_user_id']]['head_pic'];
                 }
             }
         }
