@@ -832,11 +832,21 @@
     $(function(){
         $(document).on("change",'#cat_id',function(){
             var v = $(this).val();
-            get_category(v,'cat_id_2','0');
-            if(v==0){
-                $('#cat_id_2').empty().html("<option value='0'>请选择商品分类</option>");
-            }
+            $('#cat_id_2').empty().html("<option value='0'>请选择商品分类</option>");
             $('#cat_id_3').empty().html("<option value='0'>请选择商品分类</option>");
+            $.get('/Home/api/get_category',{parent_id:v},function(res){
+                if(res){
+                    $('#cat_id_2').empty().html(res);
+                }
+            });
+
+
+
+            // get_category(v,'cat_id_2','0');
+            // if(v==0){
+            //     $('#cat_id_2').empty().html("<option value='0'>请选择商品分类</option>");
+            // }
+            // $('#cat_id_3').empty().html("<option value='0'>请选择商品分类</option>");
         })
     })
 
