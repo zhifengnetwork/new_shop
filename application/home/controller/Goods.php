@@ -59,10 +59,10 @@ class Goods extends Base {
         $commentStatistics = $goodsLogic->commentStatistics($goods_id);// 获取某个商品的评论统计
         $point_rate = tpCache('shopping.point_rate');
         $region_id = Cookie::get('district_id');
-        if ($region_id) {
-            $dispatching = $goodsLogic->getGoodsDispatching($goods['goods_id'], $region_id);
-            $this->assign('dispatching', $dispatching);
-        }
+        // if ($region_id) {
+        //     $dispatching = $goodsLogic->getGoodsDispatching($goods['goods_id'], $region_id);
+        //     $this->assign('dispatching', $dispatching);
+        // }
         $this->assign('freight_free', $freight_free);// 全场满多少免运费
         $this->assign('spec_goods_price', json_encode($spec_goods_price,true)); // 规格 对应 价格 库存表
         $this->assign('navigate_goods',navigate_goods($goods_id,1));// 面包屑导航
@@ -241,7 +241,8 @@ class Goods extends Base {
         $goods_id = I('goods_id/d');//143
         $region_id = I('region_id/d');//28242
         $goods_logic = new GoodsLogic();
-        $dispatching_data = $goods_logic->getGoodsDispatching($goods_id,$region_id);
+        $dispatching_data = null;
+        // $dispatching_data = $goods_logic->getGoodsDispatching($goods_id,$region_id);
         $this->ajaxReturn($dispatching_data);
     }
 

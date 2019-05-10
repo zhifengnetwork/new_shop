@@ -444,7 +444,7 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
             $all_ids = array_unique($to_user_ids);
             
             $user = M('users')->where('user_id','in',$all_ids)->column('user_id,nickname,mobile,head_pic');
-            $goods = M('goods')->whereIn('goods_id',$goods_ids)->column('goods_id,goods_name');
+            $goods = M('order_goods')->where('order_id',$order_id)->whereIn('goods_id',$goods_ids)->column('goods_id,goods_name');
             //添加用户信息
             if ($user) {
                 foreach($commission_log as $key => $value){

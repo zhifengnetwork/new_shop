@@ -1371,33 +1371,33 @@
      */
 
     $(document).ready(function () {
-        getCombination();
+        // getCombination();
     });
-    function getCombination() {
-        var goods_id = parseInt($("input[name='goods_id']").val());
-        var item_id = $("input[name='item_id']").val();
-        var url = "/index.php?m=Home&c=Goods&a=combination";
-        $.ajax({
-            type: "Post",
-            url: url,
-            data: {goods_id: goods_id, item_id: item_id},
-            dataType: "json",
-            success: function (data) {
-                if (data.status == 1) {
-                    var str = combinationHtml(data.result)
-                    if(data.result.length>0){
-                        $('#Combination-list-ul').html(str);
+    // function getCombination() {
+    //     var goods_id = parseInt($("input[name='goods_id']").val());
+    //     var item_id = $("input[name='item_id']").val();
+    //     var url = "/index.php?m=Home&c=Goods&a=combination";
+    //     $.ajax({
+    //         type: "Post",
+    //         url: url,
+    //         data: {goods_id: goods_id, item_id: item_id},
+    //         dataType: "json",
+    //         success: function (data) {
+    //             if (data.status == 1) {
+    //                 var str = combinationHtml(data.result)
+    //                 if(data.result.length>0){
+    //                     $('#Combination-list-ul').html(str);
 
-                    }else{
-                        $('#Combination-list-ul').children().remove();
+    //                 }else{
+    //                     $('#Combination-list-ul').children().remove();
 
-                    }
-                    $(".Combination-list ul").css("width",$(".Combination-list ul li").length*10.5+"rem");
-                }
+    //                 }
+    //                 $(".Combination-list ul").css("width",$(".Combination-list ul li").length*10.5+"rem");
+    //             }
 
-            }
-        });
-    }
+    //         }
+    //     });
+    // }
 
 function combinationHtml(result) {
     var item_id = $("input[name='item_id']").val()?$("input[name='item_id']").val():0;
