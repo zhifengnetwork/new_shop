@@ -5,7 +5,8 @@
     .no_team{
         position: absolute;
         left: 50%;
-        top: 50%;
+        /* top: 50%; */
+        margin-top: 3rem;
         color: rgb(218, 214, 214);
         transform: translate(-50%,-50%);
         font-size: 0.7rem;
@@ -74,13 +75,15 @@
     }
 </style>
 <div class="application-record">
-    <div class="hh" style="padding-top: 1rem;">
-        <div class="user_top_tx">
-            <notempty name="$leader.head_pic"><img src="{$leader.head_pic}"/><else/><img src="/public/images/user_default_icon.jpg"/></notempty>
+    <notempty name="leader">
+        <div class="hh" style="padding-top: 1rem;">
+            <div class="user_top_tx">
+                <notempty name="$leader.head_pic"><img src="{$leader.head_pic}"/><else/><img src="/public/images/user_default_icon.jpg"/></notempty>
+            </div>
+            <h2 id="nickname">上级名称：{$leader.nickname}</h2>
+            <h2 id="">上级联系方式：{$leader.mobile}</h2>
         </div>
-        <h2 id="nickname">上级名称：{$leader.nickname}</h2>
-        <h2 id="">上级联系方式：{$leader.mobile}</h2>
-    </div>
+    </notempty>
     <div class="maleri30">
         <!-- <ul class="re_tit">
             <div style="height:10.5em;">
@@ -99,8 +102,9 @@
             <li>我的团队</li>
         </ul>
         <ul class="re_tit">
-            <li class="li2">团队总人数：</li>
+            <li class="li1">团队总人数：</li>
             <li class="li1">{$count}</li>
+            <li class="li2"></li>
         </ul>
         <ul class="re_tit">
             <li class="li1"><span>用户</span></li>
