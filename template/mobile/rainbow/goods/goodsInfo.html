@@ -8,20 +8,80 @@
     }
     .layermbox0 .layermchild{min-width: .375rem !important;}
     .share_icon{
-        height:1.5rem;
-        width:1.5rem;
+    	
+        height:2rem;
+        width:2rem;
         display:inline-block;
         position:fixed;
-        top:2rem;
+        top:4rem;
         right:0.1rem;
         z-index:9999;
         padding:10px;
-        background:black; 
         border-radius:0.4rem;
         color:#fff;
-        opacity: 0.5;
+       
 
     }
+    .layui-layer-title{
+    	
+    	font-size: .5rem;
+    	
+    }
+    .layui-layer-shade{
+	
+	opacity: 1!important;
+	
+}
+.layui-layer-content img:nth-child(1){
+	
+	height: 80%!important;
+	
+}
+.layui-layer-content img:last-child{
+	
+	
+	width: 20%!important;
+	height: 20%!important;
+	position: absolute;
+	bottom: .05rem!important;
+	
+	
+}
+.layui-layer-content{
+	
+	position: relative;
+	
+}
+.layui-layer-content p:nth-child(2){
+	
+	
+	
+	display: inline-block;
+	font-size: .5rem;
+	/*line-height: 20px;*/
+	line-height: .6rem;
+	width: 50%;
+	padding-top: .5rem;
+	overflow : hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical
+
+	
+	
+}
+.layui-layer-content p:nth-child(3){
+	
+	
+	position: absolute;
+	left: 0;
+	bottom: .5rem;
+	font-size: .5rem;
+	padding-left: .2rem;
+	
+}
+
 </style>
 <div class="he_sustain">
     <div class="classreturn loginsignup detail">
@@ -58,9 +118,9 @@
             </ul>
         </div>
         <!-- <a class="share_icon" onclick="share_icon();">分享</a> -->
-        <a  class="share_icon" onclick="share_icon();">
-        <img src="/public/static/images/fengxiang2.png" />
-        </a>  
+        <!--<a  class="share_icon" onclick="share_icon();">
+        <img src="/public/static/images/erweima.png" />
+        </a>  -->
     </div>
     <div class="de_font p">
         <div class="thirty">
@@ -77,6 +137,7 @@
             <div class="scunde p">
                 <span class="red" id="price">￥{$goods.shop_price}</span>
                 <span id="market_price_title">市场价：</span><span class="linethr" id="market_price">{$goods.market_price}</span>
+                <img src="/public/static/images/erweima.png"  style="float: right;width: 1rem;" onclick="share_icon();"/>
                 <p class="inlist">
                     <if condition="$goods.prom_type neq 2"><span style="float:left;">销量：{$goods['sales_sum']+$goods['virtual_sales_sum']}</span></if>
                     <!--<span >当前库存：<span class="spec_store_count">{$goods.store_count}</span></span>-->
