@@ -10,6 +10,14 @@
 				<h3>返佣日志</h3>
 				<h5>返佣日志</h5>
 			</div>
+			<ul class="tab-base nc-row">
+				<li><a class="current" href="{:U('distribution/commission_log',array('type'=>0))}" data-state=""><span>全部</span></a></li>
+				<li><a href="{:U('distribution/commission_log',array('type'=>1))}" data-state="1"><span>级别利润</span></a></li>
+				<li><a href="{:U('distribution/commission_log',array('type'=>2))}" data-state="2"><span>每台奖励</span></a></li>
+				<li><a href="{:U('distribution/commission_log',array('type'=>3))}" data-state="3"><span>同级奖励</span></a></li>
+				<li><a href="{:U('distribution/commission_log',array('type'=>4))}" data-state="4"><span>分红</span></a></li>
+				<li><a href="{:U('distribution/commission_log',array('type'=>5))}" data-state="5"><span>全球分红</span></a></li>      
+			</ul>
 		</div>
 	</div>
 	<!-- 操作说明 -->
@@ -32,6 +40,7 @@
 			<form class="navbar-form form-inline" id="search-form" method="get" action="{:U('Distribution/commission_log')}" onsubmit="return check_form();">
 				<input type="hidden" name="ctime" id="ctime" value="{$ctime}">
 				<input type="hidden" name="log_ids" value="{$log_ids}" id="log_ids" />
+				<inptu type="hidden" name="type" value="{$type}" id="type"/>
 				<div class="sDiv">
 					<div class="sDiv2" style="margin-right: 10px;">
 						<input type="text" size="30" id="start_time" name="start_time" value="{$start_time}" placeholder="起始时间" class="qsbox">

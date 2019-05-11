@@ -252,7 +252,7 @@ class Distribution extends Base
     {
         $Ad = M('distrbut_commission_log');
         $p = input('p/d');
-
+        $type = input('type',1);
         $ctime = urldecode(I('ctime'));
         $user_name = I('user_name');
         $order_sn = I('order_sn');
@@ -307,6 +307,7 @@ class Distribution extends Base
             }
         }
         
+        $this->assign('type',$type);
         $this->assign('user_type',$user_type);
         $this->assign('log_ids',$log_ids);
         $this->assign('user_name',$user_name);
@@ -321,6 +322,12 @@ class Distribution extends Base
         $this->assign('count',$count);
         $this->assign('page', $show);
         return $this->fetch();
+    }
+
+    //返佣日志条件
+    public function get_condition($type)
+    {
+        return $where;
     }
     
     //返佣日志详情
