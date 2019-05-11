@@ -238,7 +238,7 @@ class UsersLogic extends Model
      * @return array
      */
     private function getThirdUser($data)
-    {
+    {   
         $user = [];
         $thirdUser = Db::name('oauth_users')->where(['openid' => $data['openid'], 'oauth' => $data['oauth']])->find();
         if (!$thirdUser) {

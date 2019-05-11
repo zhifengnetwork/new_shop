@@ -22,7 +22,6 @@ class Sales extends Model
 	private $user_id; //用户id
 	private $order_id;//订单id
 	private $goods_id;//商品id
-	public static $the_count = 0;
 
 	public function __construct($user_id,$order_id,$goods_id)
 	{	
@@ -35,25 +34,24 @@ class Sales extends Model
 	{
 		$user_id = $this->user_id;
 		$user = $this->get_user();
-		$bonus_products_id = ($user['bonus_products_id'] > 0) ? $user['bonus_products_id'] : 0;
+		$bonus_products_id = 0;
+		// $bonus_products_id = ($user['bonus_products_id'] > 0) ? $user['bonus_products_id'] : 0;
 		if (!$user) {
 			return array('msg'=>"该用户不存在",'code'=>0);
 		}
+		
 		//获取下级id列表
 		$d_info = Db::query("select `user_id`, `first_leader`,`parents` from `tp_users` where 'first_leader' = $user_id or parents like '%,$user_id,%'");
-		$d_info = $d_info ? array_column($d_info,'user_id') : '';
-		$goods = $this->goods($this->goods_id);
-		if (($goods['code'] == 1) && ($goods['goods']['is_team_prize'] == 1) && ($user['bonus_products_id'] != $goods['goods']['goods_id'])) {
-			$bonus_products_id = $goods['goods']['goods_id'];
+		$d_info = $d_info ? array_column($d_info,'user_id') : array();
+		$goods = $this->order();
+		if (($goods['code'] == 1) && ($goods['data']['is_team_prize'] == 1)) {
+			$bonus_products_id = $goods['data']['goods_id'];
+			array_push($d_info,$this->user_id);
 			M('users')->where('user_id','in',$d_info)->where('bonus_products_id','>',0)->update(['bonus_products_id'=>0]);
-			$bool = M('users')->where('user_id',$this->user_id)->update(['bonus_products_id'=>$goods['goods']['goods_id']]);
-			
-			if (!$bool && self::$the_count < 3) {
-				self::$the_count ++;
-				$this->sales();
-			}
+			$first_leader_id = $user['first_leader'];
+			$bool = M('users')->where('user_id',$first_leader_id)->update(['bonus_products_id'=>$goods['data']['goods_id']]);
 		}
-
+		
 		$user_level = $user['distribut_level'];
 		if ($user['parents']) {
 			$parents_id = explode(',', $user['parents']);
@@ -63,7 +61,7 @@ class Sales extends Model
 			}
 
 			if ($bonus_products_id > 0) {
-				M('users')->where('user_id','in',$parents_id)->where('bonus_products_id','>',0)->update(['bonus_products_id'=>0]);
+				M('users')->where('user_id','in',$parents_id)->where('user_id','neq',$first_leader_id)->where('bonus_products_id','>',0)->update(['bonus_products_id'=>0]);
 			}
 			
 			$this->cash_unlock($parents_id);	//提现解锁
@@ -76,9 +74,7 @@ class Sales extends Model
 				$reward = $this->reward($parents_id,$user_level,$is_repeat);
 			}
 			
-			if ($bonus_products_id > 0) {
-				$this->team_bonus($bonus_products_id);	//团队奖励
-			}
+			$this->team_bonus($parents_id);	//团队奖励
 			
 			return $reward;
 		} else {
@@ -155,10 +151,10 @@ class Sales extends Model
 			if ($value['is_lock'] == 1) {
 				continue;
 			}
-			//不是分销商不奖励
-			if ($value['is_distribut'] != 1) {
-				continue;
-			}
+			// //不是分销商不奖励
+			// if ($value['is_distribut'] != 1) {
+			// 	continue;
+			// }
 			
 			//等级比下级低没有奖励
 			if ($user_level > $value['distribut_level']) {
@@ -268,7 +264,7 @@ class Sales extends Model
 				'status'=>1,
 				'goods_id'=>$this->goods_id,
 				'money'=>$total_money,
-				'add_time'=>Date('Y-m-d H:m:s')
+				'add_time'=>Date('Y-m-d H:i:s')
 			);
 
 			$this->writeLog($data,$divide);
@@ -322,8 +318,6 @@ class Sales extends Model
 				$my_user_money = $my_prize + $user['user_money'];
 				$my_distribut_money = $my_prize + $user['distribut_money'];
 				$bool = M('users')->where('user_id',$user_id)->update(['user_money'=>$my_user_money,'distribut_money'=>$my_distribut_money]);
-				// M('users')->where('user_id',$this->user_id)->setInc('user_money',$my_prize);
-				// M('users')->where('user_id',$this->user_id)->setInc('distribut_money',$my_prize);
 				$result['code'] = 0;
 				$status = 0;
 				if ($bool) {
@@ -361,10 +355,10 @@ class Sales extends Model
 			if ($value['is_lock'] == 1) {
 				continue;
 			}
-			//不是分销商不奖励
-			if ($value['is_distribut'] != 1) {
-				continue;
-			}
+			// //不是分销商不奖励
+			// if ($value['is_distribut'] != 1) {
+			// 	continue;
+			// }
 			
 			//等级比下级低没有奖励
 			if ($user_level > $value['distribut_level']) {
@@ -437,7 +431,7 @@ class Sales extends Model
 			if (!$money) {
 				continue;
 			}
-
+			
 			$total_money += $money;
 			$user_money = $money+$value['user_money'];
 			$distribut_money = $money+$value['distribut_money'];
@@ -474,7 +468,7 @@ class Sales extends Model
 				'status'=>1,
 				'goods_id'=>$this->goods_id,
 				'money'=>$total_money,
-				'add_time'=>Date('Y-m-d H:m:s')
+				'add_time'=>Date('Y-m-d H:i:s')
 			);
 
 			$this->writeLog($data,$divide);
@@ -484,12 +478,8 @@ class Sales extends Model
 	}
 
 	//团队奖励
-	public function team_bonus($bonus_products_id)
+	public function team_bonus($parents_id)
 	{
-		$user_id = $this->user_id;
-		$order_id = $this->order_id;
-		$goods_id = $this->goods_id;
-
 		$order = $this->order();
 		
 		if ($order['code'] != 1) {
@@ -497,19 +487,19 @@ class Sales extends Model
 		}
 		$order = $order['data'];
 
-		$goods = $this->goods($bonus_products_id);
+		$leader = M('users')->whereIn('user_id',$parents_id)->where('bonus_products_id','>',0)->find();
+		if (!$leader) {
+			return ['code'=>0,'msg'=>"该用户没有获得团队奖励的上级"];
+		}
+		
+		//获取奖励百分比
+		$goods = $this->goods($leader['bonus_products_id']);
 		if ($goods['code'] == 0) {
 			return $goods;
 		}
 		$goods = $goods['goods'];
 		
-		$first_leader = M('users')->where('user_id',$user_id)->value('first_leader');
-		$leader = M('users')->where('user_id',$first_leader)->find();
-		if (!$leader) {
-			return ['code'=>0,'msg'=>"该用户没有上级"];
-		}
-		
-		$money = $goods['shop_price'] * $order['goods_num'] * ($goods['prize_ratio'] / 100);
+		$money = $order['goods_price'] * $order['goods_num'] * ($goods['prize_ratio'] / 100);
 		
 		if(!$money){
 			return ['code'=>0];
@@ -525,7 +515,7 @@ class Sales extends Model
 
 		$data[] = array(
 			'user_id' => $this->user_id,
-			'to_user_id' => $first_leader,
+			'to_user_id' => $leader['user_id'],
 			'money' => $money,
 			'order_sn' => $order['order_sn'],
 			'order_id' => $this->order_id,
@@ -541,8 +531,8 @@ class Sales extends Model
 			'user_id'=>$this->user_id,
 			'status'=>1,
 			'goods_id'=>$this->goods_id,
-			'money'=>$total_money,
-			'add_time'=>Date('Y-m-d H:m:s')
+			'money'=>$money,
+			'add_time'=>Date('Y-m-d H:i:s')
 		);
 
 		$this->writeLog($data,$divide);
@@ -606,11 +596,6 @@ class Sales extends Model
 	//订单信息
 	public function order()
 	{
-		$order = M('order')->where('order_id',$this->order_id)->find();
-		if (!$order) {
-			return array('msg'=>"没有该商品的订单信息",'code'=>0);
-		}
-		
 		$order_goods = M('order_goods')
 						->where('order_id',$this->order_id)
 						->where('goods_id',$this->goods_id)
@@ -620,10 +605,7 @@ class Sales extends Model
 			return array('msg'=>"没有该商品的订单信息",'code'=>0);
 		}
 
-		$data = array('goods_id'=>
-			$this->goods_id,'goods_num'=>$order_goods['goods_num'],'order_sn'=>$order['order_sn']);
-
-		return array('data'=>$data,'code'=>1);
+		return array('data'=>$order_goods,'code'=>1);
 	}
 
 	//商品信息
@@ -648,6 +630,8 @@ class Sales extends Model
 			if (!$order_divide) {
 				//分钱记录日志
 				M('order_divide')->insert($divide);
+			} else {
+				M('order_divide')->where('user_id',$divide['user_id'])->where('order_id',$divide['order_id'])->where('goods_id',$divide['goods_id'])->setInc('money',$divide['money']);
 			}
 		}
 		

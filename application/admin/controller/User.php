@@ -133,9 +133,11 @@ class User extends Base
         
         $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-
         $list = Db::query("select * from `tp_users` where `first_leader` > 0 and `first_leader` = $id");
         $count = count($list);
+        $agnet_name = $this->all_level();
+
+        $this->assign('agnet_name',$agnet_name);
 
         $this->assign('list',$list);
         $this->assign('count',$count);
@@ -149,19 +151,26 @@ class User extends Base
         
         $list = Db::query("select * from `tp_users` where `first_leader` > 0 and find_in_set('$id',parents)");
         $count = count($list);
+        $agnet_name = $this->all_level();
 
+        $this->assign('agnet_name',$agnet_name);
+        $this->assign('list',$list);
+        $this->assign('count',$count);
+		return $this->fetch();
+    }
+    
+    # 获取等级
+    public function all_level()
+    {
         $agent_level = M('agent_level')->field('level,level_name')->select();
         if($agent_level){
             foreach($agent_level as $v){
                 $agnet_name[$v['level']] = $v['level_name'];
             }
-            $this->assign('agnet_name', $agnet_name);
         }
 
-        $this->assign('list',$list);
-        $this->assign('count',$count);
-		return $this->fetch();
-	}
+        return $agnet_name;
+    }
 
     /**
      * 会员详细信息查看
@@ -443,12 +452,15 @@ class User extends Base
         $count = M('recharge')->where($map)->count();
         $page = new Page($count);
         $lists = M('recharge')->where($map)->order('ctime desc')->limit($page->firstRow . ',' . $page->listRows)->select();
-        $user_ids = array_column($lists, 'user_id');
-        $avatar = get_avatar($user_ids);
+        if ($lists) {
+            $user_ids = array_column($lists, 'user_id');
+            $avatar = get_avatar($user_ids);
 
-        foreach ($lists as $key => $value) {
-            $lists[$key]['head_pic'] = $avatar[$value['user_id']];
+            foreach ($lists as $key => $value) {
+                $lists[$key]['head_pic'] = $avatar[$value['user_id']];
+            }
         }
+        
         $this->assign('page', $page->show());
         $this->assign('pager', $page);
         $this->assign('lists', $lists);
@@ -809,12 +821,15 @@ class User extends Base
         $count = Db::name('withdrawals')->alias('w')->join('__USERS__ u', 'u.user_id = w.user_id', 'INNER')->where($where)->count();
         $Page = new Page($count, 20);
         $list = Db::name('withdrawals')->alias('w')->field('w.*,u.nickname')->join('__USERS__ u', 'u.user_id = w.user_id', 'INNER')->where($where)->order("w.id desc")->limit($Page->firstRow . ',' . $Page->listRows)->select();
-        $user_ids = array_column($list, 'user_id');
-        $avatar = get_avatar($user_ids);
+        if ($list) {
+            $user_ids = array_column($list, 'user_id');
+            $avatar = get_avatar($user_ids);
 
-        foreach ($list as $key => $value) {
-            $list[$key]['head_pic'] = $avatar[$value['user_id']];
+            foreach ($list as $key => $value) {
+                $list[$key]['head_pic'] = $avatar[$value['user_id']];
+            }
         }
+        
         //$this->assign('create_time',$create_time2);
         $show = $Page->show();
         $this->assign('show', $show);

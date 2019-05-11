@@ -61,7 +61,6 @@ class LevelLogic extends Model
                 if($count < $team_nums){
                     continue;
                 }else{
-                    dump($v.':'.$count);
                     $this->upgrade_agent($v,$max_level,$count);
                     // Db::name('admin_log')->insert(['log_info'=>$v]);
                 }

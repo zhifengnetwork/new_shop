@@ -434,7 +434,7 @@ a.green:hover { color: #FFF; background-color: #1BBC9D; border-color: #16A086; }
                     var user_head_pic = '';
                     for (var i=0; i<data.data.length;i++){
                         user_head_pic = data.data[i].user_head_pic ? data.data[i].user_head_pic : '/public/images/user_default_icon.jpg';
-                        to_user_head_pic = data.data[i].user_head_pic ? data.data[i].to_user_head_pic : '/public/images/user_default_icon.jpg';
+                        to_user_head_pic = data.data[i].to_user_head_pic ? data.data[i].to_user_head_pic : '/public/images/user_default_icon.jpg';
                         
                         commission_html +='<tr><td class="text-center" style="width:10%;">'+data.data[i].user_name+'</td>' +
                                 '<td class="text-center" style="width:6%;"><img src="'+user_head_pic+'" style="width:2rem;height:2rem;" alt=""></td>' +

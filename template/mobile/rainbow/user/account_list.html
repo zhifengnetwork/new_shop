@@ -121,6 +121,9 @@ body{
 	font-size:.5rem;
 	text-align:center;
 }
+.list_item li p{
+    margin-bottom: 0.2rem;
+}
 </style>
 <!-- <div class="allaccounted">
     <div class="maleri30"> -->
@@ -270,7 +273,7 @@ body{
                     var str = '';
                     for (let i = 0; i < data.length; i++) {
                         str = (data[i].status == 1) ? "成功" : "失败";
-                        html += '<li class="list_item"><span><p>金额：' + data[i].money +
+                        html += '<li class="list_item"><span><p style="margin-bottom: 0.2rem;">金额：' + data[i].money +
                         '</p><p>' + data[i].create_time +
                         '</p></span><span>' + str +
                         '</span>';     
@@ -309,7 +312,7 @@ body{
                 return false;
             }
             if (scrollTop + windowHeight >= scrollHeight-60) {
-                temp = scrollTop ;
+                temp = scrollTop;
                 all_record(type_1,distribut_type_1);//调用加载更多
             }
         }

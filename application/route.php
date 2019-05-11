@@ -25,3 +25,7 @@
 //Route::get('goodsInfo/:id','home/goods/goodsInfo',['cache'=>['Home/Goods/goodsInfo',300]]);// 访问方式 http://www.tpshop2.0.com/goodsInfo/77.html
 
 // http://www.tpshop2.0.com/home/goods/goodsInfo/id/77.html
+use think\Route;
+// 注册路由到index模块的News控制器的read操作
+Route::rule('index','Index/index');
+// Route::rule('admin','admin/Index/index');

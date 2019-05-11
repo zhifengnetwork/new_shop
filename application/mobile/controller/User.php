@@ -75,6 +75,22 @@ class User extends MobileBase
             'WAITRECEIVE' => '待收货', //订单查询状态 待收货
             'WAITCCOMMENT' => '待评价', //订单查询状态 待评价
         );
+        $Earnings = new Earnings;
+        $wait_earnings = $Earnings->where('user_id',$this->user_id)->find();
+        
+        //不在同一天清空待收益
+        if ($wait_earnings) {
+            $today = intval(date('Ymd'));
+            $time = intval(date('Ymd',strtotime($wait_earnings['update_time'])));
+            
+            if ($today != $time) {
+                $wait_earnings->money = 0;
+                $wait_earnings->obj = null;
+
+                $wait_earnings->save();
+            }
+        }
+        
         $this->assign('order_status_coment', $order_status_coment);
     }
 
@@ -353,7 +369,10 @@ class User extends MobileBase
             $goods = M('order_goods')->whereIn('rec_id',$rec_ids)->where('goods_id','in',$goods_ids)->where('is_send','<>',3)->field('order_id,goods_id,goods_name,goods_num,goods_price,is_team_prize,prize_ratio')->select();
             $order_ids = array_column($goods, 'order_id');
             $order = M('order')->whereIn('order_id',$order_ids)->column('order_id,user_id');
-            
+            //是否有团队奖励
+            if ($fisrt_leader['bonus_products_id'] > 0) {
+                $prize_ratio = M('goods')->where('goods_id',$fisrt_leader['bonus_products_id'])->value('prize_ratio');
+            }
             foreach ($goods as $k1 => $v1) {
                 $order = M('order')->where('order_id',$v1['order_id'])->field('order_id,user_id')->find();
                 $parents = $leader_list[$order['user_id']]['parents'];
@@ -370,26 +389,41 @@ class User extends MobileBase
                 if ($count == count($list,1)) {
                     $num = $num ? 1 : 0;
                 }
-                
-                //团队奖励商品
-                if ($v1['is_team_prize'] == 1) {dump($v1['is_team_prize']);die;
-                    $first_leader = M('users')->where('user_id',$order['user_id'])->field('first_leader,bonus_products_id')->find();
-                    //是直推上级且商品符合则返佣
-                    if(($first_leader['first_leader'] == $user['user_id']) && ($fisrt_leader['bonus_products_id'] == $v1['goods_id'])){
-                        $team_money = $v1['goods_price'] * $v1['goods_num'] * ($v1['prize_ratio'] / 100);
-                        $money = round($money,2);
-                        if ($money) {
-                            $total_money += $team_money;
+                //团队奖励
+                if ($prize_ratio > 0) {
+                    $team_money = $v1['goods_price'] * $v1['goods_num'] * ($prize_ratio / 100);
+                    $money = round($money,2);
+                    if ($money) {
+                        $total_money += $team_money;
 
-                            $list[$num]['goods_id'] = $v1['goods_id'];
-                            $list[$num]['order_id'] = $v1['order_id'];
-                            $list[$num]['goods_name'] = $v1['goods_name'];
-                            $list[$num]['goods_num'] = $v1['goods_num'];
-                            $list[$num]['money'] = $team_money;
-                            $num ++;
-                        }
+                        $list[$num]['goods_id'] = $v1['goods_id'];
+                        $list[$num]['order_id'] = $v1['order_id'];
+                        $list[$num]['goods_name'] = $v1['goods_name'];
+                        $list[$num]['goods_num'] = $v1['goods_num'];
+                        $list[$num]['money'] = $team_money;
+                        $num ++;
                     }
                 }
+                // //团队奖励商品
+                // if ($v1['is_team_prize'] == 1) {
+                //     $first_leader = M('users')->where('user_id',$order['user_id'])->field('first_leader,bonus_products_id')->find();
+                //     //是直推上级且商品符合则返佣
+                //     if(($first_leader['first_leader'] == $user['user_id']) && ($fisrt_leader['bonus_products_id'] == $v1['goods_id'])){
+                //         // $prize_ratio = M('goods')->where('goods_id',$)
+                //         $team_money = $v1['goods_price'] * $v1['goods_num'] * ($v1['prize_ratio'] / 100);
+                //         $money = round($money,2);
+                //         if ($money) {
+                //             $total_money += $team_money;
+
+                //             $list[$num]['goods_id'] = $v1['goods_id'];
+                //             $list[$num]['order_id'] = $v1['order_id'];
+                //             $list[$num]['goods_name'] = $v1['goods_name'];
+                //             $list[$num]['goods_num'] = $v1['goods_num'];
+                //             $list[$num]['money'] = $team_money;
+                //             $num ++;
+                //         }
+                //     }
+                // }
                 
                 if (!$parents_id) {
                     continue;
@@ -928,11 +962,6 @@ class User extends MobileBase
     {
     	// // $usersLogic = new UsersLogic;
     	// // $result = $usersLogic->account($this->user_id, $type);
-        // if ($type == 'income') {
-        //     dump($type);
-        // } else {
-        //     $result = M('account_log')->where('user_money','<',0)->select();
-        // }
         
     	// if ($_GET['is_ajax']) {
     	// 	return $this->fetch('ajax_account_list');
@@ -975,13 +1004,13 @@ class User extends MobileBase
                     break;
             }
 
-            $result = M('distrbut_commission_log')->where('to_user_id',$user_id)->where($where)->order('create_time','desc')->field('log_id,money,status,order_id,create_time')->page($page,10)->select();
+            $result = M('distrbut_commission_log')->where('to_user_id',$user_id)->where($where)->order('create_time','desc')->field('log_id,money,status,order_id,create_time')->page($page,15)->select();
 
             foreach ($result as $key => $value) {
                 $result[$key]['create_time'] = date('Y-m-d H:i',$value['create_time']);
             }
         } else {
-            $result = M('account_log')->where('user_money','<',0)->where('user_id',$user_id)->order('create_time','desc')->field('log_id,user_money as money,change_time as create_time,order_id')->page($page,10)->select();
+            $result = M('account_log')->where('user_money','<',0)->where('user_id',$user_id)->order('create_time','desc')->field('log_id,user_money as money,change_time as create_time,order_id')->page($page,15)->select();
 
             foreach ($result as $key => $value) {
                 $result[$key]['create_time'] = date('Y-m-d H:i',$value['create_time']);

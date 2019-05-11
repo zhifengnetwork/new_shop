@@ -620,7 +620,7 @@ class Order extends MobileBase
         $return = Db::name('reply')->add($data);
         if($return){
             Db::name('comment')->where(['comment_id'=>$data['comment_id']])->setInc('reply_num');
-            $data['reply_time'] = date('Y-m-d H:m',$data['reply_time']);
+            $data['reply_time'] = date('Y-m-d H:i',$data['reply_time']);
             $this->ajaxReturn(['status'=>1,'msg'=>'评论成功！','result'=>$data]);
             exit;
         } else {

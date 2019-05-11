@@ -169,6 +169,7 @@ class Distribution extends Base
         // $count = $Ad->count();
         $Page = new Page($count, 20);
         $show = $Page->show();
+        $this->assign('count',$count);
         $this->assign('page', $show);
         return $this->fetch();
     }
@@ -198,7 +199,8 @@ class Distribution extends Base
             $where['create_time'] = [['>= time',strtotime($start_time)],['< time',strtotime($end_time." 23:59:59")],'and'];
         }
         if ($order_sn) {
-            $where['order_sn'] = ['like',"%$order_sn%"];
+            $order_ids = M('order')->where('order_sn','like',"%$order_sn%")->column('order_id');
+            $where['order_id'] = ['in',$order_ids];
         }
         if ($permin || $permax) {
             $where['money'] = ['between',[floatval($permin),floatval($permax)]];
