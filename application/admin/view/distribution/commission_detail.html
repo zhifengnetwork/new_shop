@@ -3,17 +3,17 @@
 
 .ncap-order-style .ncap-order-details{
 	margin:20px auto;
-  width:750px;
+  width:950px;
 }
 .contact-info h3,.contact-info {
   display: inline-block;
   vertical-align: middle;
 }
 .user-info{
-  width: 200px;
+  width: 250px;
 }
 .good-info{
-  width: 200px;
+  width: 250px;
 }
 
 </style>
@@ -34,8 +34,7 @@
       <div class="tabs-panels">
           <div class="contact-info">
               <h4>基本信息</h4>
-              <h5>{$comm_name}</h5>
-              <neq name="$type" value="5">
+              <neq name="$detail.type" value="4">
                 <dl>
                     <dt>用户名：</dt>
                     <dd class='user-info'>{$detail.user_id|user_name}</dd>
@@ -45,18 +44,18 @@
               </neq>
               <dl>
                   <dt>获得返利用户名：</dt>
-                  <dd>{$detail.to_user_id|user_name}</dd>
-                  <neq name="$type" value="5">
+                  <dd class='user-info'>{$detail.to_user_id|user_name}</dd>
+                  <neq name="$detail.type" value="4">
                     <dt>数量：</dt>
-                    <dd class='user-info'>{$detail.num}</dd>
+                    <dd>{$detail.num}</dd>
                   </neq>
               </dl>
               <dl>
                 <dt>时间：</dt>
-                <dd>{$detail.create_time|date="Y-m-d H:i:s",###}</dd>
-                <neq name="$type" value="5">
+                <dd class='user-info'>{$detail.create_time|date="Y-m-d H:i:s",###}</dd>
+                <neq name="$detail.type" value="4">
                   <dt>订单编号：</dt>
-                  <dd>{$detail.order_id|order_sn}</dd>
+                  <dd>{$detail.order_sn}</dd>
                 </neq>
               </dl>
           </div>       

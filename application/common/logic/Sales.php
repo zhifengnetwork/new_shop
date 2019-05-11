@@ -729,6 +729,7 @@ class Sales extends Model
 	//订单信息
 	public function order()
 	{
+		$order_sn = M('order')->where('order_id',$this->order_id)->value('order_sn');
 		$order_goods = M('order_goods')
 						->where('order_id',$this->order_id)
 						->where('goods_id',$this->goods_id)
@@ -737,6 +738,8 @@ class Sales extends Model
 		if (!$order_goods) {
 			return array('msg'=>"没有该商品的订单信息",'code'=>0);
 		}
+
+		$order_goods['order_sn'] = $order_sn;
 
 		return array('data'=>$order_goods,'code'=>1);
 	}

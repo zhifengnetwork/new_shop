@@ -360,10 +360,8 @@ class Distribution extends Base
     public function commission_detail()
     {
         $id = input('id/d');
-        $type = I('type',0);
         $detail = M('distrbut_commission_log')->where('log_id',$id)->find();
 
-        $this->assign('type',$type);
         $this->assign('detail',$detail);
         return $this->fetch();
     }
@@ -371,20 +369,27 @@ class Distribution extends Base
     //购买返佣
     public function export_commission_log()
     {
+        $log_ids = I('log_ids');
+        $type = I('type',0);
+        $title_name = array("返佣","级别利润","每台奖励","同级奖励","分红","全球分红");
+
         $strTable = '<table width="500" border="1">';
         $strTable .= '<tr >';
         $strTable .= '<td style="text-align:center;font-size:14px;width:120px;">ID</td>';
-        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">用户名</td>';
+        if ($type != 5) {
+            $strTable .= '<td style="text-align:center;font-size:14px;" width="*">用户名</td>';
+        }
+        
         $strTable .= '<td style="text-align:center;font-size:14px;" width="*">获得返利用户名</td>';
         $strTable .= '<td style="text-align:center;font-size:14px;" width="*">所得金额</td>';
-        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">订单编号</td>';
-        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">数量</td>';
+        if ($type != 5) {
+            $strTable .= '<td style="text-align:center;font-size:14px;" width="*">订单编号</td>';
+            $strTable .= '<td style="text-align:center;font-size:14px;" width="*">数量</td>';
+        }
+        
         $strTable .= '<td style="text-align:center;font-size:14px;" width="*">时间</td>';
         $strTable .= '<td style="text-align:center;font-size:14px;" width="*">描述</td>';
         $strTable .= '</tr>';
-
-        $log_ids = I('log_ids');
-        $type = I('type',0);
         
         $condition = array();
         $condition = $this->get_condition($type);
@@ -406,15 +411,18 @@ class Distribution extends Base
                 foreach ($log_list as $k => $val) {
                     $username = $user_names[$val['user_id']]['nickname'] ? $user_names[$val['user_id']]['nickname'] : $user_names[$val['user_id']]['mobile'];
                     $to_username = $user_names[$val['to_user_id']]['nickname'] ? $user_names[$val['to_user_id']]['nickname'] : $user_names[$val['to_user_id']]['mobile'];
-                    $order_sn = $val['order_sn'];
-
+                   
                     $strTable .= '<tr>';
                     $strTable .= '<td style="text-align:center;font-size:12px;">' . $val['log_id'] . '</td>';
-                    $strTable .= '<td style="text-align:center;font-size:12px;">' . $username . ' </td>';
+                    if ($type != 5) {
+                        $strTable .= '<td style="text-align:center;font-size:12px;">' . $username . ' </td>';
+                    }
                     $strTable .= '<td style="text-align:center;font-size:12px;">' . $to_username . '</td>';
                     $strTable .= '<td style="text-align:center;font-size:12px;">' . $val['money'] . '</td>';
-                    $strTable .= '<td style="vnd.ms-excel.numberformat:@">' . $order_sn . '</td>';
-                    $strTable .= '<td style="text-align:center;font-size:12px;">' . $val['num'] . '</td>';
+                    if ($type != 5) {
+                        $strTable .= '<td style="vnd.ms-excel.numberformat:@">' . $val['order_sn'] . '</td>';
+                        $strTable .= '<td style="text-align:center;font-size:12px;">' . $val['num'] . '</td>';
+                    }
                     $strTable .= '<td style="text-align:center;font-size:12px;">' . date('Y-m-d H:i', $val['create_time']) . '</td>';
                     $strTable .= '<td style="text-align:left;font-size:12px;">' . $val['desc'] . ' </td>';
                     $strTable .= '</tr>';
@@ -424,7 +432,7 @@ class Distribution extends Base
         }
         $strTable .= '</table>';
         $i = ($i == 1) ? '' : '_'.$i;
-        downloadExcel($strTable, '购买商品返佣明细表' . $i);
+        downloadExcel($strTable, $title_name[$type].'明细表' . $i);
         exit();
     }
 
