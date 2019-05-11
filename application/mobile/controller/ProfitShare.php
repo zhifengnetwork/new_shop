@@ -62,9 +62,9 @@ class ProfitShare extends MobileBase
             $inspectorPartProfit=0.00;
         }else{
 //            echo $today_profit['total']."````````````".$today_ratio;die;
-            $partnersPartProfit=round($today_profit*$today_ratio/100/$partners*$partners_ratio/100,2);
-            $managersPartProfit=round($today_profit*$today_ratio/100/$managers*$managers_ratio/100,2);
-            $inspectorPartProfit=round($today_profit*$today_ratio/100/$inspector*$inspector_ratio/100,2);
+            $partnersPartProfit=floor($today_profit*$today_ratio/100/$partners*$partners_ratio)/100;
+            $managersPartProfit=floor($today_profit*$today_ratio/100/$managers*$managers_ratio)/100;
+            $inspectorPartProfit=floor($today_profit*$today_ratio/100/$inspector*$inspector_ratio)/100;
         }
         //写入记录表
         $data=array();
