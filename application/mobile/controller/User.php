@@ -617,30 +617,74 @@ class User extends MobileBase
     public function team_list()
     {
         $user_id = $this->user_id;
-        $id_array = $this->lower_id($user_id); //获取下级id列表
+        // $id_array = $this->lower_id($user_id); //获取下级id列表
+        
+        // //获取对应下级id的数据
+        // $team_list = M('users')->where('user_id','in',$id_array)->field('user_id,nickname,mobile,distribut_level,distribut_money,head_pic')->page(1,10)->select();
+        // //获取等级
+        // $level = M('agent_level')->column('level,level_name');
+        
+        // foreach($team_list as $k1 => $v1){
+        //     $team_list[$k1]['level_name'] = $level[$v1['distribut_level']];
+        // }
+
+        // $count = count($team_list);
+        
+        $leader_id = M('users')->where('user_id',$user_id)->value('first_leader');
+        $leader = M('users')->where('user_id',$leader_id)->field('nickname,mobile,head_pic')->find();
+        
+        $this->assign('leader',$leader);
+        // $this->assign('count',$count);
+        // $this->assign('team',$team_list);
+        return $this->fetch();
+    }
+
+    /**
+     * 三级分销
+     */
+    public function three_level()
+    {
+        $user_id = $this->user_id;
+        $leader_ids = I('ids',[]);
+        $type = I('type',1);
+        $page = I('page',1);
+    
+        $where = array();
+        
+        switch($type){
+            //一级
+            case 1:
+                $where['first_leader'] = $user_id;
+                break;
+            //二级
+            case 2:
+                $user_id = M('users')->whereIn('first_leader',function($query) use ($user_id) {
+                    $query->name('users')->where('first_leader',$user_id)->field('user_id');
+                })->column('user_id');
+                $where['first_leader'] = ['in',$user_id];
+                break;
+            //三级
+            case 3:
+                $user_id = M('users')->whereIn('first_leader',function($query) use ($user_id) {
+                    $query->name('users')->whereIn('first_leader',function($query) use ($user_id) {
+                        $query->name('users')->where('first_leader',$user_id)->field('user_id');
+                    })->field('user_id');
+                })->column('user_id');
+                $where['first_leader'] = ['in',$user_id];
+                break;
+            default: break; 
+        }
         
         //获取对应下级id的数据
-        $team_list = M('users')->where('user_id','in',$id_array)->field('user_id,nickname,mobile,distribut_level,distribut_money,head_pic')->select();
-        //获取等级
+        $team_list = M('users')->where($where)->field('user_id,nickname,mobile,distribut_level,distribut_money,head_pic')->page($page,15)->select();
+
         $level = M('agent_level')->column('level,level_name');
         
         foreach($team_list as $k1 => $v1){
             $team_list[$k1]['level_name'] = $level[$v1['distribut_level']];
         }
-
-        $count = 0;
-        if (count($team_list) == count($team_list,1)) {
-            $count = $team_list ? 1 : 0;
-        } else {
-            $count = count($team_list);
-        }
-        $leader_id = M('users')->where('user_id',$user_id)->value('first_leader');
-        $leader = M('users')->where('user_id',$leader_id)->field('nickname,mobile,head_pic')->find();
-        
-        $this->assign('leader',$leader);
-        $this->assign('count',$count);
-        $this->assign('team',$team_list);
-        return $this->fetch();
+        // $result = $team_list;
+        return json($team_list);
     }
 
     /**
