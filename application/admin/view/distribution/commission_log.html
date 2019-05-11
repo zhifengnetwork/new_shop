@@ -5,18 +5,18 @@
 <div id="ajaxwaitid"></div>
 <div class="page">
 	<div class="fixed-bar">
-		<div class="item-title">
+		<div class="item-title" id="comm_li">
 			<div class="subject">
 				<h3>返佣日志</h3>
 				<h5>返佣日志</h5>
 			</div>
 			<ul class="tab-base nc-row">
-				<li><a class="current" href="{:U('distribution/commission_log',array('type'=>0))}" data-state=""><span>全部</span></a></li>
-				<li><a href="{:U('distribution/commission_log',array('type'=>1))}" data-state="1"><span>级别利润</span></a></li>
-				<li><a href="{:U('distribution/commission_log',array('type'=>2))}" data-state="2"><span>每台奖励</span></a></li>
-				<li><a href="{:U('distribution/commission_log',array('type'=>3))}" data-state="3"><span>同级奖励</span></a></li>
-				<li><a href="{:U('distribution/commission_log',array('type'=>4))}" data-state="4"><span>分红</span></a></li>
-				<li><a href="{:U('distribution/commission_log',array('type'=>5))}" data-state="5"><span>全球分红</span></a></li>      
+				<li><a href="{:U('distribution/commission_log',array('type'=>0))}" data-state=""><span>全部</span></a></li>
+				<li><a href="{:U('distribution/commission_log',array('type'=>1))}" data-state="0"><span>级别利润</span></a></li>
+				<li><a href="{:U('distribution/commission_log',array('type'=>2))}" data-state="0"><span>每台奖励</span></a></li>
+				<li><a href="{:U('distribution/commission_log',array('type'=>3))}" data-state="0"><span>同级奖励</span></a></li>
+				<li><a href="{:U('distribution/commission_log',array('type'=>4))}" data-state="0"><span>分红</span></a></li>
+				<li><a href="{:U('distribution/commission_log',array('type'=>5))}" data-state="0"><span>全球分红</span></a></li>      
 			</ul>
 		</div>
 	</div>
@@ -40,7 +40,7 @@
 			<form class="navbar-form form-inline" id="search-form" method="get" action="{:U('Distribution/commission_log')}" onsubmit="return check_form();">
 				<input type="hidden" name="ctime" id="ctime" value="{$ctime}">
 				<input type="hidden" name="log_ids" value="{$log_ids}" id="log_ids" />
-				<inptu type="hidden" name="type" value="{$type}" id="type"/>
+				<input type="hidden" name="type" value="{$type}" id="type"/>
 				<div class="sDiv">
 					<div class="sDiv2" style="margin-right: 10px;">
 						<input type="text" size="30" id="start_time" name="start_time" value="{$start_time}" placeholder="起始时间" class="qsbox">
@@ -85,12 +85,14 @@
 						<th align="center" abbr="ac_id" axis="col3" class="">
 							<div style="text-align: center; width: 80px;" class="">ID</div>
 						</th>
-						<th align="center" abbr="article_time" axis="col4" class="">
-							<div style="text-align: center; width: 150px;" class="">用户名称</div>
-						</th>
-						<th align="center" axis="col4" class="">
-							<div style="text-align: center; width: 50px;" class="">用户头像</div>
-						</th>
+						<neq name="$type" value="5">
+							<th align="center" abbr="article_time" axis="col4" class="">
+								<div style="text-align: center; width: 150px;" class="">用户名称</div>
+							</th>
+							<th align="center" axis="col4" class="">
+								<div style="text-align: center; width: 50px;" class="">用户头像</div>
+							</th>
+						</neq>
 						<th align="center" abbr="article_time" axis="col4" class="">
 							<div style="text-align: center; width: 150px;" class="">获得返利用户</div>
 						</th>
@@ -100,12 +102,14 @@
 						<th align="center" abbr="article_time" axis="col5" class="">
 							<div style="text-align: center; width: 100px;" class="">所得金额</div>
 						</th>
-						<th align="center" abbr="article_time" axis="col6" class="">
-							<div style="text-align: center; width: 150px;" class="">订单编号</div>
-						</th>
-						<th align="center" abbr="article_time" axis="col6" class="">
-							<div style="text-align: center; width: 100px;" class="">数量</div>
-						</th>
+						<neq name="$type" value="5">
+							<th align="center" abbr="article_time" axis="col6" class="">
+								<div style="text-align: center; width: 150px;" class="">订单编号</div>
+							</th>
+							<th align="center" abbr="article_time" axis="col6" class="">
+								<div style="text-align: center; width: 100px;" class="">数量</div>
+							</th>
+						</neq>
 						<th align="center" abbr="article_time" axis="col6" class="">
 							<div style="text-align: center; width: 150px;" class="">时间</div>
 						</th>
@@ -135,18 +139,20 @@
 							<td align="center" class="">
 								<div style="text-align: center; width: 80px;">{$vo.log_id}</div>
 							</td>
-							<td align="center" class="">
-								<div style="text-align: center; width: 150px;">{$vo.user_name}</div>
-							</td>
-							<td align="left" class="">
-			                    <div style="text-align: center; width: 50px;">
-			                        <if condition="!empty($vo.user_name) and !empty($vo.user_head_pic)">
-			                        	<img src="{$vo.user_head_pic}" style="width:30px;height:30px;" alt="">
-			                        <elseif condition="!empty($vo.user_name)"/>
-			                            <img src="/public/images/user_default_icon.jpg" style="width:30px;height:30px;" alt="">
-			                        </if>
-			                    </div>
-			                </td>
+							<neq name="$type" value="5">
+								<td align="center" class="">
+									<div style="text-align: center; width: 150px;">{$vo.user_name}</div>
+								</td>
+								<td align="left" class="">
+									<div style="text-align: center; width: 50px;">
+										<if condition="!empty($vo.user_name) and !empty($vo.user_head_pic)">
+											<img src="{$vo.user_head_pic}" style="width:30px;height:30px;" alt="">
+										<elseif condition="!empty($vo.user_name)"/>
+											<img src="/public/images/user_default_icon.jpg" style="width:30px;height:30px;" alt="">
+										</if>
+									</div>
+								</td>
+							</neq>
 							<td align="center" class="">
 								<div style="text-align: center; width: 150px;">{$vo.to_user_name}</div>
 							</td>
@@ -162,12 +168,14 @@
 							<td align="center" class="">
 								<div style="text-align: center; width: 100px;">{$vo.money|default='0'}</div>
 							</td>
-							<td align="center" class="">
-								<div style="text-align: center; width: 150px;">{$vo.order_id|order_sn}</div>
-							</td>
-							<td align="center" class="">
-								<div style="text-align: center; width: 100px;">{$vo.num}</div>
-							</td>
+							<neq name="$type" value="5">
+								<td align="center" class="">
+									<div style="text-align: center; width: 150px;">{$vo.order_id|order_sn}</div>
+								</td>
+								<td align="center" class="">
+									<div style="text-align: center; width: 100px;">{$vo.num}</div>
+								</td>
+							</neq>
 							<td align="center" class="">
 								<div style="text-align: center; width: 150px;">{$vo.create_time|date="Y-m-d H:i:s",###}</div>
 							</td>
@@ -176,7 +184,7 @@
                             </td>
                             <td align="center" class="handle">
 								<div style="text-align: center; width: 200px; max-width:200px;">
-									<a class="btn blue" href="{:U('Distribution/commission_detail',array('id'=>$vo['log_id']))}"><i class="fa fa-search"></i>查看</a>
+									<a class="btn blue" href="{:U('Distribution/commission_detail',array('id'=>$vo['log_id'],'type'=>$type))}"><i class="fa fa-search"></i>查看</a>
 								</div>
 							</td>
 							<td align="" class="" style="width: 100%;">
@@ -194,6 +202,17 @@
 </div>
 <script>
 	$(document).ready(function(){
+		var li_index = '';
+		var type = '{$type}';
+		//导航栏切换
+		$('#comm_li ul li').each(function(){
+			if($(this).index() == type){
+				console.log($(this).index());
+				$(this).children().addClass('current');
+			};
+		});
+
+		console.log(li_index)
 		// 表格行点击选中切换
 		$('#flexigrid > table>tbody >tr').click(function(){
 			$(this).toggleClass('trSelected');

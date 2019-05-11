@@ -252,7 +252,7 @@ class Distribution extends Base
     {
         $Ad = M('distrbut_commission_log');
         $p = input('p/d');
-        $type = input('type',1);
+        $type = input('type',0);
         $ctime = urldecode(I('ctime'));
         $user_name = I('user_name');
         $order_sn = I('order_sn');
@@ -262,7 +262,7 @@ class Distribution extends Base
         
         $where = [];
         $log_ids = '';
-        
+        $where = $this->get_condition($type);
         if($user_name){
             $user['nickname'] = ['like', "%$user_name%"];
             $id_list = M('users')->where($user)->column('user_id');
@@ -327,6 +327,32 @@ class Distribution extends Base
     //返佣日志条件
     public function get_condition($type)
     {
+        $where = [];
+        //查询条件
+        switch ($type) {
+            case 0:
+                break;
+            case 1:
+                $where['type'] = ['in',[1,2]];
+                $where['distribut_type'] = ['in',[2,3]];
+                break;
+            case 2:
+                $where['type'] = ['in',[1,2,3]];
+                break;
+            case 3:
+                $where['type'] = ['in',[1,2]];
+                $where['distribut_type'] = 4;
+                break;
+            case 4:
+                $where['type'] = 3;
+                break;
+            case 5:
+                $where['type'] = 4;
+                break;
+            default:
+                break;
+        }
+
         return $where;
     }
     
@@ -334,7 +360,10 @@ class Distribution extends Base
     public function commission_detail()
     {
         $id = input('id/d');
+        $type = I('type',0);
         $detail = M('distrbut_commission_log')->where('log_id',$id)->find();
+
+        $this->assign('type',$type);
         $this->assign('detail',$detail);
         return $this->fetch();
     }
@@ -353,9 +382,12 @@ class Distribution extends Base
         $strTable .= '<td style="text-align:center;font-size:14px;" width="*">时间</td>';
         $strTable .= '<td style="text-align:center;font-size:14px;" width="*">描述</td>';
         $strTable .= '</tr>';
+
         $log_ids = I('log_ids');
+        $type = I('type',0);
         
         $condition = array();
+        $condition = $this->get_condition($type);
         if ($log_ids) {
             $condition['log_id'] = ['in', explode(',',$log_ids)];
         }
