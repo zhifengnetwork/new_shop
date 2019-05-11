@@ -1871,7 +1871,7 @@ window.$ === undefined && (window.$ = Zepto)
 var province_id,city_id,district_id,province_name,city_name,district_name;
 locationInitialize();
 ajaxProvince();
-ajaxDispatching();
+// ajaxDispatching();
 //选择省 start
 $('body').on('click', '.province-list p', function () {
   province_id = $(this).attr('data-id');
@@ -1900,7 +1900,7 @@ $('body').on('click', '.area-list p', function () {
   setCookies('province_name', province_name, 30 * 24 * 60 * 60 * 1000);
   setCookies('city_name', city_name, 30 * 24 * 60 * 60 * 1000);
   setCookies('district_name', district_name, 30 * 24 * 60 * 60 * 1000);
-  ajaxDispatching();
+  // ajaxDispatching();
   $('.area-list').hide();
   $('.province-list').show();
   $('.container').hide();
@@ -2001,6 +2001,7 @@ function ajaxDispatching() {
       data: {goods_id: goods_id, region_id: region_id},
       url: "/index.php?m=Home&c=Goods&a=dispatching",
       success: function (data) {
+        if(!data) return false;
         if (data.status == 1) {
             //有货
             if(data.result.freight == 0){

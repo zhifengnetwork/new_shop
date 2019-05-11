@@ -105,8 +105,13 @@
         -o-transform: translate(-50%,-50%);
         -webkit-transform: translate(-50%,-50%);
         color: white;
-
     }
+    .team_list{
+        margin-bottom: .3rem;
+    }
+    /* #getmore{
+        display: none;
+    } */
 </style>
 <div class="application-record">
     <notempty name="leader">
@@ -151,7 +156,8 @@
             <li class="li3"><span>所得佣金</span></li>
             <li class="li1"><span>操作</span></li>
         </ul>
-        <ul class="team_list">加载中...</ul>
+        <ul class="team_list"></ul>
+        <div id="getmore" style="font-size:.38rem;text-align: center;color:rgba(226, 226, 226, 0.904);padding:.25rem .24rem .4rem; clear:both;"></div>
         <!-- <empty name="team">
             <div class="no_team">
                 您还没有下级
@@ -196,6 +202,7 @@
             temp = 0;
             page = 1;
             $('.team_list').empty();
+            $('#getmore').html("加载中...");
         }
         type_1 = type;
         $.ajax({
@@ -226,7 +233,7 @@
                     if($('.team_list').children.length == 0){
                         $('.team_list').html("暂无数据");
                     } else {
-                        
+                        $('#getmore').html("没有更多数据啦");
                     }
                 }
             }

@@ -55,7 +55,7 @@ function sales($order_id){
         return array('msg'=>"参数错误",'code'=>0);
     }
     
-    $is_reward = M('order_divide')->where('order_id',$order_id)->find();
+    $is_reward = M('order_divide')->where('order_id',$order_id)->where('status',1)->find();
     
     if ($is_reward) {
        return array('msg'=>"该商品已返佣",'code'=>0);
@@ -94,7 +94,7 @@ function sales($order_id){
         }
     }
 
-    $is_reward = M('order_divide')->where('order_id',$order_id)->find();
+    $is_reward = M('order_divide')->where('order_id',$order_id)->where('status',1)->find();
     
     if ($is_reward) {
        M('order')->where('order_id',$order_id)->update(['is_distribut'=>1]);
