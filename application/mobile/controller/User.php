@@ -223,7 +223,7 @@ class User extends MobileBase
                                 $query->name('order')->where('user_id',$user_id)->where('order_id','not in',$order_ids)->where('order_id','not in',$old_order_id)->field('order_id');
                             })->where('is_send','<>',3)->column('rec_id,goods_id');
         
-        $repeat_ids = $this->repeat_buy($all_order_goods); //重复购买商品id
+        $repeat_ids = $this->repeat_buy($user['distribut_level'],$all_order_goods); //重复购买商品id
         $all_ids = $repeat_ids['all_ids'];
         $goods_ids = $repeat_ids['goods_ids'];
         
@@ -301,13 +301,13 @@ class User extends MobileBase
     }
 
     //重复购买商品id
-    public function repeat_buy($all_order_goods)
+    public function repeat_buy($user_level,$all_order_goods)
     {
         $order_goods_count = array_count_values($all_order_goods); //统计键值
         $result = array('goods_ids'=>array(),'all_ids'=>array(),'first'=>array());
         
         foreach ($order_goods_count as $k1 => $v1) {
-            if ($v1 > 1) {
+            if ($user_level > 0) {
                 $result['goods_ids'][] = $k1;   //重复购买商品id
                 foreach ($all_order_goods as $k2 => $v2) {
                     if ($v2 == $k1) {

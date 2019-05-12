@@ -143,7 +143,7 @@ class Sales extends Model
 		$result = array('code'=>0);
 
 		//专员等级以上购买返佣
-		if ($user_level > 1) {
+		if ($user_level > 0) {
 			$my_prize = floatval($comm['preferential'][$user_level]);
 			if ($my_prize > 0) {
 				$user_id = $this->user_id;
@@ -169,7 +169,7 @@ class Sales extends Model
 					'order_id' => $this->order_id,
 					'goods_id' => $this->goods_id,
 					'num' => $order['goods_num'],
-					'type' => 2,
+					'type' => 1,
 					'distribut_type' => 1,
 					'status' => $status,
 					'create_time' => time(),
@@ -410,7 +410,7 @@ class Sales extends Model
 		$result = array('code' => 0);
 		
 		//专员等级以上购买返佣
-		if ($user_level > 1) {
+		if ($user_level > 0) {
 			$my_prize = floatval($comm['preferential'][$user_level]);
 			if ($my_prize > 0) {
 				$user_id = $this->user_id;
