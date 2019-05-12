@@ -262,7 +262,7 @@ class Distribution extends Base
         
         $where = [];
         $log_ids = '';
-        $where = $this->get_condition($type);
+        $where = get_comm_condition($type); //获取条件
         if($user_name){
             $user['nickname'] = ['like', "%$user_name%"];
             $id_list = M('users')->where($user)->column('user_id');
@@ -322,39 +322,6 @@ class Distribution extends Base
         $this->assign('count',$count);
         $this->assign('page', $show);
         return $this->fetch();
-    }
-
-    //返佣日志条件
-    public function get_condition($type)
-    {
-        $where = [];
-        //查询条件
-        switch ($type) {
-            case 0:
-                break;
-            case 1:
-                $where['type'] = ['in',[1,2]];
-                $where['distribut_type'] = ['in',[2]];
-                break;
-            case 2:
-                $where['type'] = ['in',[1,2]];
-                $where['distribut_type'] = ['in',[3]];
-                break;
-            case 3:
-                $where['type'] = ['in',[1,2]];
-                $where['distribut_type'] = ['in',[4]];
-                break;
-            case 4:
-                $where['type'] = 3;
-                break;
-            case 5:
-                $where['type'] = 4;
-                break;
-            default:
-                break;
-        }
-
-        return $where;
     }
     
     //返佣日志详情
