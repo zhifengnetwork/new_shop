@@ -620,6 +620,7 @@ class User extends MobileBase
     {
         $user_id = $this->user_id;
         // $id_array = $this->lower_id($user_id); //获取下级id列表
+        // dump($this->lower_id(8831));exit;
         
         // //获取对应下级id的数据
         // $team_list = M('users')->where('user_id','in',$id_array)->field('user_id,nickname,mobile,distribut_level,distribut_money,head_pic')->page(1,10)->select();
@@ -643,9 +644,12 @@ class User extends MobileBase
         $second_count = count($second);
         $third_count = count($third);
 
+        $team_count = Db::query("SELECT count(*) as count FROM tp_users where find_in_set('$user_id',`parents`)");
+
         $this->assign('first_count',$first_count);
         $this->assign('second_count',$second_count);
         $this->assign('third_count',$third_count);
+        $this->assign('team_count',$team_count[0]['count'] ? $team_count[0]['count'] : 0);
         $this->assign('leader',$leader);
         // $this->assign('count',$count);
         // $this->assign('team',$team_list);
