@@ -46,7 +46,10 @@ class Api extends Base {
         echo $html;
     }
     
-
+    public function shop(){
+        return null;
+    }
+    
     public function getTwon(){
     	$parent_id = I('get.parent_id/d');
     	$data = M('region')->where("parent_id",$parent_id)->select();

@@ -141,6 +141,42 @@ class Sales extends Model
 		$status = 1;
 		$data = array();
 		$result = array('code'=>0);
+
+		//专员等级以上购买返佣
+		if ($user_level > 1) {
+			$my_prize = floatval($comm['preferential'][$user_level]);
+			if ($my_prize > 0) {
+				$user_id = $this->user_id;
+				$total_money = $my_prize;
+				$user = M('users')->where('user_id',$user_id)->field('user_money,distribut_money')->find();
+				$my_user_money = $my_prize + $user['user_money'];
+				$my_distribut_money = $my_prize + $user['distribut_money'];
+				$bool = M('users')->where('user_id',$user_id)->update(['user_money'=>$my_user_money,'distribut_money'=>$my_distribut_money]);
+				$result['code'] = 0;
+				$status = 0;
+				if ($bool) {
+					$result['code'] = 1;
+					$status = 1;
+				}
+				
+				$msg = "自购优惠 ".$my_prize."（元），商品：".$order['goods_num']." 件";
+
+				$data[] = array(
+					'user_id' => $this->user_id,
+					'to_user_id' => $this->user_id,
+					'money' => $my_prize,
+					'order_sn' => $order['order_sn'],
+					'order_id' => $this->order_id,
+					'goods_id' => $this->goods_id,
+					'num' => $order['goods_num'],
+					'type' => 2,
+					'distribut_type' => 1,
+					'status' => $status,
+					'create_time' => time(),
+					'desc' => $msg
+				);
+			}
+		}
 		
 		foreach ($all_user as $key => $value) {
 			$money = 0;
@@ -370,12 +406,11 @@ class Sales extends Model
 		$msg = "";
 		$is_prize = false;
 		$total_money = 0;
-		$user_money = 0;
 		$data = array();
 		$result = array('code' => 0);
 		
-		//第二次购买返佣
-		if ($is_repeat) {
+		//专员等级以上购买返佣
+		if ($user_level > 1) {
 			$my_prize = floatval($comm['preferential'][$user_level]);
 			if ($my_prize > 0) {
 				$user_id = $this->user_id;
