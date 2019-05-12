@@ -745,7 +745,7 @@ class User extends MobileBase
         $log = M('commission_log')->where('add_user_id','in',$id_list)->where('user_id',$user_id)->where('identification',2)->order('id',desc)->limit(50)->select();
         if ($log) {
             foreach($log as $key => $value){
-                $log[$key]['nickname'] = $list[$value['add_user_id']]['nickname'];
+                $log[$key]['nickname'] = $list[$value['add_user_id']]['nickname'] ?: $list[$value['add_user_id']]['mobile'];
                 $log[$key]['mobile'] = $list[$value['add_user_id']]['mobile'];
             }
         }
