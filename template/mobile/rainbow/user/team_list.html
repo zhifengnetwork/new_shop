@@ -109,6 +109,23 @@
     .team_list{
         margin-bottom: .3rem;
     }
+
+    .top_team_level_count{
+        display:inline-block;
+        position: relative;
+        top:5px;
+        width:100%;
+        height:14px;
+        color:red;
+        font-size:12px;
+    }
+    .top_team_level_count span{
+        display:inline-block;
+        width:32.3%;
+        height:14px;
+        line-height: 14px;
+        text-align: center;
+    }
 </style>
 <div class="application-record">
     <notempty name="leader">
@@ -135,17 +152,37 @@
             </div>
         </ul> -->
         <ul class="re_tit">
-            <li>我的团队</li>
+            <li>我的团队 <span style="color:red;">{$team_count}</span></li>
         </ul>
         <!-- <ul class="re_tit">
             <li class="li1">团队总人数：</li>
             <li class="li1" id="team_count"></li>
             <li class="li2"></li>
         </ul> -->
+        <p class="top_team_level_count">
+            <span>{$first_count}</span>
+            <span>{$second_count}</span>
+            <span>{$third_count}</span>
+        </p>
         <ul class="re_tit tab1">
-            <li class="li1"><span><p>{$first_count}</p><a href="javascript:void(0)" onclick="get_distribut(1)">一级分销</a></span></li>
-            <li class="li1"><span><p>{$second_count}</p><a href="javascript:void(0)" onclick="get_distribut(2)">二级分销</a></span></li>
-            <li class="li1"><span><p>{$third_count}</p><a href="javascript:void(0)" onclick="get_distribut(3)">三级分销</a></span></li>
+            <li class="li1">
+                <span>
+                    <!-- <p>{$first_count}</p> -->
+                    <a href="javascript:void(0)" onclick="get_distribut(1)">一级分销</a>
+                </span>
+            </li>
+            <li class="li1">
+                <span>
+                    <!-- <p>{$second_count}</p> -->
+                    <a href="javascript:void(0)" onclick="get_distribut(2)">二级分销</a>
+                </span>
+            </li>
+            <li class="li1">
+                <span>
+                    <!-- <p>{$third_count}</p> -->
+                    <a href="javascript:void(0)" onclick="get_distribut(3)">三级分销</span></a>
+                </span>
+            </li>
         </ul>
         <ul class="re_tit">
             <li class="li1"><span>用户</span></li>
