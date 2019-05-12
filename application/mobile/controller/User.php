@@ -103,8 +103,10 @@ class User extends MobileBase
             }
             $this->assign('agnet_name', $agnet_name);
         }
+
         $MenuCfg = new MenuCfg();
         $menu_list = $MenuCfg->where('is_show', 1)->order('menu_id asc')->select();
+        
         $comm = $this->today_commission();
         $this->user['today_comm'] = $comm;
         $this->assign('menu_list', $menu_list);
@@ -658,26 +660,26 @@ class User extends MobileBase
                 break;
             //二级
             case 2:
-                $user_id = M('users')->whereIn('first_leader',function($query) use ($user_id) {
-                    $query->name('users')->where('first_leader',$user_id)->field('user_id');
-                })->column('user_id');
-                $where['first_leader'] = ['in',$user_id];
+                $first = M('users')->where('first_leader',$user_id)->column('user_id');
+                $second = $first ? M('users')->where(['first_leader'=>['in',$first]])->column('user_id') : [];
+                $where['first_leader'] = $second ? ['in',$second] : array();
                 break;
             //三级
             case 3:
-                $user_id = M('users')->whereIn('first_leader',function($query) use ($user_id) {
-                    $query->name('users')->whereIn('first_leader',function($query) use ($user_id) {
-                        $query->name('users')->where('first_leader',$user_id)->field('user_id');
-                    })->field('user_id');
-                })->column('user_id');
-                $where['first_leader'] = ['in',$user_id];
+                $first = M('users')->where('first_leader',$user_id)->column('user_id');
+                $second = $first ? M('users')->where(['first_leader'=>['in',$first]])->column('user_id') : [];
+                $third = $second ? M('users')->where(['first_leader'=>['in',$second]])->column('user_id') : [];
+                $where['first_leader'] = $third ? ['in',$third] : array();
                 break;
             default: break; 
         }
         
-        //获取对应下级id的数据
-        $team_list = M('users')->where($where)->field('user_id,nickname,mobile,distribut_level,distribut_money,head_pic')->page($page,15)->select();
-
+        $team_list = array();
+        if ($where['first_leader']) {
+            //获取对应下级id的数据
+            $team_list = M('users')->where($where)->field('user_id,nickname,mobile,distribut_level,distribut_money,head_pic')->page($page,15)->select();
+        }
+        
         $level = M('agent_level')->column('level,level_name');
         
         foreach($team_list as $k1 => $v1){

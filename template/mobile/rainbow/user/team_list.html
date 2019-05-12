@@ -231,7 +231,7 @@
                     $('.team_list').append(html);
                 } else {
                     if($('.team_list').children().length == 0){
-                        $('.team_list').html("暂无数据");
+                        $('#getmore').html("暂无数据");
                     } else {
                         $('#getmore').html("没有更多数据啦");
                     }
@@ -239,9 +239,9 @@
             }
         });
         
-        if ($('.team_list').children().length < 15) {
-            $('#getmore').html("没有更多数据啦");
-        }
+        // if ($('.team_list').children().length < 15) {
+        //     $('#getmore').html("没有更多数据啦");
+        // }
     }
 
     $(window).scroll(
