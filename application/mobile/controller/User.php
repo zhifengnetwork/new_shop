@@ -635,6 +635,17 @@ class User extends MobileBase
         $leader_id = M('users')->where('user_id',$user_id)->value('first_leader');
         $leader = M('users')->where('user_id',$leader_id)->field('nickname,mobile,head_pic')->find();
         
+        $first = M('users')->where('first_leader',$user_id)->column('user_id');
+        $second = $first ? M('users')->where(['first_leader'=>['in',$first]])->column('user_id') : [];
+        $third = $second ? M('users')->where(['first_leader'=>['in',$second]])->column('user_id') : [];
+
+        $first_count = count($first);
+        $second_count = count($second);
+        $third_count = count($third);
+
+        $this->assign('first_count',$first_count);
+        $this->assign('second_count',$second_count);
+        $this->assign('third_count',$third_count);
         $this->assign('leader',$leader);
         // $this->assign('count',$count);
         // $this->assign('team',$team_list);
@@ -1065,7 +1076,7 @@ class User extends MobileBase
                 $result[$key]['status'] = 1;
             }
         }
-        
+
         return json($result);
     }
 
