@@ -267,9 +267,9 @@
 		<div class="nav">
 			<span><a href="{:U('Mobile/Goods/goodsList',array('id'=>$goods_id))}"><img src="__STATIC__/images/goods.png"/><p>每日好货</p></a></span>
 			<span><a href="{:U('Mobile/User/sign_list')}"><img src="__STATIC__/images/sign_in.gif"/><p>现金签到</p></a></span>
-			<span><a href="#"><img src="__STATIC__/images/the_pig.png"/><p>猪年大发</p></a></span>
 			<span><a href="{:U('Mobile/Goods/goodsList',array('id'=>$black_technology))}"><img src="__STATIC__/images/black_technology.png"/><p>黑科技馆</p></a></span>
-			<span><a href="{:U('Mobile/Goods/goodsList',array('id'=>$quantum))}"><img src="__STATIC__/images/quantum.png"/><p>量子馆</p></a></span>
+			<span><a href="{:U('Mobile/Goods/goodsList',array('id'=>$quantum))}"><img src="__STATIC__/images/quantum.png"/><p>量子体验</p></a></span>
+			<span><a href="#"><img src="__STATIC__/images/the_pig.png"/><p>猪年大发</p></a></span>
 		</div>
 
 		<!--nav区域结束-->
@@ -328,6 +328,9 @@
 		<script type="text/javascript">
 		</script>
 		<script>
+			$(document).ready(function(){ 
+				ajax_sourch_submit();
+			});
 			/**
 			* 继续加载猜您喜欢
 			* */
