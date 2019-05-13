@@ -334,7 +334,7 @@ class Distribution extends Base
         $id = input('id/d');
         $detail = M('distrbut_commission_log')->where('log_id',$id)->find();
 
-        $is_type = 6;
+        $is_type = 4;
         
         $this->assign('is_type',$is_type);
         $this->assign('detail',$detail);
