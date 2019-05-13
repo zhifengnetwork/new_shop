@@ -1039,36 +1039,6 @@ class User extends MobileBase
         $result = array();
         
         if ($type == 'income') {
-            // $where = [];
-            // //查询条件
-            // switch ($distribut_type) {
-            //     case 0:
-            //         break;
-            //     case 1:
-            //         $where['type'] = ['in',[1,2]];
-            //         $where['distribut_type'] = ['in',[2]];
-            //         break;
-            //     case 2:
-            //         $where['type'] = ['in',[1,2]];
-            //         $where['distribut_type'] = ['in',[3]];
-            //         break;
-            //     case 3:
-            //         $where['type'] = ['in',[1,2]];
-            //         $where['distribut_type'] = ['in',[4]];
-            //         break;
-            //     case 4:
-            //         $where['type'] = 3;
-            //         break;
-            //     case 5:
-            //         $where['type'] = ['in',[1,2]];
-            //         $where['distribut_type'] = ['in',[1]];
-            //         break;
-            //     case 6:
-            //         $where['type'] = 4;
-            //         break;
-            //     default:
-            //         break;
-            // }
             $where = get_comm_condition($distribut_type); //获取条件
 
             $result = M('distrbut_commission_log')->where('to_user_id',$user_id)->where($where)->order('create_time','desc')->field('log_id,money,status,order_id,create_time')->page($page,15)->select();

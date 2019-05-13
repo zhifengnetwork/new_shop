@@ -97,9 +97,9 @@ class Distribution extends Base
             }
         }
         if ($data['act'] == 'del') {
-			$level = M('agent_level')->where('level_id',$data['level_id'])->value('level');
+            $level = M('agent_level')->where('level_id',$data['level_id'])->value('level');
             $r = D('agent_level')->where('level_id=' . $data['level_id'])->delete();
-			M('goods_commission')->where('level',$level)->delete();
+            M('goods_commission')->where('level',$level)->delete();
             if ($r !== false) {
                 $return = ['status' => 1, 'msg' => '删除成功', 'result' => ''];
             } else {
@@ -220,6 +220,7 @@ class Distribution extends Base
         }
         
         $total_per = $Ad->where($where)->sum('money');
+        
         $this->assign('total_per',$total_per);
         $this->assign('user_name',$user_name);
         $this->assign('start_time',$start_time);
@@ -306,7 +307,10 @@ class Distribution extends Base
                 $list[$key]['to_user_head_pic'] = $avatar[$value['to_user_id']];
             }
         }
+
+        $is_type = 6;
         
+        $this->assign('is_type',$is_type);
         $this->assign('type',$type);
         $this->assign('user_type',$user_type);
         $this->assign('log_ids',$log_ids);
@@ -330,6 +334,9 @@ class Distribution extends Base
         $id = input('id/d');
         $detail = M('distrbut_commission_log')->where('log_id',$id)->find();
 
+        $is_type = 6;
+        
+        $this->assign('is_type',$is_type);
         $this->assign('detail',$detail);
         return $this->fetch();
     }
