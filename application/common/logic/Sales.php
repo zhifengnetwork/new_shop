@@ -92,12 +92,11 @@ class Sales extends Model
 		// 			 ->join('order order','goods.order_id = order.order_id')
 		// 			 ->where(['goods.goods_id'=>$this->goods_id,'order.user_id'=>$this->user_id])
 		// 			 ->count();
-
 		$order_goods = M('order_goods')->where(['goods_id'=>$goods_id])->select();
 
 		if ($order_goods) {
 			$ids = array_column($order_goods,'order_id');
-			$order_num = M('order')->where('user_id',$user_id)->where('order_id','in',$ids)->count();
+			$order_num = M('order')->where('user_id',$user_id)->where('order_id','in',$ids)->where('pay_status',1)->count();
 		}
 		
 		if ($order_num > 1) {
