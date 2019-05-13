@@ -367,7 +367,7 @@ class Distribution extends Base
         $strTable .= '</tr>';
         
         $condition = array();
-        $condition = $this->get_condition($type);
+        $condition = get_comm_condition($type); //获取条件
         if ($log_ids) {
             $condition['log_id'] = ['in', explode(',',$log_ids)];
         }
