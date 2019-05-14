@@ -34,16 +34,16 @@
 }
 .layui-layer-content img:nth-child(1){
 	
-	height: 80%!important;
+	height: 74%!important;
 	
 }
 .layui-layer-content img:last-child{
 	
 	
-	width: 20%!important;
-	height: 20%!important;
+	width: 25%!important;
+	height: 25%!important;
 	position: absolute;
-	bottom: .05rem!important;
+	bottom: .1rem!important;
 	
 	
 }
@@ -137,7 +137,7 @@
             <div class="scunde p">
                 <span class="red" id="price">￥{$goods.shop_price}</span>
                 <span id="market_price_title">市场价：</span><span class="linethr" id="market_price">{$goods.market_price}</span>
-                <img src="/public/static/images/erweima.png"  style="float: right;width: 1rem;" onclick="share_icon();"/>
+                <img src="/public/static/images/erweimafengxiang.jpg"  style="float: right;width: 1.5rem;" onclick="share_icon();"/>
                 <p class="inlist">
                     <if condition="$goods.prom_type neq 2"><span style="float:left;">销量：{$goods['sales_sum']+$goods['virtual_sales_sum']}</span></if>
                     <!--<span >当前库存：<span class="spec_store_count">{$goods.store_count}</span></span>-->
@@ -1410,7 +1410,7 @@
                     <img style="width:100%; height:40%;" src="`+src+`" />
                     <p>`+name+`</p>
                     <p style="display:inline-block;color:red;hieght:10%;line-height:10%;">￥ `+price+`</p>
-                    <img style="width:50%; height:40%;position:absolute; right:20px;bottom:20px;" src="/Mobile/Goods/goods_share_qrcode?url=`+share_url+`" />
+                    <img style="width:50%; height:40%;position:absolute; right:20px;bottom:28px;" src="/Mobile/Goods/goods_share_qrcode?url=`+share_url+`" />
                 </div>
                 `;
             

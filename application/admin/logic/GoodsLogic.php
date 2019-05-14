@@ -231,7 +231,6 @@ class GoodsLogic extends Model
        }
         $str .="<td><b>购买价</b></td>
                <td><b>成本价</b></td>
-               <td><b>佣金</b></td>
                <td><b>库存</b></td>
                <td><b>SKU</b></td>
                <td><b>操作</b></td>
@@ -239,7 +238,6 @@ class GoodsLogic extends Model
         if(count($spec_arr2) > 0){
             $str_fill .='<td><input id="item_price" value="0" onkeyup="this.value=this.value.replace(/[^\d.]/g,&quot;&quot;)" onpaste="this.value=this.value.replace(/[^\d.]/g,&quot;&quot;)"></td>
                <td><input id="item_cost_price" value="0" onkeyup="this.value=this.value.replace(/[^\d.]/g,&quot;&quot;)" onpaste="this.value=this.value.replace(/[^\d.]/g,&quot;&quot;)"></td>
-               <td><input id="item_commission" value="0" onkeyup="this.value=this.value.replace(/[^\d.]/g,&quot;&quot;)" onpaste="this.value=this.value.replace(/[^\d.]/g,&quot;&quot;)"></td>
                <td><input id="item_store_count" value="0" onkeyup="this.value=this.value.replace(/[^\d.]/g,&quot;&quot;)" onpaste="this.value=this.value.replace(/[^\d.]/g,&quot;&quot;)"></td>
                <td><input id="item_sku" value="" onkeyup="this.value=this.value.replace(/[^\d.]/g,&quot;&quot;)" onpaste="this.value=this.value.replace(/[^\d.]/g,&quot;&quot;)"></td>
                <td><button id="item_fill" type="button" class="btn btn-success">批量填充</button></td>
@@ -263,10 +261,10 @@ class GoodsLogic extends Model
 			$keySpecGoodsPrice[$item_key][price] ? false : $keySpecGoodsPrice[$item_key][price] = 0; // 价格默认为0
 			$keySpecGoodsPrice[$item_key][store_count] ? false : $keySpecGoodsPrice[$item_key][store_count] = 0; //库存默认为0
 			$keySpecGoodsPrice[$item_key][cost_price] ? false : $keySpecGoodsPrice[$item_key][cost_price] = 0; //成本价默认为0
-			$keySpecGoodsPrice[$item_key][commission] ? false : $keySpecGoodsPrice[$item_key][commission] = 0; //佣金默认为0
+			// $keySpecGoodsPrice[$item_key][commission] ? false : $keySpecGoodsPrice[$item_key][commission] = 0; //佣金默认为0
             $str .="<td><input name='item[$item_key][price]' value='{$keySpecGoodsPrice[$item_key][price]}' onkeyup='this.value=this.value.replace(/[^\d.]/g,\"\")' onpaste='this.value=this.value.replace(/[^\d.]/g,\"\")' /></td>";
            $str .="<td><input name='item[$item_key][cost_price]' value='{$keySpecGoodsPrice[$item_key][cost_price]}' onkeyup='this.value=this.value.replace(/[^\d.]/g,\"\")' onpaste='this.value=this.value.replace(/[^\d.]/g,\"\")' /></td>";
-           $str .="<td><input name='item[$item_key][commission]' value='{$keySpecGoodsPrice[$item_key][commission]}' onkeyup='this.value=this.value.replace(/[^\d.]/g,\"\")' onpaste='this.value=this.value.replace(/[^\d.]/g,\"\")' /></td>";
+        //    $str .="<td><input name='item[$item_key][commission]' value='{$keySpecGoodsPrice[$item_key][commission]}' onkeyup='this.value=this.value.replace(/[^\d.]/g,\"\")' onpaste='this.value=this.value.replace(/[^\d.]/g,\"\")' /></td>";
             $str .="<td><input name='item[$item_key][store_count]' value='{$keySpecGoodsPrice[$item_key][store_count]}' onkeyup='this.value=this.value.replace(/[^\d.]/g,\"\")' onpaste='this.value=this.value.replace(/[^\d.]/g,\"\")'/></td>";            
             $str .="<td><input name='item[$item_key][sku]' value='{$keySpecGoodsPrice[$item_key][sku]}' /><input type='hidden' name='item[$item_key][key_name]' value='$item_name' /></td>";
             $str .="<td><button type='button' class='btn btn-default delete_item'>无效</button></td>";
