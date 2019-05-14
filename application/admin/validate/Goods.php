@@ -20,7 +20,7 @@ class Goods extends Validate
         'is_virtual' => 'checkVirtualIndate',
         'exchange_integral' => 'checkExchangeIntegral',
         'is_free_shipping' => 'require|checkShipping',
-        'commission' => 'checkCommission',
+        // 'commission' => 'checkCommission',
         'ladder_amount' => 'checkLadderAmount',
         'ladder_price' => 'checkLadderPrice',
         'virtual_limit' => 'checkVirtualLimit',
