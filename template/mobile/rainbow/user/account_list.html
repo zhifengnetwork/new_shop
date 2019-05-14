@@ -116,10 +116,10 @@ body{
  /* ddddd */
 }
 .wu{
-	color:gray;
-	margin-top:2rem;
-	font-size:.5rem;
-	text-align:center;
+    color:gray;
+    margin-top:2rem;
+    font-size:.5rem;
+    text-align:center;
 }
 .list_item li p{
     margin-bottom: 0.2rem;
@@ -144,7 +144,7 @@ body{
         <div class="allpion">
             <div class="fll_acc fll_acc-h">
               <ul><li class="orderid-h">订单</li><li class="price-h">金额</li><li class="time-h">时间</li></ul>
-            </div>  	
+            </div>      
               <foreach name="account_log" item="v">
                   <div class="fll_acc" onclick="ajax_account_detail(this)" data-url="{:U('Mobile/User/account_detail',['log_id'=>$v['log_id']])}">
                       <ul>
@@ -177,11 +177,12 @@ body{
                 <!-- 第二层导航 -->
                 <ul id="tab22">
                     <li class="active" onclick="all_record('income',0)">全部</li> <!-- 默认选中哪个，就让哪个active -->
-                    <li onclick="all_record('income',1)">级别利润</li>
-                    <li onclick="all_record('income',2)">每台奖励</li>
+                    <li onclick="all_record('income',1)">级差奖</li>
+                    <li onclick="all_record('income',2)">直推奖</li>
                     <li onclick="all_record('income',3)">同级奖励</li>
                     <li onclick="all_record('income',4)">分红</li>
-                    <li onclick="all_record('income',5)">全球分红</li>
+                    <li onclick="all_record('income',5)">自购优惠</li>
+                    <li onclick="all_record('income',6)">全球分红</li>
                 </ul>
                 <div class="box_box"> 
                     <div class="box2" style="display:block;">
@@ -198,6 +199,9 @@ body{
                     </div>
                     <div class="box2">
                        
+                    </div>
+                    <div class="box2">
+                      
                     </div>
                     <div class="box2">
                       
@@ -264,8 +268,8 @@ body{
             url: '/mobile/user/get_record',
             success: function(data){
                 // console.log(data);
-            	$(".box_box .box2").removeClass("wu")
-            	$(".box1 .tit").removeClass("wu")
+                $(".box_box .box2").removeClass("wu")
+                $(".box1 .tit").removeClass("wu")
                 if (data.length > 0) {
                     bool = true;
                     page ++;
@@ -288,7 +292,7 @@ body{
                         $(".box_box .box2").addClass("wu")
                         $(".box_box .box2").eq(distribut_type).html("暂无数据")
                     }
-                	if ($(".box1 .tit").children().length == 0) {
+                    if ($(".box1 .tit").children().length == 0) {
                         $(".box1 .tit").addClass("wu")
                         $(".box1 .tit").html("暂无数据");
                     }

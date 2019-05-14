@@ -92,12 +92,11 @@ class Sales extends Model
 		// 			 ->join('order order','goods.order_id = order.order_id')
 		// 			 ->where(['goods.goods_id'=>$this->goods_id,'order.user_id'=>$this->user_id])
 		// 			 ->count();
-
 		$order_goods = M('order_goods')->where(['goods_id'=>$goods_id])->select();
 
 		if ($order_goods) {
 			$ids = array_column($order_goods,'order_id');
-			$order_num = M('order')->where('user_id',$user_id)->where('order_id','in',$ids)->count();
+			$order_num = M('order')->where('user_id',$user_id)->where('order_id','in',$ids)->where('pay_status',1)->count();
 		}
 		
 		if ($order_num > 1) {
@@ -138,11 +137,49 @@ class Sales extends Model
 		$msg = "";
 		$is_prize = false;
 		$total_money = 0;
+		$status = 1;
 		$data = array();
 		$result = array('code'=>0);
+
+		//专员等级以上购买返佣
+		if ($user_level > 0) {
+			$my_prize = floatval($comm['preferential'][$user_level]);
+			if ($my_prize > 0) {
+				$user_id = $this->user_id;
+				$total_money = $my_prize;
+				$user = M('users')->where('user_id',$user_id)->field('user_money,distribut_money')->find();
+				$my_user_money = $my_prize + $user['user_money'];
+				$my_distribut_money = $my_prize + $user['distribut_money'];
+				$bool = M('users')->where('user_id',$user_id)->update(['user_money'=>$my_user_money,'distribut_money'=>$my_distribut_money]);
+				$result['code'] = 0;
+				$status = 0;
+				if ($bool) {
+					$result['code'] = 1;
+					$status = 1;
+				}
+				
+				$msg = "自购优惠 ".$my_prize."（元），商品：".$order['goods_num']." 件";
+
+				$data[] = array(
+					'user_id' => $this->user_id,
+					'to_user_id' => $this->user_id,
+					'money' => $my_prize,
+					'order_sn' => $order['order_sn'],
+					'order_id' => $this->order_id,
+					'goods_id' => $this->goods_id,
+					'num' => $order['goods_num'],
+					'type' => 1,
+					'distribut_type' => 1,
+					'status' => $status,
+					'create_time' => time(),
+					'desc' => $msg
+				);
+			}
+		}
 		
 		foreach ($all_user as $key => $value) {
 			$money = 0;
+			$user_money = 0;
 			// //没有等级没有奖励
 			// if ($value['distribut_level'] <= 0) {
 			// 	continue;
@@ -168,17 +205,37 @@ class Sales extends Model
 				if ($layer > 2) {
 					continue;
 				}
-
+				//直推奖，直推奖已奖励的不再奖励
 				if (!$is_prize) {
 					$money = $basic_reward ? $basic_reward[$value['distribut_level']] : 0;
 					$is_prize = true;
 					$msg = "直推奖 ";
 					$distribut_type = 2;
-				} else {
-					$msg = "同级奖 ";
-					$distribut_type = 4;
+					$msg = $msg.$money."（元），商品：".$order['goods_num']." 件";
+
+					if ($money > 0) {
+						$user_money += $money;
+						
+						$data[] = array(
+							'user_id' => $this->user_id,
+							'to_user_id' => $value['user_id'],
+							'money' => $money,
+							'order_sn' => $order['order_sn'],
+							'order_id' => $this->order_id,
+							'goods_id' => $this->goods_id,
+							'num' => $order['goods_num'],
+							'type' => 1,
+							'distribut_type' => $distribut_type,
+							'status' => $status,
+							'create_time' => time(),
+							'desc' => $msg
+						);
+					}
 				}
-				
+				$msg = "同级奖 ";
+				$distribut_type = 4;
+				$money = 0;
+				//同级奖
 				switch($layer){
 					case 1:
 						$money += $first_layer[$value['distribut_level']] * $order['goods_num'];
@@ -191,21 +248,58 @@ class Sales extends Model
 				}
 				
 				$msg = $msg.$money."（元），商品：".$order['goods_num']." 件";
+				if ($money > 0) {
+					$user_money += $money;
+					
+					$data[] = array(
+						'user_id' => $this->user_id,
+						'to_user_id' => $value['user_id'],
+						'money' => $money,
+						'order_sn' => $order['order_sn'],
+						'order_id' => $this->order_id,
+						'goods_id' => $this->goods_id,
+						'num' => $order['goods_num'],
+						'type' => 1,
+						'distribut_type' => $distribut_type,
+						'status' => $status,
+						'create_time' => time(),
+						'desc' => $msg
+					);
+				}
 			}
 			//极差奖
 			if ($user_level < $value['distribut_level']) {
 				$layer = 0;
-				$msg = "极差奖 ";
-				$distribut_type = 3;
 
-				//基本奖励已奖励的不再奖励
+				//直推奖，直推奖已奖励的不再奖励
 				if (!$is_prize) {
 					$money = $basic_reward ? $basic_reward[$value['distribut_level']] : 0;
 					$is_prize = true;
 					$msg = "直推奖 ";
+					$msg = $msg.$money."（元），商品：".$order['goods_num']." 件";
 					$distribut_type = 2;
+
+					if ($money > 0) {
+						$user_money += $money;
+						$data[] = array(
+							'user_id' => $this->user_id,
+							'to_user_id' => $value['user_id'],
+							'money' => $money,
+							'order_sn' => $order['order_sn'],
+							'order_id' => $this->order_id,
+							'goods_id' => $this->goods_id,
+							'num' => $order['goods_num'],
+							'type' => 1,
+							'distribut_type' => $distribut_type,
+							'status' => $status,
+							'create_time' => time(),
+							'desc' => $msg
+						);
+					}
 				}
-				
+				$msg = "极差奖 ";
+				$distribut_type = 3;
+				$money = 0;
 				reset($poor_prize);	//重置数组指针
 				
 				//计算极差奖金
@@ -220,17 +314,34 @@ class Sales extends Model
 					}
 					break;
 				}
-				
 				$user_level = $value['distribut_level'];
 				$msg = $msg.$money."（元），商品：".$order['goods_num']." 件";
+				if ($money > 0) {
+					$user_money += $money;
+
+					$data[] = array(
+						'user_id' => $this->user_id,
+						'to_user_id' => $value['user_id'],
+						'money' => $money,
+						'order_sn' => $order['order_sn'],
+						'order_id' => $this->order_id,
+						'goods_id' => $this->goods_id,
+						'num' => $order['goods_num'],
+						'type' => 1,
+						'distribut_type' => $distribut_type,
+						'status' => $status,
+						'create_time' => time(),
+						'desc' => $msg
+					);
+				}
 			}
-			if (!$money) {
+			if (!$user_money) {
 				continue;
 			}
 			
-			$total_money += $money;
-			$user_money = $money+$value['user_money'];
-			$distribut_money = $money+$value['distribut_money'];
+			$total_money += $user_money;
+			$user_money += $value['user_money'];
+			$distribut_money = $user_money+$value['distribut_money'];
 			
 			$bool = M('users')->where('user_id',$value['user_id'])->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
 			
@@ -238,23 +349,7 @@ class Sales extends Model
 			$status = 0;
 			if ($bool) {
 				$result['code'] = 1;
-				$status = 1;
-			} 
-
-			$data[] = array(
-				'user_id' => $this->user_id,
-				'to_user_id' => $value['user_id'],
-				'money' => $money,
-				'order_sn' => $order['order_sn'],
-				'order_id' => $this->order_id,
-				'goods_id' => $this->goods_id,
-				'num' => $order['goods_num'],
-				'type' => 1,
-				'distribut_type' => $distribut_type,
-				'status' => $status,
-				'create_time' => time(),
-				'desc' => $msg
-			);
+			}
 		}
 		
 		if ($data) {
@@ -268,6 +363,11 @@ class Sales extends Model
 			);
 
 			$this->writeLog($data,$divide);
+
+			if (!$bool) {
+				M('distrbut_commission_log')->where(['user_id'=>$this->user_id,'order_id'=>$this->order_id,'goods_id'=>$this->goods_id])->update(['status'=>0]);
+				M('order_divide')->where(['user_id'=>$this->user_id,'order_id'=>$this->order_id,'goods_id'=>$this->goods_id])->update(['status'=>0]);
+			}
 		}
 
 		return $result;
@@ -308,8 +408,8 @@ class Sales extends Model
 		$data = array();
 		$result = array('code' => 0);
 		
-		//第二次购买返佣
-		if ($is_repeat) {
+		//专员等级以上购买返佣
+		if ($user_level > 0) {
 			$my_prize = floatval($comm['preferential'][$user_level]);
 			if ($my_prize > 0) {
 				$user_id = $this->user_id;
@@ -347,6 +447,7 @@ class Sales extends Model
 		//第二次购买上级返佣
 		foreach ($all_user as $key => $value) {
 			$money = 0;
+			$user_money = 0;
 			// //没有等级没有奖励
 			// if ($value['distribut_level'] <= 0) {
 			// 	continue;
@@ -372,17 +473,38 @@ class Sales extends Model
 				if ($layer > 2) {
 					continue;
 				}
-
+				//直推奖，直推奖已奖励的不再奖励
 				if (!$is_prize) {
 					$money = $basic_reward ? $basic_reward[$value['distribut_level']] : 0;
 					$is_prize = true;
 					$msg = "重复购买直推奖 ";
 					$distribut_type = 2;
-				} else {
-					$msg = "重复购买同级奖 ";
-					$distribut_type = 4;
-				}
-				
+
+					$msg = $msg.$money."（元），商品：".$order['goods_num']." 件";
+
+					if ($money > 0) {
+						$user_money += $money;
+						
+						$data[] = array(
+							'user_id' => $this->user_id,
+							'to_user_id' => $value['user_id'],
+							'money' => $money,
+							'order_sn' => $order['order_sn'],
+							'order_id' => $this->order_id,
+							'goods_id' => $this->goods_id,
+							'num' => $order['goods_num'],
+							'type' => 2,
+							'distribut_type' => $distribut_type,
+							'status' => $status,
+							'create_time' => time(),
+							'desc' => $msg
+						);
+					}
+				} 
+				$msg = "重复购买同级奖 ";
+				$distribut_type = 4;
+				$money = 0;
+				//同级奖
 				switch($layer){
 					case 1:
 						$money += $first_layer[$user_level] * $order['goods_num'];
@@ -395,21 +517,58 @@ class Sales extends Model
 				}
 				
 				$msg = $msg.$money."（元），商品：".$order['goods_num']." 件";
+
+				if ($money > 0) {
+					$user_money += $money;
+					
+					$data[] = array(
+						'user_id' => $this->user_id,
+						'to_user_id' => $value['user_id'],
+						'money' => $money,
+						'order_sn' => $order['order_sn'],
+						'order_id' => $this->order_id,
+						'goods_id' => $this->goods_id,
+						'num' => $order['goods_num'],
+						'type' => 2,
+						'distribut_type' => $distribut_type,
+						'status' => $status,
+						'create_time' => time(),
+						'desc' => $msg
+					);
+				}
 			}
 			//极差奖
 			if ($user_level < $value['distribut_level']) {
 				$layer = 0;
-				$msg = "重复购买极差奖 ";
-				$distribut_type = 3;
 
-				//基本奖励已奖励的不再奖励
+				//直推奖，直推奖已奖励的不再奖励
 				if (!$is_prize) {
 					$money = $basic_reward ? $basic_reward[$value['distribut_level']] : 0;
 					$is_prize = true;
 					$msg = "重复购买直推奖 ";
 					$distribut_type = 2;
+
+					if ($money > 0) {
+						$user_money += $money;
+						$data[] = array(
+							'user_id' => $this->user_id,
+							'to_user_id' => $value['user_id'],
+							'money' => $money,
+							'order_sn' => $order['order_sn'],
+							'order_id' => $this->order_id,
+							'goods_id' => $this->goods_id,
+							'num' => $order['goods_num'],
+							'type' => 2,
+							'distribut_type' => $distribut_type,
+							'status' => $status,
+							'create_time' => time(),
+							'desc' => $msg
+						);
+					}
 				}
-				
+				$msg = "重复购买极差奖 ";
+				$distribut_type = 3;
+				$money = 0;
 				reset($poor_prize);	//重置数组指针
 				
 				//计算极差奖金
@@ -427,14 +586,32 @@ class Sales extends Model
 				
 				$user_level = $value['distribut_level'];
 				$msg = $msg.$money."（元），商品：".$order['goods_num']." 件";
+
+				if ($money > 0) {
+					$user_money += $money;
+					$data[] = array(
+						'user_id' => $this->user_id,
+						'to_user_id' => $value['user_id'],
+						'money' => $money,
+						'order_sn' => $order['order_sn'],
+						'order_id' => $this->order_id,
+						'goods_id' => $this->goods_id,
+						'num' => $order['goods_num'],
+						'type' => 2,
+						'distribut_type' => $distribut_type,
+						'status' => $status,
+						'create_time' => time(),
+						'desc' => $msg
+					);
+				}
 			}
-			if (!$money) {
+			if (!$user_money) {
 				continue;
 			}
 			
-			$total_money += $money;
-			$user_money = $money+$value['user_money'];
-			$distribut_money = $money+$value['distribut_money'];
+			$total_money += $user_money;
+			$user_money += $value['user_money'];
+			$distribut_money = $user_money+$value['distribut_money'];
 			
 			$bool = M('users')->where('user_id',$value['user_id'])->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
 			
@@ -444,21 +621,6 @@ class Sales extends Model
 				$result['code'] = 1;
 				$status = 1;
 			}
-
-			$data[] = array(
-				'user_id' => $this->user_id,
-				'to_user_id' => $value['user_id'],
-				'money' => $money,
-				'order_sn' => $order['order_sn'],
-				'order_id' => $this->order_id,
-				'goods_id' => $this->goods_id,
-				'num' => $order['goods_num'],
-				'type' => 2,
-				'distribut_type' => $distribut_type,
-				'status' => $status,
-				'create_time' => time(),
-				'desc' => $msg
-			);
 		}
 
 		if ($data) {
@@ -472,6 +634,11 @@ class Sales extends Model
 			);
 
 			$this->writeLog($data,$divide);
+
+			if (!$bool) {
+				M('distrbut_commission_log')->where(['user_id'=>$this->user_id,'order_id'=>$this->order_id,'goods_id'=>$this->goods_id])->update(['status'=>0]);
+				M('order_divide')->where(['user_id'=>$this->user_id,'order_id'=>$this->order_id,'goods_id'=>$this->goods_id])->update(['status'=>0]);
+			}
 		}
 		
 		return $result;
@@ -596,6 +763,7 @@ class Sales extends Model
 	//订单信息
 	public function order()
 	{
+		$order_sn = M('order')->where('order_id',$this->order_id)->value('order_sn');
 		$order_goods = M('order_goods')
 						->where('order_id',$this->order_id)
 						->where('goods_id',$this->goods_id)
@@ -604,6 +772,8 @@ class Sales extends Model
 		if (!$order_goods) {
 			return array('msg'=>"没有该商品的订单信息",'code'=>0);
 		}
+
+		$order_goods['order_sn'] = $order_sn;
 
 		return array('data'=>$order_goods,'code'=>1);
 	}

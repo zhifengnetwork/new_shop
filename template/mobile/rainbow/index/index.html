@@ -265,16 +265,17 @@
 		<!--nav区域开始-->
 
 		<div class="nav">
-			<span><a href="{:U('Mobile/Goods/goodsList',array('id'=>$id))}"><img src="__STATIC__/images/goods.png"/><p>每日好货</p></a></span>
-			<span><a href="{:U('Mobile/User/sign_list')}"><img src="__STATIC__/images/sign_in.png"/><p>现金签到</p></a></span>
-			<span><img src="__STATIC__/images/the_pig.png"/><p>猪年大发</p></span>
-			<span><img src="__STATIC__/images/black_technology.png"/><p>黑科技馆</p></span>
+			<span><a href="{:U('Mobile/Goods/goodsList',array('id'=>$goods_id))}"><img src="__STATIC__/images/goods.png"/><p>每日好货</p></a></span>
+			<span><a href="{:U('Mobile/User/sign_list')}"><img src="__STATIC__/images/sign_in.gif"/><p>现金签到</p></a></span>
+			<span><a href="{:U('Mobile/Goods/goodsList',array('id'=>$black_technology))}"><img src="__STATIC__/images/black_technology.png"/><p>黑科技馆</p></a></span>
+			<span><a href="{:U('Mobile/Goods/goodsList',array('id'=>$quantum))}"><img src="__STATIC__/images/quantum.png"/><p>量子体验</p></a></span>
+			<span><a href="#"><img src="__STATIC__/images/the_pig.gif"/><p>猪年大发</p></a></span>
 		</div>
 
 		<!--nav区域结束-->
 
 		<!--图片-->
-		<a href="{:U('Index/index3')}"><img src="__STATIC__/images/index_center.png" class="pic_box" /></a>
+		<a href="{:U('Index/index3')}"><img src="__STATIC__/images/index_center.gif" class="pic_box" /></a>
 
 		<!--商品start-->
 		<div class="store_ear">
@@ -317,8 +318,8 @@
 
 		<!--底部导航-start-->
 
-		<div class="bottomNavWrap container1" id="bottomNavWrap" data-id="0"></div>
-
+		<!-- <div class="bottomNavWrap container1" id="bottomNavWrap" data-id="0"></div> -->
+		<include file="public/footer_nav"/>
 		<!--底部导航-end-->
 		<script src="__STATIC__/js/style.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript" src="__STATIC__/js/sourch_submit.js"></script>
@@ -327,6 +328,9 @@
 		<script type="text/javascript">
 		</script>
 		<script>
+			$(document).ready(function(){ 
+				ajax_sourch_submit();
+			});
 			/**
 			* 继续加载猜您喜欢
 			* */

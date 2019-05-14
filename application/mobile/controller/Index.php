@@ -24,8 +24,18 @@ class Index extends MobileBase {
         $count = count($goods_cat);
         $rand_num = mt_rand(0,$count);
         $goods_id = $count ? $goods_cat[$rand_num] : 0;
+        $cate_name = array(1=>"黑科技",2=>"量子");
 
-        $this->assign('id',$goods_id);
+
+        $where_technology['name|mobile_name'] = ['like',"%$cate_name[1]%"];
+        $where_quantum['name|mobile_name'] = ['like',"%$cate_name[2]%"];
+        $black_technology = M('goods_category')->where($where_technology)->value('id');
+        $quantum = M('goods_category')->where($where_quantum)->value('id');
+        // dump($quantum);die;
+
+        $this->assign('goods_id',$goods_id);
+        $this->assign('black_technology',$black_technology);
+        $this->assign('quantum',$quantum);
 
 		return $this->fetch();
 	}

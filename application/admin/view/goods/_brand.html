@@ -41,7 +41,7 @@
         </dt>
         <dd class="opt">
           <div id="gcategory">
-           <select name="parent_cat_id" id="parent_id_1" onblur="get_category(this.value,'parent_id_2','0');"  onchange="get_category(this.value,'parent_id_2','0');" class="form-control" >
+           <select name="parent_cat_id" id="parent_id_1" class="form-control" >
                 <option value="0">请选择分类</option> 
                 <foreach name="cat_list" item="v" >	                                                                                    
                     <option value="{$v[id]}"  <if condition="$v[id] eq $brand[parent_cat_id]"> selected="selected" </if>>{$v[name]}</option>
@@ -143,15 +143,31 @@ function verifyForm(){
             }
         }
     });
+
+    
 }
 
+$(document).on("change",'#parent_id_1',function(){
+    var v = $(this).val();
+    $('#parent_id_2').empty().html("<option value='0'>请选择分类</option>");
+    $.get('/Home/api/get_category',{parent_id:v},function(res){
+        if(res){
+            $('#parent_id_2').append(res);
+        }
+    });
+})
 
-window.onload = function(){
-    var brand_cat_id = parseInt('{$brand.cat_id}');
-	if(brand_cat_id > 0 ){
-		get_category($("#parent_id_1").val(),'parent_id_2',brand_cat_id);	 
-	}		
-}
+
+// window.onload = function(){
+//     var brand_cat_id = parseInt('{$brand.cat_id}');
+// 	if(brand_cat_id > 0 ){
+// 		$.get('/Home/api/get_category',{parent_id:brand_cat_id},function(res){
+//         if(res){
+//             $('#parent_id_2').append(res);
+//         }
+//     }); 
+// 	}		
+// }
 function img_call_back(fileurl_tmp)
 {
   $("#logo").val(fileurl_tmp);

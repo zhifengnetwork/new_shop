@@ -97,9 +97,9 @@ class Distribution extends Base
             }
         }
         if ($data['act'] == 'del') {
-			$level = M('agent_level')->where('level_id',$data['level_id'])->value('level');
+            $level = M('agent_level')->where('level_id',$data['level_id'])->value('level');
             $r = D('agent_level')->where('level_id=' . $data['level_id'])->delete();
-			M('goods_commission')->where('level',$level)->delete();
+            M('goods_commission')->where('level',$level)->delete();
             if ($r !== false) {
                 $return = ['status' => 1, 'msg' => '删除成功', 'result' => ''];
             } else {
@@ -220,6 +220,7 @@ class Distribution extends Base
         }
         
         $total_per = $Ad->where($where)->sum('money');
+        
         $this->assign('total_per',$total_per);
         $this->assign('user_name',$user_name);
         $this->assign('start_time',$start_time);
@@ -252,7 +253,7 @@ class Distribution extends Base
     {
         $Ad = M('distrbut_commission_log');
         $p = input('p/d');
-
+        $type = input('type',0);
         $ctime = urldecode(I('ctime'));
         $user_name = I('user_name');
         $order_sn = I('order_sn');
@@ -262,7 +263,7 @@ class Distribution extends Base
         
         $where = [];
         $log_ids = '';
-        
+        $where = get_comm_condition($type); //获取条件
         if($user_name){
             $user['nickname'] = ['like', "%$user_name%"];
             $id_list = M('users')->where($user)->column('user_id');
@@ -306,7 +307,11 @@ class Distribution extends Base
                 $list[$key]['to_user_head_pic'] = $avatar[$value['to_user_id']];
             }
         }
+
+        $is_type = 6;
         
+        $this->assign('is_type',$is_type);
+        $this->assign('type',$type);
         $this->assign('user_type',$user_type);
         $this->assign('log_ids',$log_ids);
         $this->assign('user_name',$user_name);
@@ -328,6 +333,10 @@ class Distribution extends Base
     {
         $id = input('id/d');
         $detail = M('distrbut_commission_log')->where('log_id',$id)->find();
+
+        $is_type = 4;
+        
+        $this->assign('is_type',$is_type);
         $this->assign('detail',$detail);
         return $this->fetch();
     }
@@ -335,20 +344,30 @@ class Distribution extends Base
     //购买返佣
     public function export_commission_log()
     {
+        $log_ids = I('log_ids');
+        $type = I('type',0);
+        $title_name = array("返佣","级别利润","每台奖励","同级奖励","分红","全球分红");
+
         $strTable = '<table width="500" border="1">';
         $strTable .= '<tr >';
         $strTable .= '<td style="text-align:center;font-size:14px;width:120px;">ID</td>';
-        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">用户名</td>';
+        if ($type != 5) {
+            $strTable .= '<td style="text-align:center;font-size:14px;" width="*">用户名</td>';
+        }
+        
         $strTable .= '<td style="text-align:center;font-size:14px;" width="*">获得返利用户名</td>';
         $strTable .= '<td style="text-align:center;font-size:14px;" width="*">所得金额</td>';
-        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">订单编号</td>';
-        $strTable .= '<td style="text-align:center;font-size:14px;" width="*">数量</td>';
+        if ($type != 5) {
+            $strTable .= '<td style="text-align:center;font-size:14px;" width="*">订单编号</td>';
+            $strTable .= '<td style="text-align:center;font-size:14px;" width="*">数量</td>';
+        }
+        
         $strTable .= '<td style="text-align:center;font-size:14px;" width="*">时间</td>';
         $strTable .= '<td style="text-align:center;font-size:14px;" width="*">描述</td>';
         $strTable .= '</tr>';
-        $log_ids = I('log_ids');
         
         $condition = array();
+        $condition = get_comm_condition($type); //获取条件
         if ($log_ids) {
             $condition['log_id'] = ['in', explode(',',$log_ids)];
         }
@@ -367,15 +386,18 @@ class Distribution extends Base
                 foreach ($log_list as $k => $val) {
                     $username = $user_names[$val['user_id']]['nickname'] ? $user_names[$val['user_id']]['nickname'] : $user_names[$val['user_id']]['mobile'];
                     $to_username = $user_names[$val['to_user_id']]['nickname'] ? $user_names[$val['to_user_id']]['nickname'] : $user_names[$val['to_user_id']]['mobile'];
-                    $order_sn = $val['order_sn'];
-
+                   
                     $strTable .= '<tr>';
                     $strTable .= '<td style="text-align:center;font-size:12px;">' . $val['log_id'] . '</td>';
-                    $strTable .= '<td style="text-align:center;font-size:12px;">' . $username . ' </td>';
+                    if ($type != 5) {
+                        $strTable .= '<td style="text-align:center;font-size:12px;">' . $username . ' </td>';
+                    }
                     $strTable .= '<td style="text-align:center;font-size:12px;">' . $to_username . '</td>';
                     $strTable .= '<td style="text-align:center;font-size:12px;">' . $val['money'] . '</td>';
-                    $strTable .= '<td style="vnd.ms-excel.numberformat:@">' . $order_sn . '</td>';
-                    $strTable .= '<td style="text-align:center;font-size:12px;">' . $val['num'] . '</td>';
+                    if ($type != 5) {
+                        $strTable .= '<td style="vnd.ms-excel.numberformat:@">' . $val['order_sn'] . '</td>';
+                        $strTable .= '<td style="text-align:center;font-size:12px;">' . $val['num'] . '</td>';
+                    }
                     $strTable .= '<td style="text-align:center;font-size:12px;">' . date('Y-m-d H:i', $val['create_time']) . '</td>';
                     $strTable .= '<td style="text-align:left;font-size:12px;">' . $val['desc'] . ' </td>';
                     $strTable .= '</tr>';
@@ -385,7 +407,7 @@ class Distribution extends Base
         }
         $strTable .= '</table>';
         $i = ($i == 1) ? '' : '_'.$i;
-        downloadExcel($strTable, '购买商品返佣明细表' . $i);
+        downloadExcel($strTable, $title_name[$type].'明细表' . $i);
         exit();
     }
 

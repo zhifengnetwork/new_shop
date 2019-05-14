@@ -281,7 +281,7 @@ class Test extends Controller {
             
             $list2 = Db::connect('mysql://root:@127.0.0.1:3306/shopnc#utf8')->query("select tid,count(pid) as c from `pw_bbs_posts` group by tid = $val[id]");  
             
-            $sql = "insert into `tp_goods_category` (`name` , `mobile_name` , `is_show` , `cat_group` , `image` , `sort_order` , `commission_rate` , `id` , `parent_id`) values ('{$val[name]}' , '苹果' , '0' , '0' , '/public/upload/category/2017/10-23/278097a5fe8a34b56f36e4b354104a73.png' , '11' , '22' , 0 , '844')";
+            $sql = "insert into `tp_goods_category` (`name` , `mobile_name` , `is_show` , `cat_group` , `image` , `sort_order` , `id` , `parent_id`) values ('{$val[name]}' , '苹果' , '0' , '0' , '/public/upload/category/2017/10-23/278097a5fe8a34b56f36e4b354104a73.png' , '11' , '22' , 0 , '844')";
             $result = Db::execute($sql);    
         }        
         

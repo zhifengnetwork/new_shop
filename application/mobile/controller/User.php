@@ -103,8 +103,10 @@ class User extends MobileBase
             }
             $this->assign('agnet_name', $agnet_name);
         }
+
         $MenuCfg = new MenuCfg();
         $menu_list = $MenuCfg->where('is_show', 1)->order('menu_id asc')->select();
+        
         $comm = $this->today_commission();
         $this->user['today_comm'] = $comm;
         $this->assign('menu_list', $menu_list);
@@ -221,7 +223,7 @@ class User extends MobileBase
                                 $query->name('order')->where('user_id',$user_id)->where('order_id','not in',$order_ids)->where('order_id','not in',$old_order_id)->field('order_id');
                             })->where('is_send','<>',3)->column('rec_id,goods_id');
         
-        $repeat_ids = $this->repeat_buy($all_order_goods); //重复购买商品id
+        $repeat_ids = $this->repeat_buy($user['distribut_level'],$all_order_goods); //重复购买商品id
         $all_ids = $repeat_ids['all_ids'];
         $goods_ids = $repeat_ids['goods_ids'];
         
@@ -299,13 +301,13 @@ class User extends MobileBase
     }
 
     //重复购买商品id
-    public function repeat_buy($all_order_goods)
+    public function repeat_buy($user_level,$all_order_goods)
     {
         $order_goods_count = array_count_values($all_order_goods); //统计键值
         $result = array('goods_ids'=>array(),'all_ids'=>array(),'first'=>array());
         
         foreach ($order_goods_count as $k1 => $v1) {
-            if ($v1 > 1) {
+            if ($user_level > 0) {
                 $result['goods_ids'][] = $k1;   //重复购买商品id
                 foreach ($all_order_goods as $k2 => $v2) {
                     if ($v2 == $k1) {
@@ -617,30 +619,89 @@ class User extends MobileBase
     public function team_list()
     {
         $user_id = $this->user_id;
-        $id_array = $this->lower_id($user_id); //获取下级id列表
+        // $id_array = $this->lower_id($user_id); //获取下级id列表
+        // dump($this->lower_id(8831));exit;
         
-        //获取对应下级id的数据
-        $team_list = M('users')->where('user_id','in',$id_array)->field('user_id,nickname,mobile,distribut_level,distribut_money,head_pic')->select();
-        //获取等级
+        // //获取对应下级id的数据
+        // $team_list = M('users')->where('user_id','in',$id_array)->field('user_id,nickname,mobile,distribut_level,distribut_money,head_pic')->page(1,10)->select();
+        // //获取等级
+        // $level = M('agent_level')->column('level,level_name');
+        
+        // foreach($team_list as $k1 => $v1){
+        //     $team_list[$k1]['level_name'] = $level[$v1['distribut_level']];
+        // }
+
+        // $count = count($team_list);
+        
+        $leader_id = M('users')->where('user_id',$user_id)->value('first_leader');
+        $leader = M('users')->where('user_id',$leader_id)->field('nickname,mobile,head_pic')->find();
+        
+        $first = M('users')->where('first_leader',$user_id)->column('user_id');
+        $second = $first ? M('users')->where(['first_leader'=>['in',$first]])->column('user_id') : [];
+        $third = $second ? M('users')->where(['first_leader'=>['in',$second]])->column('user_id') : [];
+
+        $first_count = count($first);
+        $second_count = count($second);
+        $third_count = count($third);
+
+        $team_count = Db::query("SELECT count(*) as count FROM tp_users where find_in_set('$user_id',`parents`)");
+
+        $this->assign('first_count',$first_count);
+        $this->assign('second_count',$second_count);
+        $this->assign('third_count',$third_count);
+        $this->assign('team_count',$team_count[0]['count'] ? $team_count[0]['count'] : 0);
+        $this->assign('leader',$leader);
+        // $this->assign('count',$count);
+        // $this->assign('team',$team_list);
+        return $this->fetch();
+    }
+
+    /**
+     * 三级分销
+     */
+    public function three_level()
+    {
+        $user_id = $this->user_id;
+        $leader_ids = I('ids',[]);
+        $type = I('type',1);
+        $page = I('page',1);
+    
+        $where = array();
+        
+        switch($type){
+            //一级
+            case 1:
+                $where['first_leader'] = $user_id;
+                break;
+            //二级
+            case 2:
+                $first = M('users')->where('first_leader',$user_id)->column('user_id');
+                $second = $first ? M('users')->where(['first_leader'=>['in',$first]])->column('user_id') : [];
+                $where['first_leader'] = $second ? ['in',$second] : array();
+                break;
+            //三级
+            case 3:
+                $first = M('users')->where('first_leader',$user_id)->column('user_id');
+                $second = $first ? M('users')->where(['first_leader'=>['in',$first]])->column('user_id') : [];
+                $third = $second ? M('users')->where(['first_leader'=>['in',$second]])->column('user_id') : [];
+                $where['first_leader'] = $third ? ['in',$third] : array();
+                break;
+            default: break; 
+        }
+        
+        $team_list = array();
+        if ($where['first_leader']) {
+            //获取对应下级id的数据
+            $team_list = M('users')->where($where)->field('user_id,nickname,mobile,distribut_level,distribut_money,head_pic')->page($page,15)->select();
+        }
+        
         $level = M('agent_level')->column('level,level_name');
         
         foreach($team_list as $k1 => $v1){
             $team_list[$k1]['level_name'] = $level[$v1['distribut_level']];
         }
-
-        $count = 0;
-        if (count($team_list) == count($team_list,1)) {
-            $count = $team_list ? 1 : 0;
-        } else {
-            $count = count($team_list);
-        }
-        $leader_id = M('users')->where('user_id',$user_id)->value('first_leader');
-        $leader = M('users')->where('user_id',$leader_id)->field('nickname,mobile,head_pic')->find();
-        
-        $this->assign('leader',$leader);
-        $this->assign('count',$count);
-        $this->assign('team',$team_list);
-        return $this->fetch();
+        // $result = $team_list;
+        return json($team_list);
     }
 
     /**
@@ -699,7 +760,7 @@ class User extends MobileBase
         $log = M('commission_log')->where('add_user_id','in',$id_list)->where('user_id',$user_id)->where('identification',2)->order('id',desc)->limit(50)->select();
         if ($log) {
             foreach($log as $key => $value){
-                $log[$key]['nickname'] = $list[$value['add_user_id']]['nickname'];
+                $log[$key]['nickname'] = $list[$value['add_user_id']]['nickname'] ?: $list[$value['add_user_id']]['mobile'];
                 $log[$key]['mobile'] = $list[$value['add_user_id']]['mobile'];
             }
         }
@@ -978,31 +1039,7 @@ class User extends MobileBase
         $result = array();
         
         if ($type == 'income') {
-            $where = [];
-            //查询条件
-            switch ($distribut_type) {
-                case 0:
-                    break;
-                case 1:
-                    $where['type'] = ['in',[1,2]];
-                    $where['distribut_type'] = ['in',[2,3]];
-                    break;
-                case 2:
-                    $where['type'] = ['in',[1,2,3]];
-                    break;
-                case 3:
-                    $where['type'] = ['in',[1,2]];
-                    $where['distribut_type'] = 4;
-                    break;
-                case 4:
-                    $where['type'] = 3;
-                    break;
-                case 5:
-                    $where['type'] = 4;
-                    break;
-                default:
-                    break;
-            }
+            $where = get_comm_condition($distribut_type); //获取条件
 
             $result = M('distrbut_commission_log')->where('to_user_id',$user_id)->where($where)->order('create_time','desc')->field('log_id,money,status,order_id,create_time')->page($page,15)->select();
 
@@ -1018,7 +1055,7 @@ class User extends MobileBase
                 $result[$key]['status'] = 1;
             }
         }
-        
+
         return json($result);
     }
 

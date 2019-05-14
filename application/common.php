@@ -40,6 +40,42 @@ function share_deal_after($xiaji,$shangji){
 }
 
 
+//返佣日志条件
+function get_comm_condition($type)
+{
+    $where = [];
+    //查询条件
+    switch ($type) {
+            case 0:
+                break;
+            case 1:
+                $where['type'] = ['in',[1,2]];
+                $where['distribut_type'] = ['in',[3]];
+                break;
+            case 2:
+                $where['type'] = ['in',[1,2]];
+                $where['distribut_type'] = ['in',[2]];
+                break;
+            case 3:
+                $where['type'] = ['in',[1,2]];
+                $where['distribut_type'] = ['in',[4]];
+                break;
+            case 4:
+                $where['type'] = 3;
+                break;
+            case 5:
+                $where['type'] = ['in',[1,2]];
+                $where['distribut_type'] = ['in',[1]];
+                break;
+            case 6:
+                $where['type'] = 4;
+                break;
+            default:
+                break;
+        }
+
+    return $where;
+}
 
 /**
  * 购买返佣
@@ -55,7 +91,7 @@ function sales($order_id){
         return array('msg'=>"参数错误",'code'=>0);
     }
     
-    $is_reward = M('order_divide')->where('order_id',$order_id)->find();
+    $is_reward = M('order_divide')->where('order_id',$order_id)->where('status',1)->find();
     
     if ($is_reward) {
        return array('msg'=>"该商品已返佣",'code'=>0);
@@ -94,7 +130,7 @@ function sales($order_id){
         }
     }
 
-    $is_reward = M('order_divide')->where('order_id',$order_id)->find();
+    $is_reward = M('order_divide')->where('order_id',$order_id)->where('status',1)->find();
     
     if ($is_reward) {
        M('order')->where('order_id',$order_id)->update(['is_distribut'=>1]);

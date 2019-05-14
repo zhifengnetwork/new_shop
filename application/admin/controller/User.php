@@ -1056,14 +1056,17 @@ class User extends Base
             # 插入或更新设置
             $info = Db::name('config')->where('inc_type',$inc_type)->find();
             if($info){
-                Db::execute("update `tp_config` set `value` = '$value' where `name` = '$name' and `inc_type` = '$inc_type'");
+                $bool = Db::execute("update `tp_config` set `value` = '$value' where `name` = '$name' and `inc_type` = '$inc_type'");
             }else{
-                Db::execute("insert into `tp_config` (`name`,`value`,`inc_type`,`desc`) values ('$name','$value','$inc_type','$desc')");
+                $bool = Db::execute("insert into `tp_config` (`name`,`value`,`inc_type`,`desc`) values ('$name','$value','$inc_type','$desc')");
+            }
+            if (!$bool) {
+                $this->error('操作失败');
             }
             $this->success('操作成功');
             exit;
         }
-
+        
         # 获取设置信息
         $info = Db::name('config')->where('inc_type','user_sign_rule')->find();
         if($info){
