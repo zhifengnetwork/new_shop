@@ -142,7 +142,7 @@ class User extends MobileBase
         
         $user = M('users')->where('user_id',$user_id)->field('user_id,first_leader,distribut_level,is_distribut,bonus_products_id,is_lock')->find();
         //不是分销商、冻结账号没有待收益
-        if (($user['is_distribut'] != 1) || $user['is_lock'] == 1) {
+        if ($user['is_lock'] == 1) {
             $lists = array();
         } else {
             $order_id = $obj ? array_column($obj,'o') : array();
@@ -341,7 +341,7 @@ class User extends MobileBase
             $query->name('order')->where('order_id','not in',$order_divide)->where('user_id','in',$lower_ids)->where('order_id','not in',$old_order_id)->field('order_id');
         })->where('is_send','<>',3)->column('rec_id,goods_id');
         
-        $repeat_ids = $this->repeat_buy($goods_ids); //是否重复购买
+        $repeat_ids = $this->repeat_buy($user['distribut_level'],$goods_ids); //是否重复购买
         $second_ids = $repeat_ids['goods_ids'];
         $first_ids = $repeat_ids['first'];
         
