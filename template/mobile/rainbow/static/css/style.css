@@ -749,8 +749,8 @@ div.index_hot {
 	display:block
 }
 .guesslike ul li .similer-product img {
-	width:7.95733rem;
-	height:7.95733rem
+	width: 100%;
+	height:7.95733rem;
 }
 .guesslike .add {
 	text-align:center;
@@ -827,7 +827,7 @@ footer .flool3 p {
 .mslide {
 	position:relative;
 	overflow:hidden;
-	top: 1.8rem
+	
 }
 .mslide:after {
 	content:'';
