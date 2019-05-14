@@ -59,7 +59,8 @@ class Article extends MobileBase
     public function agreement(){
     	$doc_code = I('doc_code','agreement');
     	$article = Db::name('system_article')->where('doc_code',$doc_code)->find();
-    	if(empty($article)) $this->error('抱歉，您访问的页面不存在！');
+        if(empty($article)) $this->error('抱歉，您访问的页面不存在！');
+        $article['doc_content'] = htmlspecialchars_decode($article['doc_content']);
     	$this->assign('article',$article);
     	return $this->fetch();
     }
