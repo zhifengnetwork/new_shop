@@ -234,7 +234,8 @@ function goods_thum_images($goods_id, $width, $height,$item_id=0)
 
 
     if (empty($original_img)) {
-        return '/public/images/icon_goods_thumb_empty_300.png';
+        // return '/public/images/icon_goods_thumb_empty_300.png';
+        return '/template/mobile/rainbow/static/images/zy.png';
     }
     
     if(tpCache('oss.oss_switch')){
@@ -246,7 +247,8 @@ function goods_thum_images($goods_id, $width, $height,$item_id=0)
 
     $original_img = '.' . $original_img; // 相对路径
     if (!is_file($original_img)) {
-        return '/public/images/icon_goods_thumb_empty_300.png';
+        // return '/public/images/icon_goods_thumb_empty_300.png';
+        return '/template/mobile/rainbow/static/images/zy.png';
     }
 
     try {

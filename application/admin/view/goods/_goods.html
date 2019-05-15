@@ -866,12 +866,12 @@
         $(document).on("click", '#item_fill', function () {
             var item_price_fill = $("#item_price").val();
             var item_cost_price_fill = $("#item_cost_price").val();
-            var item_commission_fill = $("#item_commission").val();
+            // var item_commission_fill = $("#item_commission").val();
             var item_store_count_fill = $("#item_store_count").val();
             var item_sku_fill = $("#item_sku").val();
             $("input[name$='[price]']").val(item_price_fill);
             $("input[name$='[cost_price]']").val(item_cost_price_fill);
-            $("input[name$='[commission]']").val(item_commission_fill);
+            // $("input[name$='[commission]']").val(item_commission_fill);
             $("input[name$='[store_count]']").val(item_store_count_fill);
             $("input[name$='[sku]']").each(function(i,o){
                 if(item_sku_fill != ''){

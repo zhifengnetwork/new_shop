@@ -237,7 +237,7 @@ class Article extends Base {
     }
     
     public function agreement(){
-    	$agreement = db('system_article')->select();
+        $agreement = db('system_article')->select();
     	$this->assign('agreement',$agreement);
     	return $this->fetch();
     }
