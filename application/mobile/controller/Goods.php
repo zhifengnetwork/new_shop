@@ -296,6 +296,25 @@ class Goods extends MobileBase
         }
     }
 
+    # 抛出下载图片
+    public function png_to_download(){
+
+        $file = I('file','');
+        $name = I('name','download');
+
+        $file_path = ROOT_PATH."/public/upload/goods_share_png/";
+        $down_host = $_SERVER['HTTP_HOST'].'/'; //当前域名
+        header('Content-type: image/jpeg'); 
+        header("Content-Disposition: attachment; filename='$name.png'"); 
+        //判断如果文件存在,则跳转到下载路径 
+        if(file_exists($file_path.$file)){
+            header('location:http://'.$down_host.'public/upload/goods_share_png/'.$file); 
+        }else{ 
+            header('HTTP/1.1 404 Not Found'); 
+        }
+    }
+
+
     # 商品分享二维码
     public function goods_share_qrcode(){
         $url = I('get.url');
