@@ -30,8 +30,8 @@ class Combination extends Base
 {
     public function index()
     {
-        header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        return false;
+
     }
 
     /**
@@ -60,8 +60,8 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
      */
     public function save()
     {
-        header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        return false;
+
     }
 
     /**

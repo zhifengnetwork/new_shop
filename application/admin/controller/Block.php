@@ -20,26 +20,22 @@ use think\Db;
 class Block extends Base{
 
 	public function index(){
-        header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");  
+        return false;
 	}
 
 	//自定义页面列表页
 	public function pageList(){
-            header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");    
+        return false;   
 	}
 
 	public function ajaxGoodsList(){
-            header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        return false;
     }
 
 
     //商品列表板块参数设置
     public function goods_list_block(){
-        header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        return false;
     }
 
     //新闻列表 浏览
@@ -137,14 +133,14 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
 	*保存编辑完成后的信息
 	*/
 	public function add_data(){
-        header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        return false;
+
 	}
 
 	//设置首页
 	public function set_index(){
-        header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        return false;
+
 	}
 
 	//删除页面
@@ -163,15 +159,15 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
 	
 	//获取秒杀活动数据
 	public function get_flash(){
-            header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        return false;
+
 	}
 
 
     //添加行业模板及风格入口页
     public function template_class(){
-		header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        return false;
+
     }
     function filter_data($list){
         $data = [];
@@ -246,14 +242,14 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
 
     //我的模板展示(用户)
     public function templateList(){
-		header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        return false;
+
     }
 
     //行业模板展示(系统模板)
     public function templateList2(){
-		header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        return false;
+
     }
 
     public function get_style(){

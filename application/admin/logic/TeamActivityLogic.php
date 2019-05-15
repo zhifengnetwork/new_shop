@@ -40,8 +40,7 @@ class TeamActivityLogic extends Model
      * @throws \think\Exception
      */
     public function lottery($admin_id){
-		header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+		return false;
     }
 
     /**

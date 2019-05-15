@@ -199,8 +199,8 @@ class Plugin extends Base {
         $condition['type'] = I('get.type');
         $condition['code'] = I('get.code');
         $model = M('plugin');
-        if(($condition["code"] == "unionpay")){ header("Content-type: text/html; charset=utf-8");exit("请联系TPshop官网客服购买高级版支持此功能"); } 	
-        if($condition["type"] == "login"  && $condition["code"] == "weixin"){ header("Content-type: text/html; charset=utf-8");exit("请联系TPshop官网客服购买高级版支持此功能"); } 	
+        if(($condition["code"] == "unionpay")){ header("Content-type: text/html; charset=utf-8");return false; } 	
+        if($condition["type"] == "login"  && $condition["code"] == "weixin"){ header("Content-type: text/html; charset=utf-8");return false; } 	
         $row = $model->where($condition)->find();
         if(!$row){
             exit($this->error("不存在该插件"));

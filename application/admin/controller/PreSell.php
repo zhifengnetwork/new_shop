@@ -24,8 +24,7 @@ class PreSell extends Base
 {
 	public function index()
 	{
-		header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+		return false;
 	}
 
 	/**
@@ -34,8 +33,7 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
 	 */
 	public function info()
 	{
-		header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+		return false;
 	}
 
 	/**
@@ -43,33 +41,28 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
 	 */
 	public function save()
 	{
-		header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+		return false;
 	}
 
 	/**
 	 * 删除
 	 */
 	public function delete(){
-		header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+		return false;
 	}
 
 	public function succeed()
 	{
-		header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+		return false;
 	}
 
 	public function fail()
 	{
-		header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+		return false;
 	}
 
 	public function finish()
 	{
-		header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+		return false;
 	}
 }
