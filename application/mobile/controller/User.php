@@ -180,7 +180,7 @@ class User extends MobileBase
                 $Earnings->money = $total_money;
                 $Earnings->obj = $obj;
 
-                $Earnings->save();
+                // $Earnings->save();
 
                 $earnings_info = $Earnings->where($where)->find();
                 $obj = $earnings_info->obj;
@@ -305,7 +305,7 @@ class User extends MobileBase
     {
         $order_goods_count = array_count_values($all_order_goods); //统计键值
         $result = array('goods_ids'=>array(),'all_ids'=>array(),'first'=>array());
-        
+
         foreach ($order_goods_count as $k1 => $v1) {
             if ($user_level > 0) {
                 $result['goods_ids'][] = $k1;   //重复购买商品id
@@ -329,7 +329,6 @@ class User extends MobileBase
     {
         $user_id = $user['user_id'];
         $lower_ids = $this->lower_id($user_id);  //获取下级id列表
-        $sales = new \app\common\logic\Sales(0,0,0);
        
         $leader_list = M('users')->whereIn('user_id',$lower_ids)->column('user_id,parents,first_leader,distribut_level,is_distribut,bonus_products_id,is_lock');
         $leader_list[$user_id] = $user;
@@ -460,10 +459,10 @@ class User extends MobileBase
                     if ($leader_list[$v2]['is_lock'] == 1) {
                         continue;
                     }
-                    //不是分销商不奖励
-                    if ($leader_list[$v2]['is_distribut'] != 1) {
-                        continue;
-                    }
+                    // //不是分销商不奖励
+                    // if ($leader_list[$v2]['is_distribut'] != 1) {
+                    //     continue;
+                    // }
                     
                     //平级奖
                     if ($level == $leader_list[$v2]['distribut_level']) {
@@ -676,23 +675,21 @@ class User extends MobileBase
             //二级
             case 2:
                 $first = M('users')->where('first_leader',$user_id)->column('user_id');
-                $second = $first ? M('users')->where(['first_leader'=>['in',$first]])->column('user_id') : [];
-                $where['first_leader'] = $second ? ['in',$second] : array();
+                $where['first_leader'] = $first ? ['in',$first] : array();
                 break;
             //三级
             case 3:
                 $first = M('users')->where('first_leader',$user_id)->column('user_id');
                 $second = $first ? M('users')->where(['first_leader'=>['in',$first]])->column('user_id') : [];
-                $third = $second ? M('users')->where(['first_leader'=>['in',$second]])->column('user_id') : [];
-                $where['first_leader'] = $third ? ['in',$third] : array();
+                $where['first_leader'] = $second ? ['in',$second] : array();
                 break;
             default: break; 
         }
-        
+
         $team_list = array();
         if ($where['first_leader']) {
             //获取对应下级id的数据
-            $team_list = M('users')->where($where)->field('user_id,nickname,mobile,distribut_level,distribut_money,head_pic')->page($page,15)->select();
+            $team_list = Db::name('users')->where($where)->field('user_id,nickname,mobile,distribut_level,distribut_money,head_pic')->page($page,15)->select();
         }
         
         $level = M('agent_level')->column('level,level_name');
@@ -700,7 +697,7 @@ class User extends MobileBase
         foreach($team_list as $k1 => $v1){
             $team_list[$k1]['level_name'] = $level[$v1['distribut_level']];
         }
-        // $result = $team_list;
+        
         return json($team_list);
     }
 

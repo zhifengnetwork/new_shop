@@ -53,33 +53,37 @@ class Sales extends Model
 		}
 		
 		$user_level = $user['distribut_level'];
+		$parents_id = array();
+		// if ($user['parents']) {
 		if ($user['parents']) {
 			$parents_id = explode(',', $user['parents']);
 			$parents_id = array_filter($parents_id);  //去除0
-			if (!$parents_id) {
-				return array('msg'=>"该用户没有上级",'code'=>0);
-			}
-
-			if ($bonus_products_id > 0) {
-				M('users')->where('user_id','in',$parents_id)->where('user_id','neq',$first_leader_id)->where('bonus_products_id','>',0)->update(['bonus_products_id'=>0]);
-			}
-			
-			$this->cash_unlock($parents_id);	//提现解锁
-			$is_repeat = $this->repeat_buy($this->user_id,$this->goods_id);
-			
-			//是否重复购买
-			if ($is_repeat) {
-				$reward = $this->repeat_reward($parents_id,$user_level,$is_repeat);
-			} else {
-				$reward = $this->reward($parents_id,$user_level,$is_repeat);
-			}
-			
-			$this->team_bonus($parents_id);	//团队奖励
-			
-			return $reward;
-		} else {
-			return array('msg'=>"该用户没有上级",'code'=>0);
 		}
+		
+		// if (!$parents_id) {
+		// 	return array('msg'=>"该用户没有上级",'code'=>0);
+		// }
+
+		if ($bonus_products_id > 0) {
+			M('users')->where('user_id','in',$parents_id)->where('user_id','neq',$first_leader_id)->where('bonus_products_id','>',0)->update(['bonus_products_id'=>0]);
+		}
+		
+		$this->cash_unlock($parents_id);	//提现解锁
+		$is_repeat = $this->repeat_buy($this->user_id,$this->goods_id);
+		
+		//是否重复购买
+		if ($user_level > 0) {
+			$reward = $this->repeat_reward($parents_id,$user_level,true);
+		} else {
+			$reward = $this->reward($parents_id,$user_level,false);
+		}
+		
+		$this->team_bonus($parents_id);	//团队奖励
+		
+		return $reward;
+		// } else {
+		// 	return array('msg'=>"该用户没有上级",'code'=>0);
+		// }
 	}
 
 	//是否重复购买
@@ -477,7 +481,7 @@ class Sales extends Model
 				if (!$is_prize) {
 					$money = $basic_reward ? $basic_reward[$value['distribut_level']] : 0;
 					$is_prize = true;
-					$msg = "重复购买直推奖 ";
+					$msg = "自购直推奖 ";
 					$distribut_type = 2;
 
 					$msg = $msg.$money."（元），商品：".$order['goods_num']." 件";
@@ -501,7 +505,7 @@ class Sales extends Model
 						);
 					}
 				} 
-				$msg = "重复购买同级奖 ";
+				$msg = "自购同级奖 ";
 				$distribut_type = 4;
 				$money = 0;
 				//同级奖
@@ -545,7 +549,7 @@ class Sales extends Model
 				if (!$is_prize) {
 					$money = $basic_reward ? $basic_reward[$value['distribut_level']] : 0;
 					$is_prize = true;
-					$msg = "重复购买直推奖 ";
+					$msg = "自购直推奖 ";
 					$distribut_type = 2;
 
 					if ($money > 0) {
@@ -566,7 +570,7 @@ class Sales extends Model
 						);
 					}
 				}
-				$msg = "重复购买极差奖 ";
+				$msg = "自购极差奖 ";
 				$distribut_type = 3;
 				$money = 0;
 				reset($poor_prize);	//重置数组指针
