@@ -19,19 +19,19 @@ use think\Db;
 class Import extends Base {
 
  	public function index(){
-            header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        return false;
+
   	}
 
   	//上传的csv文件及图片文件 返回数组结果
 	public function upload_data(){
-        header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        return false;
+
 	}
 
 	public function add_data(){
-        header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        return false;
+
 	}
 
 	/**

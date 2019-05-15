@@ -38,8 +38,8 @@ class Invoice extends Base
     public function index()
     {
         $invoice = new \app\common\model\Invoice();
-        header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        return false;
+
     }
 
     /**
@@ -48,21 +48,21 @@ exit("请联系TPshop官网客服购买高级版支持此功能");
      */
     public function ajaxindex()
     {
-        header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        return false;
+
     }
 
     //开票时间
     function changetime()
     {
-        header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        return false;
+
     }
 
     public function export_invoice()
     {
-        header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        return false;
+
     }
 
 }

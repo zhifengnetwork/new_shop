@@ -31,6 +31,8 @@ class MobileBase extends Controller {
      */
     public function _initialize() {
         
+        $this->Automatic_Program_SSGuanxi();
+
         session('user'); //不用这个在忘记密码不能获取session('validate_code');
 //        Session::start();
         header("Cache-control: private");  // history.back返回后输入框值丢失问题 参考文章 http://www.tp-shop.cn/article_id_1465.html  http://blog.csdn.net/qinchaoguang123456/article/details/29852881
@@ -125,12 +127,13 @@ class MobileBase extends Controller {
      */
     public function Automatic_Program_SSGuanxi(){
 
+        $pdb = Db::query("select * from `tp_parents_cache` where sort = 1 and (`parents` = '' or `parents` REGEXP '^[1-9]') order by id desc");
+        if(!$pdb){
+            
+        }
 
-
-
-
-
-        
+        dump($pdb);exit;
+        exit;
     }
  
 

@@ -101,7 +101,7 @@ function collect_goods(goods_id){
  function pop_login(){
 	 layer.open({
 		 type: 2,
-		 title: '<b>登陆TPshop网</b>',
+		 title: '<b>登陆网站</b>',
 		 skin: 'layui-layer-rim',
 		 shadeClose: true,
 		 shade: 0.5,

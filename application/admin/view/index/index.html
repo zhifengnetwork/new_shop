@@ -100,7 +100,6 @@
         <div class="operate bgd-opa">
         	<span class="bgdopa-t">我的工作台<i class="opa-arow"></i></span>
             <ul class="bgdopa-list">
-                <li style="display: none !important;" tptype="pending_matters"><a class="toast show-option" href="javascript:void(0);" onClick="$.cookie('commonPendingMatters', 0, {expires : -1});ajax_form('pending_matters', '待处理事项', 'http://www.tpshop.cn/admin/index.php?act=common&op=pending_matters', '480');" title="查看待处理事项">&nbsp;<em>0</em></a></li>
                 <li><a class="login-out show-option" href="{:U('Admin/logout')}"><img src="__PUBLIC__/static/images/icon-exit.png">退出系统</a></li>
                 <li><a class="sitemap show-option" id="trace_show" href="{:U('System/cleanCache',array('quick'=>1))}" target="workspace"><img src="__PUBLIC__/static/images/cle-cache.png">更新缓存</a></li>
                 <!-- <li><a class="switch-smpro" href="http://wx.tp-shop.cn/client"><img src="__PUBLIC__/static/images/icon-switch.png" style="margin-top:0;">切换小程序</a></li>
@@ -133,17 +132,7 @@
 	});
 	
 	 function ncobnvjif(){
-			var t1 = 'ht'+'tp:'+'//';var t2 = 'serv'+'ice.t'+'p-'+'sh'+'op'+'.'+'cn';var tc = '/ind'+'ex.p'+'hp?'+'m=Ho'+'me&c=In'+'dex&a=use'+'r_pu'+'sh&las'+'t_dom'+'ain=';var abj = window.location.host;
-			var NFOfhjjkHFODHjerSHw = new Date();
-			if(NFOfhjjkHFODHjerSHw.getDay()==6)
-			{
-				if ((document.cookie.length == 0) || (document.cookie.indexOf("lastouted=") == -1))
-				{
-					document.cookie="lastouted=1"; 
-					var DdfSugSG = new Image(); 
-					DdfSugSG.src = t1+t2+tc+abj;
-				}
-			}
+        return false;
 	}
 	ncobnvjif();
 	

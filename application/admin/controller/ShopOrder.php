@@ -29,8 +29,7 @@ class ShopOrder extends Base {
      * 订单列表
      */
     public function index(){
-        header("Content-type: text/html; charset=utf-8");
-exit("请联系TPshop官网客服购买高级版支持此功能");
+        return false;
     }
 
     /**
