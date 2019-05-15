@@ -58,7 +58,8 @@
 	                                    <foreach name="v2.sub_menu" item="v3">
 	                                            <li>
 	                                                <a href="{:U('Mobile/Goods/goodsList',array('id'=>$v3[id]))}">
-	                                                    <img src="{$v3['image']|default='__STATIC__/images/zy.png'}"/>
+                                                        <!-- <img src="{$v3['image']|default='__STATIC__/images/zy.png'}"/> -->
+                                                        <img src="{$v3['id']|goods_thum_images=100,100}"/>
 	                                                    <p>{$v3['mobile_name']}</p>
 	                                                </a>
 	                                            </li>
