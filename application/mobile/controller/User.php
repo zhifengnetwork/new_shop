@@ -141,7 +141,7 @@ class User extends MobileBase
         $obj = json_decode($obj,true);
         
         $user = M('users')->where('user_id',$user_id)->field('user_id,first_leader,distribut_level,is_distribut,bonus_products_id,is_lock')->find();
-        //不是分销商、冻结账号没有待收益
+        //冻结账号没有待收益
         if ($user['is_lock'] == 1) {
             $lists = array();
         } else {
