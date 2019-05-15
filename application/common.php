@@ -39,40 +39,51 @@ function share_deal_after($xiaji,$shangji){
     return true;
 }
 
+//获取用户所有上级id
+function get_parents_ids($user_id){
+    $parents_cache = M('parents_cache')->where('user_id',$user_id)->order('sort','asc')->select();
+    $parent_ids = array();
+    foreach ($parents_cache as $key => $value) {
+        $parent_arr = array_filter(explode(',',$value['parents']));
+        $parents_cache[$key]['parents'] = $parent_arr;
+        $parent_ids = array_merge($parent_ids,$parent_arr);
+    }
+    
+    return $parent_ids;
+}
 
-//返佣日志条件
-function get_comm_condition($type)
-{
+//返佣查询条件
+function get_comm_condition($type){
     $where = [];
     //查询条件
     switch ($type) {
-            case 0:
-                break;
-            case 1:
-                $where['type'] = ['in',[1,2]];
-                $where['distribut_type'] = ['in',[3]];
-                break;
-            case 2:
-                $where['type'] = ['in',[1,2]];
-                $where['distribut_type'] = ['in',[2]];
-                break;
-            case 3:
-                $where['type'] = ['in',[1,2]];
-                $where['distribut_type'] = ['in',[4]];
-                break;
-            case 4:
-                $where['type'] = 3;
-                break;
-            case 5:
-                $where['type'] = ['in',[1,2]];
-                $where['distribut_type'] = ['in',[1]];
-                break;
-            case 6:
-                $where['type'] = 4;
-                break;
-            default:
-                break;
-        }
+        case 0:
+            break;
+        case 1:
+            $where['type'] = ['in',[1,2]];
+            $where['distribut_type'] = ['in',[3]];
+            break;
+        case 2:
+            $where['type'] = ['in',[1,2]];
+            $where['distribut_type'] = ['in',[2]];
+            break;
+        case 3:
+            $where['type'] = ['in',[1,2]];
+            $where['distribut_type'] = ['in',[4]];
+            break;
+        case 4:
+            $where['type'] = 3;
+            break;
+        case 5:
+            $where['type'] = ['in',[1,2]];
+            $where['distribut_type'] = ['in',[1]];
+            break;
+        case 6:
+            $where['type'] = 4;
+            break;
+        default:
+            break;
+    }
 
     return $where;
 }
@@ -142,10 +153,14 @@ function sales($order_id){
 /**
  * 是否确认收货后才返佣
  */
-function is_receiving_commission($goods_id){
-    $ids = $goods_id ? array_column($goods_id,'goods_id') : 0;
-    $goods = M('goods')->whereIn('goods_id',$ids)->where('is_receiving_commission',1)->find();
-    $bool = $goods ? false : true;
+function is_receiving_commission($order_goods){
+    $bool = true;
+    foreach ($order_goods as $key => $value) {
+        if($value['is_receiving_commission'] == 1){
+            $bool = false;
+            break;
+        }
+    }
     return $bool;
 }
 

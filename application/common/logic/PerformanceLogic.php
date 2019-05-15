@@ -67,7 +67,7 @@ class PerformanceLogic extends Model
 		);
 		//上级
 		$id_list = $Users->where('user_id',$user_id)->value('parents');
-		$id_list = explode(',', $id_list);
+		$id_list = $id_list ? explode(',', $id_list) : array();
 		$new_list = array_reverse(array_filter($id_list));
 		
 		if (!$new_list) {
