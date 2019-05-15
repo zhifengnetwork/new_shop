@@ -278,39 +278,9 @@ class Goods extends MobileBase
 
         //匹配出图片的格式
         if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $base64, $result)){
-            $type = $result[2];
-            $new_file = ROOT_PATH."/public/upload/goods_share_png/";
-            if(!file_exists($new_file)){
-                //检查是否有该文件夹，如果没有就创建，并给予最高权限
-                mkdir($new_file, 0777,true);
-            }
-
-            $savename = time().rand(10000, 99999).".{$type}";
-            if (file_put_contents($new_file.$savename, base64_decode(str_replace($result[1], '', $base64)))){
-                    return $savename;
-                }else{
-                    return false;
-                }
+            
         }else{
             return false;
-        }
-    }
-
-    # 抛出下载图片
-    public function png_to_download(){
-
-        $file = I('file','');
-        $name = I('name','download');
-
-        $file_path = ROOT_PATH."/public/upload/goods_share_png/";
-        $down_host = $_SERVER['HTTP_HOST'].'/'; //当前域名
-        header('Content-type: image/jpeg'); 
-        header("Content-Disposition: attachment; filename='$name.png'"); 
-        //判断如果文件存在,则跳转到下载路径 
-        if(file_exists($file_path.$file)){
-            header('location:http://'.$down_host.'public/upload/goods_share_png/'.$file); 
-        }else{ 
-            header('HTTP/1.1 404 Not Found'); 
         }
     }
 
