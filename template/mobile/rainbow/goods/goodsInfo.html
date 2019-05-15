@@ -1634,9 +1634,11 @@ function combinationCurl(goods_id,item,combination_id) {
 					//                window.location.href = imgUri; // 下载图片
 					var data = canvas.toDataURL("image/png"); //生成的格式
 					//data就是生成的base64码啦
-					alert(data);
-					console.log(data)
-					savePicture(data)
+					layer.confirm('是否保存分享图片', {icon:3},function(y){
+                        layer.close(y);
+                        savePicture(data);
+                    });
+					
 				});
 			}
 

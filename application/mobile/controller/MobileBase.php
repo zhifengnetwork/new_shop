@@ -31,7 +31,7 @@ class MobileBase extends Controller {
      */
     public function _initialize() {
         
-        $this->Automatic_Program_SSGuanxi();
+        // $this->Automatic_Program_SSGuanxi();
 
         session('user'); //不用这个在忘记密码不能获取session('validate_code');
 //        Session::start();
