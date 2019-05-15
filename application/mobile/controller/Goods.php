@@ -268,21 +268,7 @@ class Goods extends MobileBase
         return $this->fetch();
     }
 
-    # base64 转图片并保存
-    public function base64_to_png(){
-        
-        $base64 = I('post.data', '');
-        if(!$base64){
-            return false;
-        }
 
-        //匹配出图片的格式
-        if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $base64, $result)){
-            
-        }else{
-            return false;
-        }
-    }
 
 
     # 商品分享二维码

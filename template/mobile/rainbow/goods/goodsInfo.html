@@ -1565,14 +1565,18 @@ function combinationCurl(goods_id,item,combination_id) {
 </script>
 <script language="javascript">
 			function picload(_this) {
-                
-                picload_type = 1;
 				var this_ = $(_this)
 				//  	 $(".down").click(function () {
 				html2canvas(this_).then(function(canvas) {
 					var imgUri = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"); // 获取生成的图片的url
-					               window.location.href = imgUri; // 下载图片
-					var data = canvas.toDataURL("image/png"); //生成的格式
+					            //    window.location.href = imgUri; // 下载图片
+                    var data = canvas.toDataURL("image/png"); //生成的格式
+                    layer.open({
+                        title:false,
+                        content:'<img style="width:100%;height:100%;" src="'+data+'">',
+                        area:['100%','100%'],
+                        btn:false,
+                    });
                     //data就是生成的base64码啦
                     // layer.open({
                     //     type:2,
@@ -1587,7 +1591,6 @@ function combinationCurl(goods_id,item,combination_id) {
                     //     }
                     // });
                 });
-                picload_type = 0;
             }
 
 			function savePicture(Url) {
