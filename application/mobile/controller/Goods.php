@@ -268,8 +268,8 @@ class Goods extends MobileBase
         return $this->fetch();
     }
 
-    # base64 转图片并抛出下载
-    public function base64_to_png_download(){
+    # base64 转图片并保存
+    public function base64_to_png(){
         
         $base64 = I('post.data', '');
         if(!$base64){
@@ -287,7 +287,7 @@ class Goods extends MobileBase
 
             $savename = time().rand(10000, 99999).".{$type}";
             if (file_put_contents($new_file.$savename, base64_decode(str_replace($result[1], '', $base64)))){
-                    return "/public/upload/goods_share_png/".$savename;
+                    return $savename;
                 }else{
                     return false;
                 }
@@ -295,9 +295,6 @@ class Goods extends MobileBase
             return false;
         }
     }
-
-
-
 
     # 商品分享二维码
     public function goods_share_qrcode(){

@@ -648,7 +648,6 @@
 </div>
 </form>
 
-<a style="display:none;" id="download_png" target="_bank" href="" download="{$goods.goods_name}.png">.</a>
 <!--选择属性的弹窗-e-->
 <a onclick="$('html,body').animate({'scrollTop':0},600)" style="display: block;width: 1.5rem;height:1.5rem;position: fixed; bottom: 3rem;right:0.4rem; background-color: rgba(243,241,241,0.5);border: 1px solid #CCC;-webkit-border-radius: 50%;-moz-border-radius: 50%;border-radius: 50%;" id="topup">
     <img src="__STATIC__/images/topup.png" style="display: block;width: 1.45rem;height:1.45rem;">
@@ -1415,9 +1414,9 @@
                     <img style="width:100%; height:40%;" src="`+src+`" />
                     <p style="padding-left:.3rem">`+name+`</p>
                     <p style="display:inline-block;color:red;hieght:10%;line-height:10%;padding-bottom:1rem;padding-left:.6rem">￥ `+price+`</p>
-                    <img style="width:50%; height:40%;position:absolute; right:20px;bottom:28px;padding-bottom:1rem" src="/Mobile/Goods/goods_share_qrcode?url=`+share_url+`" />                 
+                    <img style="width:50%; height:40%;position:absolute; right:20px;bottom:28px;padding-bottom:1rem" src="/Mobile/Goods/goods_share_qrcode?url=`+share_url+`" /> 
+                                 
                </div>
-               
                 `;
 //          var _tpl=`<div class="test">测试5555555</div>             
 //                      <div><a class="down" href="" download="downImg">下载</a>
@@ -1565,13 +1564,15 @@ function combinationCurl(goods_id,item,combination_id) {
 
 </script>
 <script language="javascript">
-			var picload_type = 0;
+            var picload_type = 0;
+            var uurl = '';
+            var name = '{$goods.goods_name}';
 			function picload(_this) {
                 if(picload_type == 1){
                     return false;
                 }
                 if(picload_type == 2){
-                    $('#download_png').click();
+                    window.location.href="index.php/Mobile/Goods/png_to_download?file="+uurl+"&name="+name;
                     return false;
                 }
                 picload_type = 1;
@@ -1582,22 +1583,16 @@ function combinationCurl(goods_id,item,combination_id) {
 					//                window.location.href = imgUri; // 下载图片
 					var data = canvas.toDataURL("image/png"); //生成的格式
                     //data就是生成的base64码啦
-                    $.post('/mobile/goods/base64_to_png_download',{data:data},function(res){
+                    $.post('/mobile/goods/base64_to_png',{data:data},function(res){
                         if(res){
-                            // $('#download_png').attr('href', res);
-                            // $('#download_png').click();
-                            window.location.href = url;
+                            uurl = res;
+                            window.location.href="/mobile/goods/png_to_download?file="+uurl+"&name="+name;
                             picload_type = 2;
                             return false;
                         }
                     });
                 });
                 picload_type = 0;
-            }
-            
-            function download_png(){
-                alert(1);
-                $('#download_png').click();
             }
 
 			function savePicture(Url) {
