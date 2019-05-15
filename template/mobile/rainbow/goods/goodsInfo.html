@@ -138,7 +138,7 @@
                 <span class="red" id="price">￥{$goods.shop_price}</span>
                 <span id="market_price_title">市场价：</span><span class="linethr" id="market_price">{$goods.market_price}</span>
                 <img src="/public/static/images/erweimafengxiang.jpg"  style="float: right;width: 1.5rem;" onclick="share_icon();"/>
-                <p class="inlist">
+                <p class="inlist" style="margin-top: 1rem;">
                     <if condition="$goods.prom_type neq 2"><span style="float:left;">销量：{$goods['sales_sum']+$goods['virtual_sales_sum']}</span></if>
                     <!--<span >当前库存：<span class="spec_store_count">{$goods.store_count}</span></span>-->
                     <span>运费：<i id="shipping_freight"></i></span>
@@ -644,12 +644,15 @@
         </div>
     </div>
     </div>
+   
+</div>
 </form>
 <!--选择属性的弹窗-e-->
 <a onclick="$('html,body').animate({'scrollTop':0},600)" style="display: block;width: 1.5rem;height:1.5rem;position: fixed; bottom: 3rem;right:0.4rem; background-color: rgba(243,241,241,0.5);border: 1px solid #CCC;-webkit-border-radius: 50%;-moz-border-radius: 50%;border-radius: 50%;" id="topup">
     <img src="__STATIC__/images/topup.png" style="display: block;width: 1.45rem;height:1.45rem;">
 </a>
 <div class="mask-filter-div" style="display: none;"></div>
+<script src="https://cdn.bootcss.com/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
 <script type="text/javascript" src="__STATIC__/js/mobile-location.js"></script>
 <include file="public/wx_share"/>
 <!--优惠卷弹窗打开和关闭-->
@@ -1406,14 +1409,18 @@
             var name = "{$goods['goods_name']}";
             var price = "{$goods['shop_price']}";
             var _tpl = `
-                <div style="width:100%;height:100%;">
+                <div style="width:100%;height:100%;" id="downloaddiv">
                     <img style="width:100%; height:40%;" src="`+src+`" />
                     <p>`+name+`</p>
                     <p style="display:inline-block;color:red;hieght:10%;line-height:10%;">￥ `+price+`</p>
-                    <img style="width:50%; height:40%;position:absolute; right:20px;bottom:28px;" src="/Mobile/Goods/goods_share_qrcode?url=`+share_url+`" />
-                </div>
+                    <img style="width:50%; height:40%;position:absolute; right:20px;bottom:28px;" src="/Mobile/Goods/goods_share_qrcode?url=`+share_url+`" />                 
+               </div>
+               
                 `;
-            
+//          var _tpl=`<div class="test">测试5555555</div>             
+//                      <div><a class="down" href="" download="downImg">下载</a>
+//                     </div>`;
+
             layerer.open({
                 title:'二维码分享商品',
                 btn:false,
@@ -1554,6 +1561,61 @@ function combinationCurl(goods_id,item,combination_id) {
         });
     }
 
+</script>
+<script>
+    //直接选择要截图的dom，就能截图，但是因为canvas的原因，生成的图片模糊
+    //html2canvas(document.querySelector('div')).then(function(canvas) {
+    //    document.body.appendChild(canvas);
+    //});
+    //创建一个新的canvas
+    var canvas2 = document.createElement("canvas");
+    let
+    _canvas = document.querySelector('div');
+    var w = parseInt(window.getComputedStyle(_canvas).width);
+    var h = parseInt(window.getComputedStyle(_canvas).height);
+    //将canvas画布放大若干倍，然后盛放在较小的容器内，就显得不模糊了
+    canvas2.width = w * 2;
+    canvas2.height = h * 2;
+    canvas2.style.width = w + "px";
+    canvas2.style.height = h + "px";
+    //可以按照自己的需求，对context的参数修改,translate指的是偏移量
+    //  var context = canvas.getContext("2d");
+    //  context.translate(0,0);
+    var context = canvas2.getContext("2d");
+    context.scale(2, 2);
+    html2canvas(document.querySelector('div'), { canvas: canvas2 }).then(function(canvas) {
+        //document.body.appendChild(canvas);
+        //canvas转换成url，然后利用a标签的download属性，直接下载，绕过上传服务器再下载
+//      document.querySelector(".down").setAttribute('href', canvas.toDataURL());
+          $(".down").attr('href',canvas.toDataURL())
+    });
+</script>
+ 
+ 
+<script language="javascript">
+    //这是另一种写法
+    $(function () {
+        $(".down").click(function () {
+            html2canvas($("#downloaddiv")).then(function (canvas) {
+                  var imgUri = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"); // 获取生成的图片的url
+                window.location.href = imgUri; // 下载图片
+                   var data = canvas.toDataURL("image/png");//生成的格式
+                      //data就是生成的base64码啦
+                      alert(data);
+                      console.log(data)
+                
+            });
+ 
+ 
+//            html2canvas($('.test'), {
+//                onrendered: function (canvas) {
+//                    var data = canvas.toDataURL("image/png");//生成的格式
+//                    //data就是生成的base64码啦
+//                    alert(data);
+//                }
+//            });
+        });
+    });
 </script>
 
 <script src="__PUBLIC__/js/jqueryUrlGet.js"></script><!--获取get参数插件-->
