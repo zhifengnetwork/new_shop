@@ -268,6 +268,37 @@ class Goods extends MobileBase
         return $this->fetch();
     }
 
+    # base64 转图片并抛出下载
+    public function base64_to_png_download(){
+        
+        $base64 = I('post.data', '');
+        if(!$base64){
+            return false;
+        }
+
+        //匹配出图片的格式
+        if (preg_match('/^(data:\s*image\/(\w+);base64,)/', $base64, $result)){
+            $type = $result[2];
+            $new_file = ROOT_PATH."/public/upload/goods_share_png/";
+            if(!file_exists($new_file)){
+                //检查是否有该文件夹，如果没有就创建，并给予最高权限
+                mkdir($new_file, 0777,true);
+            }
+
+            $savename = time().rand(10000, 99999).".{$type}";
+            if (file_put_contents($new_file.$savename, base64_decode(str_replace($result[1], '', $base64)))){
+                    return "/public/upload/goods_share_png/".$savename;
+                }else{
+                    return false;
+                }
+        }else{
+            return false;
+        }
+    }
+
+
+
+
     # 商品分享二维码
     public function goods_share_qrcode(){
         $url = I('get.url');
