@@ -27,14 +27,14 @@ class LevelLogic extends Model
         // get_down_nums($d_info);
         //判断是否有上级,有就升级
         if($frist_leader_info){
-            foreach($frist_leader_info as $k=>$v){   
+            foreach($frist_leader_info as $k=>$v){  
                 //现在等级
                 // $agent_level = M('users')->where('user_id',$v)->value('distribut_level');
                 $agent_level = Db::query("select `distribut_level` from `tp_users` where `user_id` = '$v'");
                 // dump($agent_level);die;
                 $agent_level=$agent_level[0]['distribut_level'];
                 //所有下级列表
-                $d_info = Db::query("select `user_id` from `tp_users` where 'first_leader' = $v or parents like '%,$v,%'");//dump($d_info);
+                $d_info = Db::query("select `user_id` from `tp_users` where 'first_leader' = $v or parents like '%,$v,%'");
                 //条件团队人数
                 // $team_nums = Db::name('agent_level')->where('level',$agent_level+1)->value('team_nums');//dump($team_nums);
                 $team_nums = Db::query("select `team_nums` from `tp_agent_level` where `level` = $agent_level+1");
@@ -129,11 +129,19 @@ class LevelLogic extends Model
     /**
      * 获取推荐上级id
      */
-    public function user_info_agent($data)
+    public function user_info_agent($user_id)
     {
-        $recUser  = $this->getAllUp($data);
-        $list = array_column($recUser,'user_id');
-        return $list;
+        $lists = Db::name('users')->where('user_id',$user_id)->value('parents');
+        $parents = [];
+        if($lists){
+            $parents = array_filter(explode(',',$lists));
+        }
+
+        array_push($parents,$user_id);
+        $parents = array_reverse($parents);
+        // $recUser  = $this->getAllUp($data);
+        // $list = array_column($recUser,'user_id');
+        return $parents;
     }
     
     /**
