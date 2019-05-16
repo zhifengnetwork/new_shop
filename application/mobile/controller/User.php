@@ -729,44 +729,8 @@ class User extends MobileBase
     */
     public function invite_user(){
         $user_id = $this->user_id;
-        //获取下级id列表
-        // $agent_level = M('users')->where('user_id',$user_id)->value('distribut_level');
-        // $d_info = Db::query("select `user_id`, `first_leader`,`parents` from `tp_users` where 'first_leader' = $user_id or parents like '%,$user_id,%'");
-        // if($d_info){
-        //     $id_array =[];
-        //     foreach($d_info as $k=>$v){
-        //         array_push($id_array ,$v['user_id']);
-        //     }
-        // }
-        // //获取对应下级id的数据
-        // $log = [];
-        // foreach ($id_array as $value) {
-        //     $list = M('users')->where('user_id',$value)->find();
-        //     array_push($log,$list);
-        // }
-        // $log = Db::query("select a.`add_user_id`,b.`mobile`,b.`nickname`,`money`,`addtime` from `tp_commission_log` as a left join `tp_users` as b on a.`add_user_id` = b.`user_id` where a.`user_id` = '$user_id' and a.`identification` = 2 order by a.`addtime` desc limit 50");
-        // dump($log);//die;
-        //获取下级
-        // $list = M('users')->where('first_leader',$user_id)->column('user_id,nickname,mobile');
-        // // dump($list);exit;
-        // if ($list) {
-        //     $id_list = array_column($list,'user_id');
-        // }
-        
-        // //获取邀请用户得到佣金
-        // $log = M('commission_log')->where('add_user_id','in',$id_list)->where('user_id',$user_id)->where('identification',2)->order('id',desc)->limit(50)->select();
-        // dump($log);exit;
-        // if ($log) {
-        //     foreach($log as $key => $value){
-        //         $log[$key]['nickname'] = $list[$value['add_user_id']]['nickname'] ?: $list[$value['add_user_id']]['mobile'];
-        //         $log[$key]['mobile'] = $list[$value['add_user_id']]['mobile'];
-        //     }
-        // }
-
-        $sql = "select a.*,b.head_pic,b.nickname,b.mobile from `tp_commission_log` as a left join `tp_users` as b on a.add_user_id = b.user_id where iden order by addtime desc";
+        $sql = "select a.*,b.head_pic,b.nickname,b.mobile from `tp_commission_log` as a left join `tp_users` as b on a.add_user_id = b.user_id where a.identification = 2 and a.user_id = '$user_id' order by addtime desc limit 50";
         $log = Db::query($sql);
-
-        
         $this->assign('log',$log);
         return $this->fetch();
     }

@@ -77,7 +77,7 @@
                         <else/>
                             <img src="/public/images/user_default_icon.jpg" style="border-radius:50%;" class="touxiang">
                         </notempty>
-                       <span class="nickname">{$v.nickname}</span>
+                        <span class="nickname">{$v.nickname ? $v.nickname : $v.mobile}</span>
                     </span>
                 </li> 
                 <li class="li1" style="width:30%"><span>{$v[money]}</span></li>  
