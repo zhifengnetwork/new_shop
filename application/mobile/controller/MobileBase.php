@@ -30,8 +30,7 @@ class MobileBase extends Controller {
      * 初始化操作
      */
     public function _initialize() {
-        
-        // $this->Automatic_Program_SSGuanxi();
+
 
         session('user'); //不用这个在忘记密码不能获取session('validate_code');
 //        Session::start();
@@ -121,21 +120,6 @@ class MobileBase extends Controller {
         
     }
     
-    /**
-     * 自动程序
-     * 组装上下级关系
-     */
-    public function Automatic_Program_SSGuanxi(){
-
-        $pdb = Db::query("select * from `tp_parents_cache` where sort = 1 and (`parents` = '' or `parents` REGEXP '^[1-9]') order by id desc");
-        if(!$pdb){
-            
-        }
-
-        dump($pdb);exit;
-        exit;
-    }
- 
 
 	
 	/**
@@ -146,21 +130,23 @@ class MobileBase extends Controller {
 	public function share_poster(){
 		# 删除长时间的缓存
 		$del_time = time() - 600;
-		Db::execute("delete from `tp_wxshare_cache` where `time` <= '$del_time'");
+        Db::execute("delete from `tp_wxshare_cache` where `time` <= '$del_time'");
 		
 		# 当前用户信息
 		$user_temp = session('user');
 		if (isset($user_temp['user_id']) && $user_temp['first_leader'] < 1 && $user_temp['openid']) {
 			$cache = Db::name('wxshare_cache')->where('openid',$user_temp['openid'])->find();
 			if($cache){
-				Db::execute("update `tp_users` set `first_leader` = '".$cache['share_user']."' where `user_id` = '".$user_temp['user_id']."'");
+                if($user_temp['user_id'] != $cache['share_user']){
+                    Db::execute("update `tp_users` set `first_leader` = '".$cache['share_user']."' where `user_id` = '".$user_temp['user_id']."'");
+                    $share_user_openid = Db::name('users')->field('id,openid')->where('user_id',$cache['share_user'])->value('openid');
+                    if($share_user_openid){
+                        $wx_content = "会员ID: ".$user_temp['user_id']." 成为了你的下级!";
+                        $wechat = new \app\common\logic\wechat\WechatUtil();
+                        $wechat->sendMsg($share_user_openid, 'text', $wx_content);
+                    }
+                }
 				Db::execute("delete from `tp_wxshare_cache` where `id` = '".$cache['id']."'");
-				$share_user_openid = Db::name('users')->field('id,openid')->where('user_id',$cache['share_user'])->value('openid');
-				if($share_user_openid){
-					$wx_content = "会员ID: ".$user_temp['user_id']." 成为了你的下级!";
-					$wechat = new \app\common\logic\wechat\WechatUtil();
-					$wechat->sendMsg($share_user_openid, 'text', $wx_content);
-				}
 			}
 		} 
 	}

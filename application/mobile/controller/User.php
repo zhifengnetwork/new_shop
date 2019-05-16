@@ -747,20 +747,25 @@ class User extends MobileBase
         // $log = Db::query("select a.`add_user_id`,b.`mobile`,b.`nickname`,`money`,`addtime` from `tp_commission_log` as a left join `tp_users` as b on a.`add_user_id` = b.`user_id` where a.`user_id` = '$user_id' and a.`identification` = 2 order by a.`addtime` desc limit 50");
         // dump($log);//die;
         //获取下级
-        $list = M('users')->where('first_leader',$user_id)->column('user_id,nickname,mobile');
+        // $list = M('users')->where('first_leader',$user_id)->column('user_id,nickname,mobile');
+        // // dump($list);exit;
+        // if ($list) {
+        //     $id_list = array_column($list,'user_id');
+        // }
         
-        if ($list) {
-            $id_list = array_column($list,'user_id');
-        }
-        
-        //获取邀请用户得到佣金
-        $log = M('commission_log')->where('add_user_id','in',$id_list)->where('user_id',$user_id)->where('identification',2)->order('id',desc)->limit(50)->select();
-        if ($log) {
-            foreach($log as $key => $value){
-                $log[$key]['nickname'] = $list[$value['add_user_id']]['nickname'] ?: $list[$value['add_user_id']]['mobile'];
-                $log[$key]['mobile'] = $list[$value['add_user_id']]['mobile'];
-            }
-        }
+        // //获取邀请用户得到佣金
+        // $log = M('commission_log')->where('add_user_id','in',$id_list)->where('user_id',$user_id)->where('identification',2)->order('id',desc)->limit(50)->select();
+        // dump($log);exit;
+        // if ($log) {
+        //     foreach($log as $key => $value){
+        //         $log[$key]['nickname'] = $list[$value['add_user_id']]['nickname'] ?: $list[$value['add_user_id']]['mobile'];
+        //         $log[$key]['mobile'] = $list[$value['add_user_id']]['mobile'];
+        //     }
+        // }
+
+        $sql = "select a.*,b.head_pic,b.nickname,b.mobile from `tp_commission_log` as a left join `tp_users` as b on a.add_user_id = b.user_id where iden order by addtime desc";
+        $log = Db::query($sql);
+
         
         $this->assign('log',$log);
         return $this->fetch();
