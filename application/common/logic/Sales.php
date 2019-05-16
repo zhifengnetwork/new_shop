@@ -35,7 +35,7 @@ class Sales extends Model
 		$user_id = $this->user_id;
 		$user = $this->get_user();
 		$bonus_products_id = 0;
-		// $bonus_products_id = ($user['bonus_products_id'] > 0) ? $user['bonus_products_id'] : 0;
+		
 		if (!$user) {
 			return array('msg'=>"该用户不存在",'code'=>0);
 		}
@@ -54,60 +54,58 @@ class Sales extends Model
 		
 		$user_level = $user['distribut_level'];
 		$parents_id = array();
-		// if ($user['parents']) {
+		
 		if ($user['parents']) {
 			$parents_id = explode(',', $user['parents']);
 			$parents_id = array_filter($parents_id);  //去除0
-		}
 		
-		// if (!$parents_id) {
-		// 	return array('msg'=>"该用户没有上级",'code'=>0);
-		// }
-
-		if ($bonus_products_id > 0) {
-			M('users')->where('user_id','in',$parents_id)->where('user_id','neq',$first_leader_id)->where('bonus_products_id','>',0)->update(['bonus_products_id'=>0]);
+			if ($bonus_products_id > 0) {
+				M('users')->where('user_id','in',$parents_id)->where('user_id','neq',$first_leader_id)->where('bonus_products_id','>',0)->update(['bonus_products_id'=>0]);
+			}
 		}
 		
 		$this->cash_unlock($parents_id);	//提现解锁
-		$is_repeat = $this->repeat_buy($this->user_id,$this->goods_id);
+		// $is_repeat = $this->repeat_buy($this->user_id,$this->goods_id);
 		
+		$is_repeat = false;
+		if($user_level > 0){
+			$is_repeat = true;
+		}
+
 		//是否重复购买
-		if ($user_level > 0) {
-			$reward = $this->repeat_reward($parents_id,$user_level,true);
+		if ($is_repeat) {
+			$reward = $this->repeat_reward($parents_id,$user_level,$is_repeat);
 		} else {
-			$reward = $this->reward($parents_id,$user_level,false);
+			$reward = $this->reward($parents_id,$user_level,$is_repeat);
 		}
 		
 		$this->team_bonus($parents_id);	//团队奖励
 		
 		return $reward;
-		// } else {
-		// 	return array('msg'=>"该用户没有上级",'code'=>0);
-		// }
 	}
 
-	//是否重复购买
-	public function repeat_buy($user_id,$goods_id)
-	{
-		$is_repeat = false;
-		$order_num = 0;
-		// $order_num = Db::name('order_goods')->alias('goods')
-		// 			 ->distinct(true)
-		// 			 ->join('order order','goods.order_id = order.order_id')
-		// 			 ->where(['goods.goods_id'=>$this->goods_id,'order.user_id'=>$this->user_id])
-		// 			 ->count();
-		$order_goods = M('order_goods')->where(['goods_id'=>$goods_id])->select();
+	// //是否重复购买
+	// public function repeat_buy($user_id,$goods_id)
+	// {
+	// 	$is_repeat = false;
+	// 	$order_num = 0;
+	// 	// $order_num = Db::name('order_goods')->alias('goods')
+	// 	// 			 ->distinct(true)
+	// 	// 			 ->join('order order','goods.order_id = order.order_id')
+	// 	// 			 ->where(['goods.goods_id'=>$this->goods_id,'order.user_id'=>$this->user_id])
+	// 	// 			 ->count();
+	// 	$order_goods = M('order_goods')->where(['goods_id'=>$goods_id])->select();
 
-		if ($order_goods) {
-			$ids = array_column($order_goods,'order_id');
-			$order_num = M('order')->where('user_id',$user_id)->where('order_id','in',$ids)->where('pay_status',1)->count();
-		}
+	// 	if ($order_goods) {
+	// 		$ids = array_column($order_goods,'order_id');
+	// 		$order_num = M('order')->where('user_id',$user_id)->where('order_id','in',$ids)->where('pay_status',1)->count();
+	// 	}
 		
-		if ($order_num > 1) {
-			$is_repeat = true;
-		}
-		return $is_repeat;
-	}
+	// 	if ($order_num > 1) {
+	// 		$is_repeat = true;
+	// 	}
+	// 	return $is_repeat;
+	// }
 
 	//第一次购买奖励
 	public function reward($parents_id,$user_level,$is_repeat)
@@ -551,6 +549,7 @@ class Sales extends Model
 					$is_prize = true;
 					$msg = "自购直推奖 ";
 					$distribut_type = 2;
+					$msg = $msg.$money."（元），商品：".$order['goods_num']." 件";
 
 					if ($money > 0) {
 						$user_money += $money;
