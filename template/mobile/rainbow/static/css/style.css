@@ -1199,14 +1199,16 @@ footer .flool3 p {
 	background-size:cover;
 }
 .logo-wrap-bg img {
-	width:100%;
+	width:100%
+	
 }
 .login-logo-wrap {
 	display:block;
 	width:5.802666rem;
-	height:2.346666rem;
+	height:6rem;
 	margin:auto;
 	overflow:hidden;
+	margin-top: -2rem
 }
 .loginsingup-input {
 	background-color:#fff;
@@ -12026,6 +12028,15 @@ pre {
 	white-space: initial;
 	display: inline-block;
 }
-
+.single_item li:last-child .similar-product-price{
+	
+	padding-bottom: 1.5rem
+	
+}
+.single_item li:nth-last-child(2) .similar-product-price{
+	
+	padding-bottom: 1.5rem
+	
+}
 
 
