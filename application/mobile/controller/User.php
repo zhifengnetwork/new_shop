@@ -180,7 +180,7 @@ class User extends MobileBase
                 $Earnings->money = $total_money;
                 $Earnings->obj = $obj;
 
-                // $Earnings->save();
+                $Earnings->save();
 
                 $earnings_info = $Earnings->where($where)->find();
                 $obj = $earnings_info->obj;
@@ -328,7 +328,7 @@ class User extends MobileBase
     public function lower_wait($user,$old_order_id)
     {
         $user_id = $user['user_id'];
-        $lower_ids = $this->lower_id($user_id);  //获取下级id列表
+        $lower_ids = get_all_lower($user_id);  //获取下级id列表
        
         $leader_list = M('users')->whereIn('user_id',$lower_ids)->column('user_id,parents,first_leader,distribut_level,is_distribut,bonus_products_id,is_lock');
         $leader_list[$user_id] = $user;
@@ -642,8 +642,9 @@ class User extends MobileBase
         $first_count = count($first);
         $second_count = count($second);
         $third_count = count($third);
-
-        $team_count = Db::query("SELECT count(*) as count FROM tp_users where find_in_set('$user_id',`parents`)");
+        
+        $team_count = Db::query("SELECT count(*) as count FROM tp_parents_cache where find_in_set('$user_id',`parents`)");
+        // $team_count = Db::query("SELECT count(*) as count FROM tp_users where find_in_set('$user_id',`parents`)");
 
         $this->assign('first_count',$first_count);
         $this->assign('second_count',$second_count);
