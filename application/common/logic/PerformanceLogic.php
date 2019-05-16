@@ -70,10 +70,6 @@ class PerformanceLogic extends Model
 		$id_list = $id_list ? explode(',', $id_list) : array();
 		$new_list = array_reverse(array_filter($id_list));
 		
-		if (!$new_list) {
-			return false;
-		}
-		
 		foreach ($new_list as $key => $value) {
 			$is_team = $Performance->where('user_id',$value)->find();
 			
