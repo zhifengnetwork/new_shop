@@ -26,38 +26,18 @@ class LevelLogic extends Model
 
         //判断是否有上级,有就升级
         if($frist_leader_info){
-            foreach($frist_leader_info as $k=>$v){  
-                //现在等级
-                $agent_level = Db::name('users')->where('user_id',$v)->value('distribut_level');
-
+            foreach($frist_leader_info as $k=>$v){
                 //所有下级id列表
-//                $d_info = Db::query("select `user_id` from `tp_users` where 'first_leader' = $v or parents like '%,$v,%'");
-                $d_info = Db::query("select `user_id` from `tp_parents_cache` where find_in_set($v,parents)");
+//                $d_info = Db::query("select `user_id` from `tp_parents_cache` where find_in_set($v,parents)");
                 //升级条件所需团队人数
-                $team_nums = Db::name('agent_level')->where('level',$agent_level+1)->value('team_nums');
-                $count = 0;
+                $res = $this->get_count($v);
 
-                if ($d_info){
-                    foreach($d_info as $k1=>$v1){
-                        //下级等级
-                        $l = Db::name('users')->where('user_id',$v1['user_id'])->value('distribut_level');//dump($l);
-
-                        if($l >= $agent_level){
-                            $count += 1;
-                            //如果同级人数达到升级条件规定,跳出到下一步
-                            if($count >= $team_nums){
-                                // continue;
-                                break;
-                            }
-                        }
-
-                    }
-                }
                 //如果该上级id所有下级的同级人数大于条件所需，执行升级，否则跳出这步循环
-                if($count < $team_nums){
+                if($res['count'] < $res['team_nums']){
                     continue;
                 }else{
-                    $this->upgrade_agent($v,$max_level,$count);
+                    //开始升级
+                    $this->upgrade_agent($v,$max_level,$res['count']);
                 }
             }
         }
@@ -114,8 +94,14 @@ class LevelLogic extends Model
         }
         if($bool == true){
             if($agent_level != $max_level){
-                Db::name('users')->where('user_id',$agent_id)->setInc('distribut_level');
-                // Db::name('admin_log')->insert(['log_info'=>$agent_id]);
+                Db::name('users')->where('user_id',$agent_id)->setInc('distribut_level');  //升级
+                Db::name('agent_level_log')->insert(['user_id'=>$agent_id,'level'=>$agent_level+1,'up_time'=>time()]);  //升级记录
+                // 看是否还要升级
+                $res = $this->get_count($agent_id);//dump($res);
+                if($res['count'] >= $res['team_nums']){
+                    // 再升1级
+                    $this->upgrade_agent($agent_id,$max_level,$res['count']);
+                }
             }
         }
     }
@@ -198,6 +184,37 @@ class LevelLogic extends Model
         $lists = array_reverse(array_filter(explode(',',$parents))); //上级列表数组
 
         return $lists;
+    }
+
+    /**
+     * 新的 获取下级同级人数与升级条件所需团队人数
+     */
+    public function get_count($agent_id)
+    {
+        $d_info = Db::query("select `user_id` from `tp_parents_cache` where find_in_set($agent_id,parents)");
+        $agent_level = Db::name('users')->where('user_id',$agent_id)->value('distribut_level');
+        $team_nums = Db::name('agent_level')->where('level',$agent_level+1)->value('team_nums');//升级条件所需团队人数
+        $count = 0;
+
+        if ($d_info){
+            foreach($d_info as $k1=>$v1){
+                //下级等级
+                $le = Db::name('users')->where('user_id',$v1['user_id'])->value('distribut_level');//dump($le);
+
+                if($le >= $agent_level){
+                    $count += 1;
+                    //如果同级人数达到升级条件规定,跳出到下一步
+                    if($count >= $team_nums){
+                        break;
+                    }
+                }
+
+            }
+        }
+        $res['team_nums'] = $team_nums;
+        $res['count'] = $count;
+
+        return $res;
     }
 
 //    /**
