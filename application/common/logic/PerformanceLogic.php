@@ -66,9 +66,10 @@ class PerformanceLogic extends Model
 			'note'=>'订单编号为 '.$order_sn.' 的业绩'
 		);
 		//上级
-		$id_list = $Users->where('user_id',$user_id)->value('parents');
-		$id_list = $id_list ? explode(',', $id_list) : array();
-		$new_list = array_reverse(array_filter($id_list));
+		// $id_list = $Users->where('user_id',$user_id)->value('parents');
+		// $id_list = $id_list ? explode(',', $id_list) : array();
+		// $new_list = array_reverse(array_filter($id_list));
+		$new_list = get_parents_ids($user_id);
 		
 		foreach ($new_list as $key => $value) {
 			$is_team = $Performance->where('user_id',$value)->find();
