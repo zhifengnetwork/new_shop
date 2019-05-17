@@ -82,8 +82,9 @@ class User extends Base
             // $third_leader = convert_arr_key($third_leader, 'third_leader');
 			
 			foreach($user_id_arr as $v){
-				$last_cout[$v]['direct'] = Db::name('users')->where('first_leader', $v)->count();
-				$last_cout[$v]['team'] = Db::query("select count(*) as count from `__PREFIX__users` where find_in_set('$v', parents)")[0]['count'];
+                $last_cout[$v]['direct'] = Db::name('users')->where('first_leader', $v)->count();
+                $last_cout[$v]['team'] = Db::query("select count(*) as count from `__PREFIX__parents_cache` where find_in_set('$v', parents)")[0]['count'];
+				// $last_cout[$v]['team'] = Db::query("select count(*) as count from `__PREFIX__users` where find_in_set('$v', parents)")[0]['count'];
 			}
 			
 			$this->assign('last_cout', $last_cout);
@@ -148,8 +149,15 @@ class User extends Base
 	public function team_list(){
         
         $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+        $all_lower = get_all_lower($id);
+        $all_lower = implode(',',$all_lower);
+        $list = array();
+        if ($all_lower) {
+            $list = Db::query("select * from `tp_users` where `first_leader` > 0 and `user_id` in ($all_lower)");
+        } 
         
-        $list = Db::query("select * from `tp_users` where `first_leader` > 0 and find_in_set('$id',parents)");
+        // $list = Db::query("select * from `tp_users` where `first_leader` > 0 and find_in_set('$id',parents)");
+        
         $count = count($list);
         $agnet_name = $this->all_level();
 

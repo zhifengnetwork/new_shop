@@ -52,6 +52,17 @@ function get_parents_ids($user_id){
     return $parent_ids;
 }
 
+//获取所有下级id
+function get_all_lower($user_id){
+    $all_lower = Db::query("select `user_id` from `tp_parents_cache` where find_in_set($user_id,parents)");
+    $all_lower_ids = array();
+    if ($all_lower) {
+        $all_lower_ids = array_column($all_lower,'user_id');
+    }
+
+    return $all_lower_ids;
+}
+
 //返佣查询条件
 function get_comm_condition($type){
     $where = [];
