@@ -218,18 +218,18 @@ class User extends MobileBase
         $num = 0;
         $result = array();
         $order_ids = M('order_divide')->where('user_id',$user_id)->column('order_id');
-
+        
         $all_order_goods = M('order_goods')->whereIn('order_id',function($query) use ($user_id,$order_ids,$old_order_id){
                                 $query->name('order')->where('user_id',$user_id)->where('order_id','not in',$order_ids)->where('order_id','not in',$old_order_id)->field('order_id');
                             })->where('is_send','<>',3)->column('rec_id,goods_id');
-        
+
         $repeat_ids = $this->repeat_buy($user['distribut_level'],$all_order_goods); //重复购买商品id
         $all_ids = $repeat_ids['all_ids'];
         $goods_ids = $repeat_ids['goods_ids'];
         
-        $order_goods = M('order_goods')->whereIn('rec_id',$all_ids)->column('goods_id,order_id,goods_name,goods_num,prize_ratio,is_team_prize');
-
-        $comm = self::get_comm_setting(true,$goods_ids); //获取返佣设置
+        $order_goods = M('order_goods')->whereIn('rec_id',$goods_ids)->column('goods_id,order_id,goods_name,goods_num,prize_ratio,is_team_prize');
+        
+        $comm = self::get_comm_setting(true,$all_ids); //获取返佣设置
         
         foreach ($comm as $k3 => $v3) {
             $money = 0;
@@ -303,18 +303,27 @@ class User extends MobileBase
     //重复购买商品id
     public function repeat_buy($user_level,$all_order_goods)
     {
-        $order_goods_count = array_count_values($all_order_goods); //统计键值
+        // $order_goods_count = array_count_values($all_order_goods); //统计键值
         $result = array('goods_ids'=>array(),'all_ids'=>array(),'first'=>array());
-
-        foreach ($order_goods_count as $k1 => $v1) {
+        
+        foreach ($all_order_goods as $k1 => $v1) {
+            if ($user_level === false) {
+                $user_level = Db::name('users')->alias('users')
+                                ->join('order order','order.user_id = users.user_id')
+                                ->join('order_goods goods','order.order_id = goods.order_id')
+                                ->where('goods.rec_id',$k1)
+                                ->value('distribut_level');
+            }
+            
             if ($user_level > 0) {
                 $result['goods_ids'][] = $k1;   //重复购买商品id
-                foreach ($all_order_goods as $k2 => $v2) {
-                    if ($v2 == $k1) {
-                        $result['all_ids'][] = $k2;
-                        unset($all_order_goods[$k2]);
-                    }
-                }
+                $result['all_ids'][] = $v1;
+                // foreach ($all_order_goods as $k2 => $v2) {
+                //     if ($v2 == $k1) {
+                //         $result['all_ids'][] = $k2;
+                //         unset($all_order_goods[$k2]);
+                //     }
+                // }
             } else {
                 $result['first'][] = $k1;
             }
@@ -329,18 +338,39 @@ class User extends MobileBase
     {
         $user_id = $user['user_id'];
         $lower_ids = get_all_lower($user_id);  //获取下级id列表
-       
-        $leader_list = M('users')->whereIn('user_id',$lower_ids)->column('user_id,parents,first_leader,distribut_level,is_distribut,bonus_products_id,is_lock');
-        $leader_list[$user_id] = $user;
-        ksort($leader_list);
-        $order_divide = M('order_divide')->where('user_id','in',$lower_ids)->column('order_id');  //获取已返佣的订单
-        //获取还没返佣的订单
-                            
-        $goods_ids = M('order_goods')->whereIn('order_id',function($query) use ($order_divide,$lower_ids,$old_order_id) {
-            $query->name('order')->where('order_id','not in',$order_divide)->where('user_id','in',$lower_ids)->where('order_id','not in',$old_order_id)->field('order_id');
-        })->where('is_send','<>',3)->column('rec_id,goods_id');
         
-        $repeat_ids = $this->repeat_buy($user['distribut_level'],$goods_ids); //是否重复购买
+        //获取已返佣的订单
+        $order_id = Db::name('order')->alias('order')
+                    ->join('order_divide divide','order.order_id = divide.order_id')
+                    ->where('divide.user_id','in',$lower_ids)
+                    ->column('order.order_id');
+        
+        $wait_goods_ids = Db::name('order')->where('order_id','not in',$order_id)->where('order_id','not in',$old_order_id)->where('user_id','in',$lower_ids)->where('pay_status',1)->field('order_id,user_id')->order('add_time','desc')->limit(5)->select();
+        
+        if (!$wait_goods_ids) {
+            return false;
+        }
+        
+        $user_ids = array_column($wait_goods_ids,'user_id');
+        $order_ids = array_column($wait_goods_ids,'order_id');
+        
+        // $wait_order = M('order')->whereIn('user_id',$lower_ids)->where('order_id','not in',$order_divide)->column('order_id,user_id');dump(date('i:s'));
+        foreach ($user_ids as $key => $value) {
+            $leader_list[$value] = get_parents_ids($value);//获取上级id
+        }
+       
+        $goods_ids = M('order_goods')->whereIn('order_id',$order_ids)->where('is_send','<>',3)->column('rec_id,goods_id');
+        // $leader_list = M('users')->whereIn('user_id',$lower_ids)->column('user_id,parents,first_leader,distribut_level,is_distribut,bonus_products_id,is_lock');
+        // $leader_list[$user_id] = $user;
+        // ksort($leader_list);
+        
+        //获取还没返佣的订单
+        
+        // $goods_ids = M('order_goods')->whereIn('order_id',function($query) use ($order_divide,$lower_ids,$old_order_id) {
+        //     $query->name('order')->where('order_id','not in',$order_divide)->where('user_id','in',$lower_ids)->where('order_id','not in',$old_order_id)->field('order_id');
+        // })->where('is_send','<>',3)->column('rec_id,goods_id');
+        
+        $repeat_ids = $this->repeat_buy(false,$goods_ids); //是否重复购买
         $second_ids = $repeat_ids['goods_ids'];
         $first_ids = $repeat_ids['first'];
         
@@ -365,24 +395,28 @@ class User extends MobileBase
         if ($comm) {
             $user_id = $user['user_id'];
             $user_level = intval($user['distribut_level']);
+            $bonus_products_id = $user['bonus_products_id'];
 
             $goods_ids = array_column($comm, 'goods_id');
             $goods = M('order_goods')->whereIn('rec_id',$rec_ids)->where('goods_id','in',$goods_ids)->where('is_send','<>',3)->field('order_id,goods_id,goods_name,goods_num,goods_price,is_team_prize,prize_ratio')->select();
+            if (!$goods) {
+                return $result;
+            }
             $order_ids = array_column($goods, 'order_id');
             $order = M('order')->whereIn('order_id',$order_ids)->column('order_id,user_id');
             //是否有团队奖励
-            if ($fisrt_leader['bonus_products_id'] > 0) {
-                $prize_ratio = M('goods')->where('goods_id',$fisrt_leader['bonus_products_id'])->value('prize_ratio');
+            if ($bonus_products_id > 0) {
+                $prize_ratio = M('goods')->where('goods_id',$bonus_products_id)->value('prize_ratio');
             }
             foreach ($goods as $k1 => $v1) {
                 $order = M('order')->where('order_id',$v1['order_id'])->field('order_id,user_id')->find();
-                $parents = $leader_list[$order['user_id']]['parents'];
-                $parents_id = $parents ? explode(',',$parents) : 0;
-                $parent_id = $leader_list[$order[$v1['order_id']]]['first_leader'];
-                $is_exist = in_array($parent_id,$parents_id);
-                if (!$is_exist) {
-                    array_unshift($parents_id,$leader_list[$parent_id]);
-                }
+                // $parents = $leader_list[$order['user_id']]['parents'];
+                // $parents_id = $parents ? explode(',',$parents) : 0;
+                $parent_id = $leader_list[$order[$v1['order_id']]];
+                // $is_exist = in_array($parent_id,$parents_id);
+                // if (!$is_exist) {
+                //     array_unshift($parents_id,$leader_list[$parent_id]);
+                // }
                 krsort($parents_id);
                 $parents_id = array_filter($parents_id);  //去除0
 
@@ -405,27 +439,7 @@ class User extends MobileBase
                         $num ++;
                     }
                 }
-                // //团队奖励商品
-                // if ($v1['is_team_prize'] == 1) {
-                //     $first_leader = M('users')->where('user_id',$order['user_id'])->field('first_leader,bonus_products_id')->find();
-                //     //是直推上级且商品符合则返佣
-                //     if(($first_leader['first_leader'] == $user['user_id']) && ($fisrt_leader['bonus_products_id'] == $v1['goods_id'])){
-                //         // $prize_ratio = M('goods')->where('goods_id',$)
-                //         $team_money = $v1['goods_price'] * $v1['goods_num'] * ($v1['prize_ratio'] / 100);
-                //         $money = round($money,2);
-                //         if ($money) {
-                //             $total_money += $team_money;
 
-                //             $list[$num]['goods_id'] = $v1['goods_id'];
-                //             $list[$num]['order_id'] = $v1['order_id'];
-                //             $list[$num]['goods_name'] = $v1['goods_name'];
-                //             $list[$num]['goods_num'] = $v1['goods_num'];
-                //             $list[$num]['money'] = $team_money;
-                //             $num ++;
-                //         }
-                //     }
-                // }
-                
                 if (!$parents_id) {
                     continue;
                 }

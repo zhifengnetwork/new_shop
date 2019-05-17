@@ -133,7 +133,7 @@ function sales($order_id){
     if ($goods_list) {
         $bool = is_receiving_commission($goods_list);
         
-        if (!$bool) {
+        if ($bool) {
             if ($order['order_status'] == 2) {
                 $bool = true;
             } else {
