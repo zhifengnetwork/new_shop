@@ -61,6 +61,7 @@ class PerformanceLogic extends Model
 			'user_id'=>$user_id,
 			'money'=>$price,
 			'goods_num'=>$goods_num,
+			'order_sn'=>$order_sn,
 			'order_id'=>$order_id,
 			'create_time'=>Date('Y-m-d H:i:s'),
 			'note'=>'订单编号为 '.$order_sn.' 的业绩'
