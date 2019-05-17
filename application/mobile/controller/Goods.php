@@ -24,13 +24,17 @@ use think\AjaxPage;
 use think\Page;
 use think\Db;
 use think\Session;
-
+use org\wechat\Jssdk;
 class Goods extends MobileBase
 {
     public function index()
     {
         return $this->fetch();
     }
+
+    /**
+     * 微信分享
+     */
 
     /**
      * 分类列表显示

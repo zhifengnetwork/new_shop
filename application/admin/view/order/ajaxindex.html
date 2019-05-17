@@ -15,6 +15,12 @@
         <td align="center" abbr="order_sn" axis="col1" class="">
           <div style="text-align: center; width: 140px;" class="">{$list.order_sn}</div>
         </td>
+        <td align="center" abbr="order_sn" axis="col1" class="">
+          <div style="text-align: center; width: 60px;" class=""><img style="width:50px; height:50px;" src="{$oginfo[$list.order_id]['original_img']}" /></div>
+        </td>
+        <td align="center" abbr="order_sn" axis="col1" class="">
+          <div style="text-align: center; width: 140px;" class="">{$oginfo[$list.order_id]['goods_name'] ? $oginfo[$list.order_id]['goods_name'] : '--'}</div>
+        </td>
         <td align="center" abbr="consignee" axis="col2" class="">
           <div style="text-align: center; width: 120px;" class="">{$list.consignee}:{$list.mobile}</div>
         </td>

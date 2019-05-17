@@ -110,6 +110,18 @@ class Order extends Base {
         $orderList = Db::name('order')->where($condition)->limit($Page->firstRow,$Page->listRows)->order($sort_order)->select();
         if ($orderList) {
             $user_ids = array_column($orderList, 'user_id');
+            $order_ids = array_column($orderList, 'order_id');
+            if($order_ids){
+                foreach($order_ids as $oid){
+                    $sql = " select a.order_id,a.goods_name,b.original_img from `tp_order_goods` as a left join `tp_goods` as b on a.goods_id = b.goods_id where a.order_id = '$oid'";
+                    $ogi = Db::query($sql);
+                    if($ogi){
+                        $oginfo[$oid] = $ogi[0];
+                    }
+                }
+            }
+
+
             $avatar = get_avatar($user_ids);
 
             foreach ($orderList as $key => $value) {
@@ -117,6 +129,8 @@ class Order extends Base {
             }
         }
         
+        // dump($oginfo);exit;
+        $this->assign('oginfo',$oginfo);
         $this->assign('orderList',$orderList);
         $this->assign('page',$show);// 赋值分页输出
         $this->assign('pager',$Page);
