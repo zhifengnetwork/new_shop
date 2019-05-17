@@ -521,6 +521,7 @@ class GoodsLogic extends Model
                 if($specGoodsPrice){
                     Db::name('spec_goods_price')->where(['goods_id' => $goods_id, 'key' => $k])->update($data);
                 }else{
+                    $data['commission'] =  $data['commission'] ? $data['commission'] : '';
                     Db::name('spec_goods_price')->insert($data);
                 }
 

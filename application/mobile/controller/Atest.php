@@ -8,6 +8,7 @@ class Atest
 {
 
     public function index(){
+        $maxlen = 1024;
 
         # 查找有上级关系，上级列缓存未完成的用户
         $user = Db::name('users')->field('user_id,first_leader,parents_cache')->where(['parents_cache' => ['=', 0], 'first_leader' => ['>', 0]])->order('first_leader asc')->find();
@@ -39,7 +40,7 @@ class Atest
                     }
 
                     $count = count($parents) - 1;
-                    if($count <= 3){
+                    if($count <= $maxlen){
                         krsort($parents);
                         $parents_str = implode(',', $parents);
                         Db::name('parents_cache')->insert(['user_id' => $user['user_id'], 'sort' => 1, 'parents' => $parents_str, 'count' => $count]);
@@ -48,13 +49,36 @@ class Atest
                         }
                         goto OnceMore;
                     }else{
+                        
+                        $len = intval($count/$maxlen);
+                        $le = $count%$maxlen;
+                        if($le > 0){
+                            $len = $len + 1;
+                        }
+                        
 
-
-                        dump($count);exit;
+                        $e = 0;
+                        for($len; $len>0; $len--){
+                            for($i=0; $i<3;$i++){
+                                $d[] = array_shift($parents);
+                                
+                            }
+                            $i = 0;
+                            $c = count($d);
+                            if($d[$c-1] == 0){
+                                $c = $c - 1;
+                                $e = 1;
+                            }
+                            krsort($d);
+                            $parents_str = implode(',', $d) ;
+                            Db::name('parents_cache')->insert(['user_id'=>$user['user_id'], 'sort' => $len, 'parents'=>$parents_str, 'count' => $c]);
+                            $d = '';
+                        }
+                        if($e){
+                            Db::name('users')->where('user_id', $user['user_id'])->update(['parents_cache' => 1]);
+                        }
+                        goto OnceMore;
                     }
-                    
-                    
-                    dump($parents);exit;
                 }else{
                     # 上级不存在上级缓存，设定上级的上级为0【没有上级】
                     $parents[] = 0;
@@ -74,10 +98,10 @@ class Atest
                 if($parents[0] == 0){
                     Db::name('users')->where('user_id', $user['user_id'])->update(['parents_cache' => 1]);
                     goto OnceMore;
+                }else{
+
+                    echo $parents[0];exit;
                 }
-
-
-                dump($parents);exit;
             }
         }else{
             exit('END');
