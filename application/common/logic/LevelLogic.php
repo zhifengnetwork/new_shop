@@ -29,6 +29,7 @@ class LevelLogic extends Model
             foreach($frist_leader_info as $k=>$v){
                 //所有下级id列表
 //                $d_info = Db::query("select `user_id` from `tp_parents_cache` where find_in_set($v,parents)");
+//                dump($v);die;
                 //升级条件所需团队人数
                 $res = $this->get_count($v);
 
@@ -176,9 +177,11 @@ class LevelLogic extends Model
     {
         $list = Db::name('parents_cache')->where('user_id',$user_id)->order('sort asc')->field('parents,count')->select();
         $list1 = [];
-        foreach ($list as $k=>$v){
-            array_push($list1,$v['parents']);
-        }
+//        if ($list){
+            foreach ($list as $k=>$v){
+                array_push($list1,$v['parents']);
+            }
+//        }
         array_push($list1,$user_id);
         $parents = implode($list1,','); //上级列
         $lists = array_reverse(array_filter(explode(',',$parents))); //上级列表数组
