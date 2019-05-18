@@ -828,12 +828,20 @@ class Order extends Base {
     public function deliveryHandle(){
         $orderLogic = new OrderLogic();
 		$data = I('post.');
-		$res = $orderLogic->deliveryHandle($data);
+        $res = $orderLogic->deliveryHandle($data);
 		if($res['status'] == 1){
 			if($data['send_type'] == 2 && !empty($res['printhtml'])){
 				$this->assign('printhtml',$res['printhtml']);
 				return $this->fetch('print_online');
-			}
+            }
+            $osql = "select a.user_id,a.order_sn,b.openid from `tp_order` as a left join `tp_users` as b on a.user_id = b.user_id where a.order_id = '$data[order_id]'";
+            $ou = Db::query($osql);
+            if(isset($ou[0]['openid']) && $ou[0]['openid']){
+                $ou = $ou[0];
+                $goods_name = Db::name('order_goods')->where('order_id', $data['order_id'])->value('goods_name');
+                $this->Out_Order($ou['openid'],'你的宝贝已发出，请耐心等候！', $goods_name,$ou['order_sn'],'神器商城','感谢你的努力付出，有付出就有回报！希望你再接再厉！');
+            }
+
 			$this->success('操作成功',U('Admin/Order/delivery_info',array('order_id'=>$data['order_id'])));
 		}else{
 			$this->error($res['msg'],U('Admin/Order/delivery_info',array('order_id'=>$data['order_id'])));

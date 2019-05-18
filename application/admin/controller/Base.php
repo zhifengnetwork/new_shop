@@ -43,6 +43,8 @@ class Base extends Controller {
         $navigate_admin = navigate_admin();
         $this->assign('navigate_admin',$navigate_admin);
         tpversion();
+
+        $this->Auto_Refresh_Access_Token();
    }
     
     /**
@@ -63,6 +65,93 @@ class Base extends Controller {
             }
         }
         $this->public_assign();
+    }
+
+    /**
+     * 主动刷新微信全局 ACCESS_TOKEN
+     * @author Rock
+     * @date 2019/03/25
+     */
+    public function Auto_Refresh_Access_Token($auto = false){
+        $conf = Db::name('wx_user')->field('id,appid,appsecret,web_access_token,web_expires')->where('wait_access',1)->find();
+        if($conf['appid']){
+            if($conf['web_expires'] < time() || $auto){
+				$appid = $conf['appid'];
+				$appsecret = $conf['appsecret'];
+                $url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=$appid&secret=$appsecret";
+                $res = httpRequest($url,'GET');
+                $res = json_decode($res,true);
+                if($res['access_token']){
+					$access_token = $res['access_token'];
+					$expires_in = time() + ($res['expires_in'] - 200);
+					Db::execute("update `tp_wx_user` set `web_access_token` = '$access_token',`web_expires` = '$expires_in' where `id` = '$conf[id]'");
+				}
+            }
+        }
+    }
+
+    # 提现成功通知
+    public function Withdrawal_Success($openid,$title,$money,$time,$remark,$url=''){
+        $data = [
+            'touser' => $openid,
+            'template_id' => '2kfCT6VDejHU55ttMbZ70rLxrVuq6bjt9ZGtyKqkSE0',
+            'url' => $url,
+            'data' => [
+                'first' => [
+                    'value' => $title,
+                ],
+                'keyword1' => [
+                    'value' => $money . ' 元',
+                ],
+                'keyword2' => [
+                    'value' => date('Y年m月d日 H时i分s秒', $time),
+                ],
+                'remark' => [
+                    'value' => $remark,
+                ],
+            ],
+        ];
+        return $this->Send_Template_Message($data);
+    }
+
+    # 发货成功通知
+    public function Out_Order($openid,$title,$goods_name,$order_sn,$system='神器商城',$remark,$url=''){
+        $data = [
+            'touser' => $openid,
+            'template_id' => 'p6GUL7lm9Au3tVCKAY3XAGY5t3g9_iHhlhYPOjGUSXY',
+            'url' => $url,
+            'data' => [
+                'first' => [
+                    'value' => $title,
+                ],
+                'keyword1' => [
+                    'value' => $goods_name,
+                ],
+                'keyword2' => [
+                    'value' => $order_sn,
+                ],
+                'keyword3' => [
+                    'value' => $system,
+                ],
+                'remark' => [
+                    'value' => $remark,
+                ],
+            ],
+        ];
+        return $this->Send_Template_Message($data);
+    }
+
+    # 发送模板消息
+    public function Send_Template_Message($data){
+        if(!$data){
+            return false;
+        }
+        $conf = Db::name('wx_user')->field('id,appid,appsecret,web_access_token,web_expires')->find();
+        $token = $conf['web_access_token'];
+        $url = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token='.$token;
+        $res = httpRequest($url,'POST',json_encode($data));
+        return $res;
+
     }
 
     /**

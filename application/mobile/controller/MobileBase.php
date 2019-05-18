@@ -115,7 +115,11 @@ class MobileBase extends Controller {
 
             // 签到送佣金
             $UserSign = new UserSign();
-            $UserSign->sign($user);
+            $sign_res = $UserSign->sign($user);
+            if($sign_res && $user['openid']){
+                $sign_log = Db::name('commission_log')->where(['user_id'=>$user['user_id'],'identification'=>1])->order('id desc')->field('num,money,addtime')->find();
+                $this->Sign_Success($user['openid'],'恭喜你签到成功',$user['nickname'],$sign_log['addtime'],$sign_log['num'],$sign_log['money'],'感谢你每天光顾商城，你的足迹会吸引越来越多小伙伴，继续加油吧！');
+            }
         }
         
     }
@@ -141,9 +145,12 @@ class MobileBase extends Controller {
                     Db::execute("update `tp_users` set `first_leader` = '".$cache['share_user']."' where `user_id` = '".$user_temp['user_id']."'");
                     $share_user_openid = Db::name('users')->field('id,openid')->where('user_id',$cache['share_user'])->value('openid');
                     if($share_user_openid){
-                        $wx_content = "会员ID: ".$user_temp['user_id']." 成为了你的下级!";
-                        $wechat = new \app\common\logic\wechat\WechatUtil();
-                        $wechat->sendMsg($share_user_openid, 'text', $wx_content);
+                        // $wx_content = "会员ID: ".$user_temp['user_id']." 成为了你的下级!";
+                        // $wechat = new \app\common\logic\wechat\WechatUtil();
+                        // $wechat->sendMsg($share_user_openid, 'text', $wx_content);
+                        
+                        $this->Invitation_Register($share_user_openid,'恭喜你邀请注册成功！',$user_temp['nickname'],$user_temp['mobile'],time(),'恭喜你又收纳一名得力爱将，你的团队越来越大！');
+                        
                     }
                 }
 				Db::execute("delete from `tp_wxshare_cache` where `id` = '".$cache['id']."'");
@@ -388,6 +395,163 @@ class MobileBase extends Controller {
     }
     public function ajaxReturn($data){
         exit(json_encode($data));
+    }
+
+    # 发货成功通知
+    public function Out_Order($openid,$title,$goods_name,$order_sn,$system='神器商城',$remark,$url=''){
+        $data = [
+            'touser' => $openid,
+            'template_id' => 'p6GUL7lm9Au3tVCKAY3XAGY5t3g9_iHhlhYPOjGUSXY',
+            'url' => $url,
+            'data' => [
+                'first' => [
+                    'value' => $title,
+                ],
+                'keyword1' => [
+                    'value' => $goods_name,
+                ],
+                'keyword2' => [
+                    'value' => $order_sn,
+                ],
+                'keyword3' => [
+                    'value' => $system,
+                ],
+                'remark' => [
+                    'value' => $remark,
+                ],
+            ],
+        ];
+        return $this->Send_Template_Message($data);
+    }
+
+
+    # 签到成功通知
+    public function Sign_Success($openid,$title,$nickname,$time,$sign,$money,$remark,$url=''){
+
+        $data = [
+            'touser' => $openid,
+            'template_id' => 'is-V83Y5OYkUpjrL9YVzWvR84oW96qvPq_flkFKRlFw',
+            'url' => $url,
+            'data' => [
+                'first' => [
+                    'value' => $title,
+                ],
+                'keyword1' => [
+                    'value' => $nickname,
+                ],
+                'keyword2' => [
+                    'value' => date('Y年m月d日 H时i分s秒', $time),
+                ],
+                'keyword3' => [
+                    'value' => $sign,
+                ],
+                'keyword4' => [
+                    'value' => $money . ' 元',
+                ],
+                'remark' => [
+                    'value' => $remark,
+                ],
+            ],
+        ];
+        return $this->Send_Template_Message($data);
+
+    }
+
+    # 邀请注册成功通知
+    public function Invitation_Register($openid,$title,$nickname,$mobile,$time,$remark,$url=''){
+
+        $data = [
+            'touser' => $openid,
+            'template_id' => 'EcnwVGHweODRpWRc6arlA9Y8etpKnvS7T3Ev9uohStk',
+            'url' => $url,
+            'data' => [
+                'first' => [
+                    'value' => $title,
+                ],
+                'keyword1' => [
+                    'value' => $nickname,
+                ],
+                'keyword2' => [
+                    'value' => $mobile,
+                ],
+                'keyword3' => [
+                    'value' => date('Y年m月d日 H时i分s秒', $time),
+                ],
+                'remark' => [
+                    'value' => $remark,
+                ],
+            ],
+        ];
+        return $this->Send_Template_Message($data);
+
+    }
+
+
+
+    # 提现成功通知
+    public function Withdrawal_Success($openid,$title,$money,$time,$remark,$url=''){
+        $data = [
+            'touser' => $openid,
+            'template_id' => '2kfCT6VDejHU55ttMbZ70rLxrVuq6bjt9ZGtyKqkSE0',
+            'url' => $url,
+            'data' => [
+                'first' => [
+                    'value' => $title,
+                ],
+                'keyword1' => [
+                    'value' => $money . ' 元',
+                ],
+                'keyword2' => [
+                    'value' => date('Y年m月d日 H时i分s秒', $time),
+                ],
+                'remark' => [
+                    'value' => $remark,
+                ],
+            ],
+        ];
+        return $this->Send_Template_Message($data);
+    }
+
+
+    # 购买成功通知
+    public function Purchase_Success($openid,$title,$name,$status,$money,$remark,$url=''){
+
+        $data = [
+            'touser' => $openid,
+            'template_id' => '10Nmjxq1MFRTmjFZMGXNC5ZLzUX_Eq6z5yG15r6KWYU',
+            'url' => $url,
+            'data' => [
+                'first' => [
+                    'value' => $title,
+                ],
+                'keyword1' => [
+                    'value' => $name,
+                ],
+                'keyword2' => [
+                    'value' => $status,
+                ],
+                'keyword3' => [
+                    'value' => $money . ' 元',
+                ],
+                'remark' => [
+                    'value' => $remark,
+                ],
+            ],
+        ];
+        return $this->Send_Template_Message($data);
+    }
+
+    # 发送模板消息
+    public function Send_Template_Message($data){
+        if(!$data){
+            return false;
+        }
+        $conf = Db::name('wx_user')->field('id,appid,appsecret,web_access_token,web_expires')->find();
+        $token = $conf['web_access_token'];
+        $url = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token='.$token;
+        $res = httpRequest($url,'POST',json_encode($data));
+        return $res;
+
     }
 
 }

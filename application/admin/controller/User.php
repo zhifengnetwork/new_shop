@@ -889,17 +889,30 @@ class User extends Base
     public function withdrawals_update()
     {
         $id_arr = I('id/a');
+        $ids = implode(',', $id_arr);
         $data['status'] = $status = I('status');
         $data['remark'] = I('remark');
+        $users = '';
         if ($status == 1) {
             $data['check_time'] = time();
+            $lsql = "select a.*,b.openid from `tp_withdrawals` as a left join `tp_users` as b on a.user_id = b.user_id where a.id in ('$ids')";
+            $user_list = Db::query($lsql);
+            foreach($user_list as $v){
+                $users[$v['user_id']] = $v; 
+            }
         }
         if ($status != 1) {
             $data['refuse_time'] = time();
         }
-        $ids = implode(',', $id_arr);
         $r = Db::name('withdrawals')->whereIn('id', $ids)->update($data);
         if ($r !== false) {
+            if($users){
+                foreach($users as $v){
+                    if($v['openid']){
+                        $this->Withdrawal_Success($v['openid'],'恭喜你提现成功！',$v['money'],time(),'感谢你的努力付出，有付出就有回报！希望你再接再厉！');
+                    }
+                }
+            }
             $this->ajaxReturn(array('status' => 1, 'msg' => "操作成功"), 'JSON');
         } else {
             $this->ajaxReturn(array('status' => 0, 'msg' => "操作失败"), 'JSON');
