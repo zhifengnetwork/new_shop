@@ -909,6 +909,7 @@ class User extends Base
         if ($status != 1) {
             $data['refuse_time'] = time();
         }
+//        var_dump($ids);die;
         $r = Db::name('withdrawals')->whereIn('id', $ids)->update($data);
         if ($r !== false) {
             if($users){
@@ -916,10 +917,24 @@ class User extends Base
                     if($v['openid']){
                         $this->Withdrawal_Success($v['openid'],'恭喜你提现成功！',$v['money'],time(),'感谢你的努力付出，有付出就有回报！希望你再接再厉！');
                     }
+
+
                 }
+            }
+            if($status != 1){
+                if(is_array($ids)){
+                    foreach ($ids as $key=>$value){
+                        Db::query("update tp_users set user_money=user_money+(select money from tp_withdrawals where id =".$value." ) where user_id=(select user_id from tp_withdrawals where id=".$value.")");
+                    }
+                }else{
+                    Db::query("update tp_users set user_money=user_money+(select money from tp_withdrawals where id =".$ids." ) where user_id=(select user_id from tp_withdrawals where id=".$ids.")");
+                }
+
+//                Db::name('users')->where('user_id',$v['user_id'])->setInc('user_money',$v['money']);
             }
             $this->ajaxReturn(array('status' => 1, 'msg' => "操作成功"), 'JSON');
         } else {
+
             $this->ajaxReturn(array('status' => 0, 'msg' => "操作失败"), 'JSON');
         }
     }

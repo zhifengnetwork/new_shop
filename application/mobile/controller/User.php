@@ -987,7 +987,8 @@ class User extends MobileBase
      */
     public function account()
     {
-        $user = session('user');
+//        $user = session('user');
+        $user = $this->user;
         //获取账户资金记录
         $logic = new UsersLogic();
         $data = $logic->get_account_log($this->user_id, I('get.type'));
@@ -2096,6 +2097,7 @@ class User extends MobileBase
      */
     public function withdrawals()
     {
+
         // dump($this->user['goods_id']);
         $config = tpCache('cash');
         // dump($config);
@@ -2132,9 +2134,12 @@ class User extends MobileBase
 
             // 统计所有0，1的金额
             $status = ['in','0,1'];
-            $total_money = Db::name('withdrawals')->where(array('user_id' => $this->user_id, 'status' => $status))->sum('money');
-            if ($total_money + $data['money'] > $this->user['user_money']) {
-                $this->ajaxReturn(['status'=>0, 'msg'=>"您有提现申请待处理，本次提现余额不足"]);
+//            $total_money = Db::name('withdrawals')->where(array('user_id' => $this->user_id, 'status' => $status))->sum('money');
+//            if ($total_money + $data['money'] > $this->user['user_money']) {
+//                $this->ajaxReturn(['status'=>0, 'msg'=>"您有提现申请待处理，本次提现余额不足"]);
+//            }
+            if ($data['money'] > $this->user['user_money']) {
+                $this->ajaxReturn(['status'=>0, 'msg'=>"本次提现余额不足"]);
             }
 
             if ($cash['cash_open'] == 1) {
@@ -2183,8 +2188,9 @@ class User extends MobileBase
             }else{
                 $data['taxfee'] = 0;
             }
-
+//            dump($data);die;
             if (M('withdrawals')->add($data)) {
+                Db::name('users')->where('user_id',$data['user_id'])->setDec('user_money',$data['money']);
                 $this->ajaxReturn(['status'=>1,'msg'=>"已提交申请",'url'=>U('User/account',['type'=>2])]);
             } else {
                 $this->ajaxReturn(['status'=>0,'msg'=>'提交失败,联系客服!']);
