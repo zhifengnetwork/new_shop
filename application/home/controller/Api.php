@@ -169,18 +169,40 @@ class Api extends Base {
      * 验证短信验证码: APP/WAP/PC 共用发送方法
      */
     public function check_validate_code(){
-          
+
         $code = I('post.code');
         $mobile = I('mobile');
-        $send = I('send');
-        $sender = empty($mobile) ? $send : $mobile; 
-        $type = I('type');
-        $session_id = I('unique_id', session_id());
-        $scene = I('scene', -1);
+        $sms_type = I('sms_type');
+//        $sender = empty($mobile) ? $send : $mobile;
+//        $type = I('type');
+//        $session_id = I('unique_id', session_id());
+//        $scene = I('scene', -1);
 
-        $logic = new UsersLogic();
-        $res = $logic->check_validate_code($code, $sender, $type ,$session_id, $scene);
-        ajaxReturn($res);
+//        $logic = new UsersLogic();
+//        $res = $logic->check_validate_code($code, $sender, $type ,$session_id, $scene);
+//        ajaxReturn($res);
+
+        if (empty($mobile)) {
+            return array('code' => 0, 'msg' => '请输入手机号');
+        }
+        $check_phone = check_mobile_number($mobile);
+        if (!$check_phone) {
+            return array('code' => 0, 'msg' => '手机号格式不正确');
+        }
+        if (!$code) {
+            return array('code' => 0, 'msg' => '请输入验证码');
+        }
+        // 验证码
+        $checkData['sms_type'] = $sms_type;
+        $checkData['code'] = $code;
+        $checkData['phone'] = $mobile;
+        $res = checkPhoneCode($checkData);
+
+        if ($res['code'] == 0) {
+            return json(['code' => 0, 'msg' => $res['msg']]);
+        }else{
+            return json(['code' => 1, 'msg' => $res['msg']]);
+        }
     }
     
     /**
