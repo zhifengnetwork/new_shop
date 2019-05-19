@@ -1052,9 +1052,11 @@ function update_pay_status($order_sn,$ext=array())
     }
 }
 
-function curl($leaderId){
-    $url = 'http://'.$_SERVER['HTTP_HOST'].'/mobile/Cart/curls';
-    // // dump($url);
+function curl_up($leaderId){
+    $htt = substr($_SERVER['HTTP_REFERER'],0,strpos($_SERVER['HTTP_REFERER'], '/'));
+    $url = $htt.'//'.$_SERVER['HTTP_HOST'].'/mobile/Cart/curls';
+//    $url = 'http://'.$_SERVER['HTTP_HOST'].'/mobile/Cart/curls';
+//      dump($url);die;
     $data = array('leaderId'=>$leaderId);
     // echo $data;
     $ch = curl_init();
@@ -1101,7 +1103,7 @@ function confirm_order($id,$user_id = 0){
     $sales = sales($id);  //确认收货后返佣
 
     // 分销商升级, 根据order表查看消费id 达到条件就给他分销商等级升级
-    curl($order['user_id']);
+    curl_up($order['user_id']);
     // $Level =new \app\common\logic\LevelLogic();
     // $Level->user_in($order['user_id']);
 

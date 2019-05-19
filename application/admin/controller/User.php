@@ -219,13 +219,18 @@ class User extends Base
             $post_data = $_POST;
 
             $u_info = Db::name('users')->field('user_id,first_leader')->find($uid);
+
+
            
             if($fleader > 0 && $fleader != $u_info['first_leader']){
                 $post_data['first_leader'] = $_POST['fleader'];
                 $post_data['second_leader'] = 0;
                 $post_data['third_leader'] = 0;
                 $post_data['parents'] = '';
+                Db::name('users')->where('user_id',$uid)->update(['parents_cache'=>0]);
+                Db::query("delete from `tp_parents_cache` where `user_id`=$uid or find_in_set($uid,`parents`)");
             }
+
             
             unset($post_data['fleader']);
 
