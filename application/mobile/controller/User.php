@@ -770,12 +770,74 @@ class User extends MobileBase
         return $this->fetch();
     }
 
+
+    public function sharePoster(){
+
+        $user_id = $this->user_id;
+        $share_error = 0;
+
+        $filename = $user_id.'-qrcode.png';
+        $save_dir = ROOT_PATH.'public/shareposter/';
+        $my_poster = $save_dir.$user_id.'-share.png';
+        $my_poster_src = '/public/shareposter/'.$user_id.'-share.png';
+        if( !file_exists($my_poster) ){
+            $shareposter = Db::name('users')->where('user_id',$user_id)->value('shareposter');
+            if($shareposter != 1){
+                $imgUrl = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['SERVER_NAME'] . '/index.php?dfc5b='.$this->user_id;
+                vendor('phpqrcode.phpqrcode');
+                \QRcode::png($imgUrl, $save_dir.$filename, QR_ECLEVEL_M);
+                $image_path =  ROOT_PATH.'public/shareposter/load/qr_backgroup.png';
+                if(!file_exists($image_path)){
+                    $share_error = 1;
+                }
+                # 分享海报
+                if(!file_exists($my_poster) && !$share_error){
+                    # 海报配置
+                    $conf = Db::name('config')->where(['inc_type' => 'shareposter', 'name' => 'shareposter'])->find();
+                    if($conf){
+                        $config = json_decode($conf['value'],true);
+
+                        $image_w = $config['w'] ? $config['w'] : 75;
+                        $image_h = $config['h'] ? $config['h'] : 75;
+                        $image_x = $config['x'] ? $config['x'] : 0;
+                        $image_y = $config['y'] ? $config['y'] : 0;
+
+                        # 根据设置的尺寸，生成缓存二维码
+                        $qr_image = \think\Image::open($save_dir.$filename);
+                        $qrcode_temp_path = $save_dir.$user_id.'-poster.png';
+                        $qr_image->thumb($image_w,$image_h,\think\Image::THUMB_SOUTHEAST)->save($qrcode_temp_path);
+                        
+                        if($image_x > 0 || $image_y > 0){
+                            $water = [$image_x, $image_y];
+                        }else{
+                            $water = 5;
+                        }
+                        
+                        # 图片合成
+                        $image = \think\Image::open($image_path);
+                        $image->water($qrcode_temp_path, $water)->save($my_poster);
+                        @unlink($qrcode_temp_path);
+                        @unlink($save_dir.$filename);
+
+                    }else{
+                        $share_error = 1;
+                    }
+
+
+                }
+            }
+        }
+        
+        $this->assign('my_poster_src', $my_poster_src);
+        return $this->fetch('sharePoster');
+    }
+
     /**
      * 我的分享
      * @author Rock
      * @date 2019/03/23
      */
-    public function sharePoster(){
+    public function sharePoster2(){
 
         $user_id = $this->user_id;
         $share_error = 0;
@@ -860,7 +922,7 @@ class User extends MobileBase
                 # 图片合成
                 $image = \think\Image::open($image_path);
                 $image->water($qrcode_temp_path, $water)->save($my_poster);
-                unlink($qrcode_temp_path);
+                @unlink($qrcode_temp_path);
                 @unlink($save_dir.$filename);
 
             }else{
