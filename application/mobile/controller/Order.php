@@ -18,6 +18,7 @@ use app\common\logic\UsersLogic;
 use app\common\logic\OrderLogic;
 use app\common\logic\CommentLogic;
 use app\common\model\Order as OrderModel;
+use app\home\controller\Api;
 use think\Page;
 use think\Request;
 use think\db;
@@ -217,6 +218,29 @@ class Order extends MobileBase
         }
         return $this->fetch();
     }
+
+    public function express_detail()
+    {
+        $order_id = I('id');
+        if(!$order_id){
+            $this->error('订单ID不存在');
+        }
+
+        $Api = new Api;
+        $data = M('delivery_doc')->where('order_id', $order_id)->find();
+        $shipping_code = $data['shipping_code'];
+        $invoice_no = $data['invoice_no'];
+        $result = $Api->queryExpress($shipping_code, $invoice_no);
+        if ($result['status'] == 0) {
+            $result['result'] = $result['result']['list'];
+        }
+        $this->assign('invoice_no', $invoice_no);
+        $this->assign('shipping_name', $data['shipping_name']);
+        $this->assign('result', $result);
+        return $this->fetch();
+    }
+
+
 
     /**
      * 物流信息
