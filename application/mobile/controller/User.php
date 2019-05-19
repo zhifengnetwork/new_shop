@@ -1099,7 +1099,8 @@ class User extends MobileBase
     public function do_login()
     {
         $username = trim(I('post.username'));
-        $password = trim(I('post.password'));
+//        $password = trim(I('post.password'));
+        $mobile_code = trim(I('post.mobile_code'));
         //验证码验证
         if (isset($_POST['verify_code'])) {
             $verify_code = I('post.verify_code');
@@ -1109,8 +1110,18 @@ class User extends MobileBase
                 exit(json_encode($res));
             }
         }
+        // 验证码
+        //            $code=I('mobile_code');
+        $sms_type=I('sms_type');
+        $checkData['sms_type'] = $sms_type;
+        $checkData['code'] = $mobile_code;
+        $checkData['phone'] = $username;
+        $res = checkPhoneCode($checkData);
+        if ($res['code'] == 0) {
+            exit(json_encode(['status' => 0, 'msg' => $res['msg']]));
+        }
         $logic = new UsersLogic();
-        $res = $logic->login($username, $password);
+        $res = $logic->login($username, 1);
         if ($res['status'] == 1) {
             $res['url'] = htmlspecialchars_decode(I('post.referurl'));
             session('user', $res['result']);
@@ -1125,6 +1136,23 @@ class User extends MobileBase
             $orderLogic = new OrderLogic();
             $orderLogic->setUserId($res['result']['user_id']);//登录后将超时未支付订单给取消掉
             $orderLogic->abolishOrder();
+        }elseif($res['status'] == -1){
+            $res['status']  == 1;
+            $res['url'] = htmlspecialchars_decode(I('post.referurl'));
+            //之前没有注册过  生成一个新的用户
+            $data = $logic->reg($username, '123456', '123456');
+            if ($data['status'] != 1) exit(json_encode($data));
+            //获取公众号openid,并保持到session的user中
+            $oauth_users = M('OauthUsers')->where(['user_id'=>$data['result']['user_id'] , 'oauth'=>'weixin' , 'oauth_child'=>'mp'])->find();
+            $oauth_users && $data['result']['open_id'] = $oauth_users['open_id'];
+
+            session('user', $data['result']);
+            setcookie('user_id', $data['result']['user_id'], null, '/');
+            setcookie('is_distribut', $data['result']['is_distribut'], null, '/');
+            $cartLogic = new CartLogic();
+            $cartLogic->setUserId($data['result']['user_id']);
+            $cartLogic->doUserLoginHandle();// 用户登录后 需要对购物车 一些操作
+
         }
         exit(json_encode($res));
     }
