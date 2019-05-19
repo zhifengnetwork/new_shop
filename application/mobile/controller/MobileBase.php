@@ -152,6 +152,14 @@ class MobileBase extends Controller {
                     session('dfc5b_user', '');
                 }
             }
+
+        
+            if( !$user['mobile'] && (CONTROLLER_NAME != 'User' || ACTION_NAME != 'setMobile') ){
+                echo "<h1 style='text-align:center; margin-top:30%;'>请先设置手机号码</h1>";
+                echo "<script>setTimeout(function(){window.location.href='/Mobile/User/setMobile'},2000);</script>";
+                exit;
+            }
+            
             
             // 邀请注册送佣金
             $UserInvite = new UserInvite();
