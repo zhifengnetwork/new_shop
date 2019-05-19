@@ -1122,6 +1122,7 @@ class User extends MobileBase
         }
         $logic = new UsersLogic();
         $res = $logic->login($username, 1);
+//        var_dump($res);die;
         if ($res['status'] == 1) {
             $res['url'] = htmlspecialchars_decode(I('post.referurl'));
             session('user', $res['result']);
@@ -1136,11 +1137,12 @@ class User extends MobileBase
             $orderLogic = new OrderLogic();
             $orderLogic->setUserId($res['result']['user_id']);//登录后将超时未支付订单给取消掉
             $orderLogic->abolishOrder();
-        }elseif($res['status'] == -1){
-            $res['status']  == 1;
+        }else if($res['status'] == -1){
+            $res['status']  = 1;
             $res['url'] = htmlspecialchars_decode(I('post.referurl'));
             //之前没有注册过  生成一个新的用户
             $data = $logic->reg($username, '123456', '123456');
+//            var_dump($data);die;
             if ($data['status'] != 1) exit(json_encode($data));
             //获取公众号openid,并保持到session的user中
             $oauth_users = M('OauthUsers')->where(['user_id'=>$data['result']['user_id'] , 'oauth'=>'weixin' , 'oauth_child'=>'mp'])->find();

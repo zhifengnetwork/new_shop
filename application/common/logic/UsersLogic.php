@@ -45,12 +45,12 @@ class UsersLogic extends Model
     public function login($username,$password=1)
     {
         if (!$username || !$password) {
-            return array('status' => 0, 'msg' => '请填写账号或密码');
+            return array('status' => 0, 'msg' => '请填写账号');
         }
 
         $user = Db::name('users')->where("mobile", $username)->whereOr('email', $username)->find();
         if (!$user) {
-            $result = array('status' => -1, 'msg' => '账号不存在!');
+            $result = array('status' => -1, 'msg' => '创建新用户成功!');
         }  elseif ($user['is_lock'] == 1) {
             $result = array('status' => -3, 'msg' => '账号异常已被锁定！！！');
         } else {

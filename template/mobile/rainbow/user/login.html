@@ -165,8 +165,8 @@
             showErrorMsg('验证码不能为空!');
             return false;
         }
-
-        var data = {username:username,mobile_code:mobile_code,referurl:encodeURIComponent(referurl)};
+        var sms_type=$("input[name='sms_type']").val()
+        var data = {username:username,mobile_code:mobile_code,referurl:encodeURIComponent(referurl),sms_type:sms_type};
         if (codeExist) {
             data.verify_code = verify_code;
         }
