@@ -26,6 +26,10 @@ class MobileBase extends Controller {
     public $weixin_config;
     public $cateTrre = array();
     public $tpshop_config = array();
+    public $user_id;
+    public $user;
+
+
     /*
      * 初始化操作
      */
@@ -107,8 +111,56 @@ class MobileBase extends Controller {
 		$this->share_poster();
 
         if(!isset($user)) $user = session('user');
-        
+        $dfc5b = I('dfc5b',0);
+        if($dfc5b && !session('dfc5b')){
+            if(!$user['user_id'] || $dfc5b != $user['user_id']){
+                $dfc5b_user = Db::name('users')->where('user_id', $dfc5b)->value('user_id,openid');
+                if($dfc5b_user){
+                    session('dfc5b_user', $dfc5b_user);
+                    session('dfc5b', $dfc5b);
+                    $this->redirect('/Mobile/User/login.html');
+                }else{
+                    session('dfc5b', 0);
+                }
+            }
+        }
+        // $user = Db::name('users')->find(17657);
+        // session('user',$user);
+
         if($user['user_id']){
+            $this->user_id = $user['user_id'];
+            $this->user = Db::name('users')->find($this->user_id);
+            $user = $this->user;
+            session('user',$user);
+
+            # 新版 - 上下级关系绑定
+            if(session('dfc5b') && !$this->user['first_leader']){
+                
+                $dfc5b = session('dfc5b');
+                if($dfc5b != $this->user_id){
+                    $dfc5b_res = Db::name('users')->where('user_id', $this->user_id)->update(['first_leader' => $dfc5b]);
+                    if($dfc5b_res){
+                        $dfc5b_user = session('dfc5b_user');
+                        if($dfc5b_user['openid']){
+                            $this->Invitation_Register($dfc5b_user['openid'],'恭喜你邀请注册成功！',$user['nickname'],$user['mobile'],time(),'恭喜你又收纳一名得力爱将，你的团队越来越大！');
+                        }
+                        session('dfc5b',0);
+                        session('dfc5b_user', '');
+                    }
+                }else{
+                    session('dfc5b',0);
+                    session('dfc5b_user', '');
+                }
+            }
+
+        
+            if( !$user['mobile'] && (CONTROLLER_NAME != 'User' || ACTION_NAME != 'setMobile') ){
+                echo "<h1 style='text-align:center; margin-top:30%;'>请先设置手机号码</h1>";
+                echo "<script>setTimeout(function(){window.location.href='/Mobile/User/setMobile'},2000);</script>";
+                exit;
+            }
+            
+            
             // 邀请注册送佣金
             $UserInvite = new UserInvite();
             $UserInvite->user_invite($user['user_id']);
@@ -129,7 +181,7 @@ class MobileBase extends Controller {
 	/**
 	* 微信扫码上下级关系缓存处理
 	* @author rock
-	* @date 219/3/29
+	* @date 2019/3/29
 	*/
 	public function share_poster(){
 		# 删除长时间的缓存
@@ -156,8 +208,8 @@ class MobileBase extends Controller {
 				Db::execute("delete from `tp_wxshare_cache` where `id` = '".$cache['id']."'");
 			}
 		} 
-	}
-
+    }
+    
 
     /**
      * 保存公告变量到 smarty中 比如 导航 
