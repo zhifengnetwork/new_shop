@@ -118,6 +118,7 @@ class MobileBase extends Controller {
                 if($dfc5b_user){
                     session('dfc5b_user', $dfc5b_user);
                     session('dfc5b', $dfc5b);
+                    $this->redirect('/Mobile/User/login.html');
                 }else{
                     session('dfc5b', 0);
                 }
