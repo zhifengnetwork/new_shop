@@ -1105,7 +1105,7 @@ function confirm_order($id,$user_id = 0){
     // 分销商升级, 根据order表查看消费id 达到条件就给他分销商等级升级
     curl_up($order['user_id']);
     // $Level =new \app\common\logic\LevelLogic();
-    // $Level->user_in($order['user_id']);
+    //    $Level->user_in($order['user_id']);
 
     // 商品待评价提醒
     $order_goods = M('order_goods')->field('goods_id,goods_name,rec_id')->where(["order_id" => $id])->find();
