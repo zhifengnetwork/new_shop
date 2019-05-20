@@ -26,46 +26,61 @@ class ProfitShare extends MobileBase
     }
     public function profitTaking(){
         $goodsProfit=new GoodsProfit();
-        //获取当天利润
-        $today_profit=$goodsProfit->get_goods_profit();
+        //获取系统配置看分红模式是0固定还是1利润
+        $model=$goodsProfit->get_config('dividend_model');
+        if($model==1){
+            //获取当天利润
+            $today_profit=$goodsProfit->get_goods_profit();
+            //获取合伙人个数   默认合伙人等级是5
+            $partners=$goodsProfit->get_partners_num(5);
+            $managers=$goodsProfit->get_partners_num(3);
+            $inspector=$goodsProfit->get_partners_num(4);
+            //获取分红比例
+            $partners_ratio=$this->get_agent_ratio(5);
+            $managers_ratio=$this->get_agent_ratio(3);
+            $inspector_ratio=$this->get_agent_ratio(4);
+
+            //获取配置表值
+            $today_ratio=$goodsProfit->get_config('today_ratio');
+
+            //本日分红利润每人  $configs['today_ratio']['value']
+            if($today_profit<=0 || $today_ratio==0){
+                $partnersPartProfit=0.00;
+                $managersPartProfit=0.00;
+                $inspectorPartProfit=0.00;
+            }else{
+//            echo $today_profit['total']."````````````".$today_ratio;die;
+                $partnersPartProfit=floor($today_profit*$today_ratio/100/$partners*$partners_ratio)/100;
+                $managersPartProfit=floor($today_profit*$today_ratio/100/$managers*$managers_ratio)/100;
+                $inspectorPartProfit=floor($today_profit*$today_ratio/100/$inspector*$inspector_ratio)/100;
+            }
+
+        }else{
+            //获取不同等级固定分红
+            $partnersPartProfit=$this->get_dividend_model(5);
+            $managersPartProfit=$this->get_dividend_model(3);
+            $inspectorPartProfit=$this->get_dividend_model(4);
+        }
+
 //        if (!isset($today_profit['total'])){
 //            $today_profit['total']=0;
 //        }
 //        $today_profit['total']=$today_profit['total']*$today_profit['goods_num'];
 //        var_dump($today_profit);
-        //获取合伙人个数   默认合伙人等级是5
-        $partners=$goodsProfit->get_partners_num(5);
-        $managers=$goodsProfit->get_partners_num(3);
-        $inspector=$goodsProfit->get_partners_num(4);
+
         //获取所有合伙人uid用于记录
         $partnersIds=$goodsProfit->get_all_partners(5);
         $managersIds=$goodsProfit->get_all_partners(3);
         $inspectorIds=$goodsProfit->get_all_partners(4);
 
-        //获取分红比例
-        $partners_ratio=$this->get_agent_ratio(5);
-        $managers_ratio=$this->get_agent_ratio(3);
-        $inspector_ratio=$this->get_agent_ratio(4);
+
 //        if($partners==0){
 //            $data['msg']='暂时没有合伙人';
 //            //写入记录表
 //        }
         //获取合伙人分红百分比
 
-        //获取配置表值
-        $today_ratio=$goodsProfit->get_config('today_ratio');
 
-        //本日分红利润每人  $configs['today_ratio']['value']
-        if($today_profit==0 || $today_ratio==0){
-            $partnersPartProfit=0.00;
-            $managersPartProfit=0.00;
-            $inspectorPartProfit=0.00;
-        }else{
-//            echo $today_profit['total']."````````````".$today_ratio;die;
-            $partnersPartProfit=floor($today_profit*$today_ratio/100/$partners*$partners_ratio)/100;
-            $managersPartProfit=floor($today_profit*$today_ratio/100/$managers*$managers_ratio)/100;
-            $inspectorPartProfit=floor($today_profit*$today_ratio/100/$inspector*$inspector_ratio)/100;
-        }
         //写入记录表
         $data=array();
         // 启动事务
@@ -135,5 +150,13 @@ class ProfitShare extends MobileBase
         $data=['to_user_id'=>$user_id,'money'=>$money,'create_time'=>time(),'desc'=>$desc,'type'=>4];
         M('distrbut_commission_log')->insert($data);
 
+    }
+    //查询固定分红金额
+    private function get_dividend_model($level){
+        $ratio=M('agent_level')->where(['level'=>$level])->find();
+        if($ratio['money']<0){
+            $ratio['money']=0.00;
+        }
+        return $ratio['money'];
     }
 }

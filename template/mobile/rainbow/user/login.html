@@ -21,13 +21,13 @@
             <a class="btn-text-message" rel="mobile" id="sendcode">获取验证码</a>
             <input type="hidden" name="sms_type" value="5" />
         </div>
-        <notempty name="first_login">
-            <div class="lsu">
-                <span class="ico ico-v-code"></span>
-                <input class="v-code-input" type="text" name="verify_code" id="verify_code" value="" placeholder="请输入验证码"/>
-                <img class="v-code-pic"  id="verify_code_img" src="{:U('Mobile/User/verify')}" onClick="verify()"/>
-            </div>
-        </notempty>
+        <!--<notempty name="first_login">-->
+            <!--<div class="lsu">-->
+                <!--<span class="ico ico-v-code"></span>-->
+                <!--<input class="v-code-input" type="text" name="verify_code" id="verify_code" value="" placeholder="请输入验证码"/>-->
+                <!--<img class="v-code-pic"  id="verify_code_img" src="{:U('Mobile/User/verify')}" onClick="verify()"/>-->
+            <!--</div>-->
+        <!--</notempty>-->
         <div class="lsu-submit">
             <input type="button"  value="登 录"  onclick="submitverify()" class="btn_big1"  />
         </div>
@@ -82,7 +82,7 @@
     //发送短信验证码
     $("#sendcode").click(function () {
         if($(this).hasClass('disabled')) return;
-        var reg = /^1[34578]\d{9}$/;  /*用户手机号*/
+        var reg = /^1[3456789]\d{9}$/;  /*用户手机号*/
         var phone = $("#username");
         var phoneS = $("#username").val();
         // console.log(phone)
