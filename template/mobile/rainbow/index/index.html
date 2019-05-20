@@ -214,6 +214,40 @@
 				width: 100%!important;
 				
                 }
+            .layermmain{
+            	
+            	background: white;
+            	opacity: 1;
+            	z-index: 1;
+            	
+            }
+              .guanzhu{
+                	
+                	width: .6rem;
+                	height: 4rem;  
+                	text-align: center;           	
+                	position: fixed;
+                	right: 0;
+                	top: 0;
+                	bottom:0;
+                	margin: auto 0;
+                	font-size: .5rem;
+                	background: #CCC;
+                	display: flex;
+                	align-items: center;
+                	background: #37afe6;
+                	color: white;
+                }
+                .erweima{
+                	width: 8rem;
+                	height: 8rem;
+                	
+                }
+                .layermmain .section{
+                	opacity: 1;
+                }
+               
+                
 		</style>
 	</head>
 
@@ -319,7 +353,7 @@
 
 		</div>
 		<!--商品end-->
-
+        <p class="guanzhu">点击关注公众号</p>
 		<!--底部导航-start-->
 
 		<!-- <div class="bottomNavWrap container1" id="bottomNavWrap" data-id="0"></div> -->
@@ -357,6 +391,20 @@
 					}
 				});
 			}
+			$(".guanzhu").click(function(){
+				
+				//自定页
+				layer.open({
+						  type: 1,
+						  title: false,
+						  closeBtn: 0,
+						  shadeClose: true,
+						  skin: 'yourclass',
+						  content: '<img src="{__STATIC__/images/erweima.png}" class="erweima"/>'
+						});
+									
+			})
+			
 		</script>
 	</body>
 
