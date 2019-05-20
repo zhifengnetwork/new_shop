@@ -75,7 +75,7 @@
         var endtime = window.localStorage.getItem('key_endtime');
         // console.log(username)
         // console.log(password)
-        if((!username && typeof username != "undefined" && username != 0) && (!endtime && typeof endtime != "undefined" && endtime != 0)){
+        if((!username && typeof username != "undefined" && username != 0) || (!endtime && typeof endtime != "undefined" && endtime != 0)){
 
         }else{
             if(endtime>nowtime){
