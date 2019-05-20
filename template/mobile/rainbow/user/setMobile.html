@@ -20,7 +20,7 @@
 </style>
 <div class="loginsingup-input">
     <form action="{:U('Mobile/User/setMobile')}" method="post" onsubmit="return submitverify(this)">
-        <div class="reset-pwd-title">修改绑定手机号码</div>
+        <div class="reset-pwd-title"><if condition="$user.mobile"> 修改绑定手机号码 <else /> 绑定手机号 </if></div>
         <div class="lsu">
             <input type="hidden" name="source" value="{$Request.param.source}"/>
             <span class="ico ico-telephone"></span>
