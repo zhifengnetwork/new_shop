@@ -3,12 +3,15 @@
 namespace app\mobile\controller;
 
 use think\Db;
-use think\Session;
-class Atest 
-{
 
+class Task{
+
+    # 定时任务程序，组装上级列缓存
     public function index($limit = 0){
-        $maxlen = 3;
+        if(!$limit){
+            $limit = time();
+        }
+        $maxlen = 1024;
         # 查找有上级关系，上级列缓存未完成的用户
         $user = Db::name('users')->field('user_id,first_leader,parents_cache')->where(['parents_cache' => ['=', 0], 'first_leader' => ['>', 0]])->order('first_leader asc')->find();
 
@@ -202,15 +205,21 @@ class Atest
             if(isset($first_parents_cache)){
                 unset($first_parents_cache);
             }
-            $limit++;
-            if($limit <= 100){
+            
+            if(time() - $limit < 25){
                 $this->index($limit);
             }else{
-                exit('每次只执行100条');
+                exit('每次只执行25秒');
             }
             
             // echo "<h3>稍后！程序再次执行...【".$user['user_id']."】</h3>";
             // echo "<script>setTimeout(function(){window.location.replace(location.href);},100);</script>";
             // exit;
     }
+
+
+
+
+
+
 }

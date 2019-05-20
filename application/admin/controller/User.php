@@ -82,8 +82,9 @@ class User extends Base
             // $third_leader = convert_arr_key($third_leader, 'third_leader');
 			
 			foreach($user_id_arr as $v){
-				$last_cout[$v]['direct'] = Db::name('users')->where('first_leader', $v)->count();
-				$last_cout[$v]['team'] = Db::query("select count(*) as count from `__PREFIX__users` where find_in_set('$v', parents)")[0]['count'];
+                $last_cout[$v]['direct'] = Db::name('users')->where('first_leader', $v)->count();
+                $last_cout[$v]['team'] = Db::query("select count(*) as count from `__PREFIX__parents_cache` where find_in_set('$v', parents)")[0]['count'];
+				// $last_cout[$v]['team'] = Db::query("select count(*) as count from `__PREFIX__users` where find_in_set('$v', parents)")[0]['count'];
 			}
 			
 			$this->assign('last_cout', $last_cout);
@@ -148,8 +149,15 @@ class User extends Base
 	public function team_list(){
         
         $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+        $all_lower = get_all_lower($id);
+        $all_lower = implode(',',$all_lower);
+        $list = array();
+        if ($all_lower) {
+            $list = Db::query("select * from `tp_users` where `first_leader` > 0 and `user_id` in ($all_lower)");
+        } 
         
-        $list = Db::query("select * from `tp_users` where `first_leader` > 0 and find_in_set('$id',parents)");
+        // $list = Db::query("select * from `tp_users` where `first_leader` > 0 and find_in_set('$id',parents)");
+        
         $count = count($list);
         $agnet_name = $this->all_level();
 
@@ -211,13 +219,18 @@ class User extends Base
             $post_data = $_POST;
 
             $u_info = Db::name('users')->field('user_id,first_leader')->find($uid);
+
+
            
             if($fleader > 0 && $fleader != $u_info['first_leader']){
                 $post_data['first_leader'] = $_POST['fleader'];
                 $post_data['second_leader'] = 0;
                 $post_data['third_leader'] = 0;
                 $post_data['parents'] = '';
+                Db::name('users')->where('user_id',$uid)->update(['parents_cache'=>0]);
+                Db::query("delete from `tp_parents_cache` where `user_id`=$uid or find_in_set($uid,`parents`)");
             }
+
             
             unset($post_data['fleader']);
 
@@ -881,19 +894,47 @@ class User extends Base
     public function withdrawals_update()
     {
         $id_arr = I('id/a');
+        $ids = implode(',', $id_arr);
         $data['status'] = $status = I('status');
         $data['remark'] = I('remark');
+        $users = '';
         if ($status == 1) {
             $data['check_time'] = time();
+            $lsql = "select a.*,b.openid from `tp_withdrawals` as a left join `tp_users` as b on a.user_id = b.user_id where a.id in ('$ids')";
+            $user_list = Db::query($lsql);
+            foreach($user_list as $v){
+                $users[$v['user_id']] = $v; 
+            }
         }
         if ($status != 1) {
             $data['refuse_time'] = time();
         }
-        $ids = implode(',', $id_arr);
+//        var_dump($ids);die;
         $r = Db::name('withdrawals')->whereIn('id', $ids)->update($data);
         if ($r !== false) {
+            if($users){
+                foreach($users as $v){
+                    if($v['openid']){
+                        $this->Withdrawal_Success($v['openid'],'恭喜你提现成功！',$v['money'],time(),'感谢你的努力付出，有付出就有回报！希望你再接再厉！');
+                    }
+
+
+                }
+            }
+            if($status != 1){
+                if(is_array($ids)){
+                    foreach ($ids as $key=>$value){
+                        Db::query("update tp_users set user_money=user_money+(select money from tp_withdrawals where id =".$value." ) where user_id=(select user_id from tp_withdrawals where id=".$value.")");
+                    }
+                }else{
+                    Db::query("update tp_users set user_money=user_money+(select money from tp_withdrawals where id =".$ids." ) where user_id=(select user_id from tp_withdrawals where id=".$ids.")");
+                }
+
+//                Db::name('users')->where('user_id',$v['user_id'])->setInc('user_money',$v['money']);
+            }
             $this->ajaxReturn(array('status' => 1, 'msg' => "操作成功"), 'JSON');
         } else {
+
             $this->ajaxReturn(array('status' => 0, 'msg' => "操作失败"), 'JSON');
         }
     }

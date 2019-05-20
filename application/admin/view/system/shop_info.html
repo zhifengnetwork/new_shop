@@ -347,12 +347,20 @@
             </dl>
             <dl class="row">
                 <dt class="tit">
-                    <label for="today_ratio">合伙人当日分红比例</label>
+                    <label for="today_ratio">全球分红比例</label>
                 </dt>
                 <dd class="opt">
                     <input id="today_ratio"  name="today_ratio" value="{$config.today_ratio}" class="input-txt" type="text">
                     <span class="err"></span>
-                    <p class="notic">合伙人当日分红比例  单位：%</p>
+                    <p class="notic">全球分红所占当日总利润的比例  单位：%</p>
+                </dd>
+            </dl>
+            <dl class="row">
+                <dt class="tit">全球分红模式</dt>
+                <dd class="opt im">
+                    <input type="radio" name="dividend_model" value="0" <if condition="$config[dividend_model] eq 0"> checked </if> >固定分红
+                    <input type="radio" name="dividend_model"  id="tpshop-im" value="1" <if condition="$config[dividend_model] eq 1"> checked </if> >按利润分红  &nbsp;&nbsp;&nbsp;&nbsp;
+                    <p class="notic">固定分红模式：按分销等级分红，利润分红：按当天的利润根据等级比例分红</p>
                 </dd>
             </dl>
             <div class="bot">

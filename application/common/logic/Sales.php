@@ -41,22 +41,23 @@ class Sales extends Model
 		}
 		
 		//获取下级id列表
-		$d_info = Db::query("select `user_id`, `first_leader`,`parents` from `tp_users` where 'first_leader' = $user_id or parents like '%,$user_id,%'");
-		$d_info = $d_info ? array_column($d_info,'user_id') : array();
+		// $d_info = Db::query("select `user_id`, `first_leader`,`parents` from `tp_users` where 'first_leader' = $user_id or parents like '%,$user_id,%'");
+		// $d_info = $d_info ? array_column($d_info,'user_id') : array();
+		$d_info = get_all_lower($user_id);
 		$goods = $this->order();
 		if (($goods['code'] == 1) && ($goods['data']['is_team_prize'] == 1)) {
 			$bonus_products_id = $goods['data']['goods_id'];
-			array_push($d_info,$this->user_id);
+			array_push($d_info,$user_id);
 			M('users')->where('user_id','in',$d_info)->where('bonus_products_id','>',0)->update(['bonus_products_id'=>0]);
 			$first_leader_id = $user['first_leader'];
 			$bool = M('users')->where('user_id',$first_leader_id)->update(['bonus_products_id'=>$goods['data']['goods_id']]);
 		}
 		
 		$user_level = $user['distribut_level'];
-		$parents_id = array();
+		$parents_id = get_parents_ids($user_id);
 		
-		if ($user['parents']) {
-			$parents_id = explode(',', $user['parents']);
+		if ($parents_id) {
+			// $parents_id = explode(',', $user['parents']);
 			$parents_id = array_filter($parents_id);  //去除0
 		
 			if ($bonus_products_id > 0) {

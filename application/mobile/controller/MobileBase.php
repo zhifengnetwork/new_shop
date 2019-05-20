@@ -26,6 +26,10 @@ class MobileBase extends Controller {
     public $weixin_config;
     public $cateTrre = array();
     public $tpshop_config = array();
+    public $user_id;
+    public $user;
+
+
     /*
      * 初始化操作
      */
@@ -107,15 +111,67 @@ class MobileBase extends Controller {
 		$this->share_poster();
 
         if(!isset($user)) $user = session('user');
-        
+        $dfc5b = I('dfc5b',0);
+        if($dfc5b && !session('dfc5b')){
+            if(!$user['user_id'] || $dfc5b != $user['user_id']){
+                $dfc5b_user = Db::name('users')->where('user_id', $dfc5b)->value('user_id,openid');
+                if($dfc5b_user){
+                    session('dfc5b_user', $dfc5b_user);
+                    session('dfc5b', $dfc5b);
+                    $this->redirect('/Mobile/User/login.html');
+                }else{
+                    session('dfc5b', 0);
+                }
+            }
+        }
+        // $user = Db::name('users')->find(17657);
+        // session('user',$user);
+
         if($user['user_id']){
+            $this->user_id = $user['user_id'];
+            $this->user = Db::name('users')->find($this->user_id);
+            $user = $this->user;
+            session('user',$user);
+
+            # 新版 - 上下级关系绑定
+            if(session('dfc5b') && !$this->user['first_leader']){
+                
+                $dfc5b = session('dfc5b');
+                if($dfc5b != $this->user_id){
+                    $dfc5b_res = Db::name('users')->where('user_id', $this->user_id)->update(['first_leader' => $dfc5b]);
+                    if($dfc5b_res){
+                        $dfc5b_user = session('dfc5b_user');
+                        if($dfc5b_user['openid']){
+                            $this->Invitation_Register($dfc5b_user['openid'],'恭喜你邀请注册成功！',$user['nickname'],$user['mobile'],time(),'恭喜你又收纳一名得力爱将，你的团队越来越大！');
+                        }
+                        session('dfc5b',0);
+                        session('dfc5b_user', '');
+                    }
+                }else{
+                    session('dfc5b',0);
+                    session('dfc5b_user', '');
+                }
+            }
+
+        
+            if( !$user['mobile'] && (CONTROLLER_NAME != 'User' || ACTION_NAME != 'setMobile') ){
+                echo "<h1 style='text-align:center; margin-top:30%;'>请先设置手机号码</h1>";
+                echo "<script>setTimeout(function(){window.location.href='/Mobile/User/setMobile'},2000);</script>";
+                exit;
+            }
+            
+            
             // 邀请注册送佣金
             $UserInvite = new UserInvite();
             $UserInvite->user_invite($user['user_id']);
 
             // 签到送佣金
             $UserSign = new UserSign();
-            $UserSign->sign($user);
+            $sign_res = $UserSign->sign($user);
+            if($sign_res && $user['openid']){
+                $sign_log = Db::name('commission_log')->where(['user_id'=>$user['user_id'],'identification'=>1])->order('id desc')->field('num,money,addtime')->find();
+                $this->Sign_Success($user['openid'],'恭喜你签到成功',$user['nickname'],$sign_log['addtime'],$sign_log['num'],$sign_log['money'],'感谢你每天光顾商城，你的足迹会吸引越来越多小伙伴，继续加油吧！');
+            }
         }
         
     }
@@ -125,7 +181,7 @@ class MobileBase extends Controller {
 	/**
 	* 微信扫码上下级关系缓存处理
 	* @author rock
-	* @date 219/3/29
+	* @date 2019/3/29
 	*/
 	public function share_poster(){
 		# 删除长时间的缓存
@@ -141,16 +197,19 @@ class MobileBase extends Controller {
                     Db::execute("update `tp_users` set `first_leader` = '".$cache['share_user']."' where `user_id` = '".$user_temp['user_id']."'");
                     $share_user_openid = Db::name('users')->field('id,openid')->where('user_id',$cache['share_user'])->value('openid');
                     if($share_user_openid){
-                        $wx_content = "会员ID: ".$user_temp['user_id']." 成为了你的下级!";
-                        $wechat = new \app\common\logic\wechat\WechatUtil();
-                        $wechat->sendMsg($share_user_openid, 'text', $wx_content);
+                        // $wx_content = "会员ID: ".$user_temp['user_id']." 成为了你的下级!";
+                        // $wechat = new \app\common\logic\wechat\WechatUtil();
+                        // $wechat->sendMsg($share_user_openid, 'text', $wx_content);
+                        
+                        $this->Invitation_Register($share_user_openid,'恭喜你邀请注册成功！',$user_temp['nickname'],$user_temp['mobile'],time(),'恭喜你又收纳一名得力爱将，你的团队越来越大！');
+                        
                     }
                 }
 				Db::execute("delete from `tp_wxshare_cache` where `id` = '".$cache['id']."'");
 			}
 		} 
-	}
-
+    }
+    
 
     /**
      * 保存公告变量到 smarty中 比如 导航 
@@ -388,6 +447,163 @@ class MobileBase extends Controller {
     }
     public function ajaxReturn($data){
         exit(json_encode($data));
+    }
+
+    # 发货成功通知
+    public function Out_Order($openid,$title,$goods_name,$order_sn,$system='神器商城',$remark,$url=''){
+        $data = [
+            'touser' => $openid,
+            'template_id' => 'p6GUL7lm9Au3tVCKAY3XAGY5t3g9_iHhlhYPOjGUSXY',
+            'url' => $url,
+            'data' => [
+                'first' => [
+                    'value' => $title,
+                ],
+                'keyword1' => [
+                    'value' => $goods_name,
+                ],
+                'keyword2' => [
+                    'value' => $order_sn,
+                ],
+                'keyword3' => [
+                    'value' => $system,
+                ],
+                'remark' => [
+                    'value' => $remark,
+                ],
+            ],
+        ];
+        return $this->Send_Template_Message($data);
+    }
+
+
+    # 签到成功通知
+    public function Sign_Success($openid,$title,$nickname,$time,$sign,$money,$remark,$url=''){
+
+        $data = [
+            'touser' => $openid,
+            'template_id' => 'is-V83Y5OYkUpjrL9YVzWvR84oW96qvPq_flkFKRlFw',
+            'url' => $url,
+            'data' => [
+                'first' => [
+                    'value' => $title,
+                ],
+                'keyword1' => [
+                    'value' => $nickname,
+                ],
+                'keyword2' => [
+                    'value' => date('Y年m月d日 H时i分s秒', $time),
+                ],
+                'keyword3' => [
+                    'value' => $sign,
+                ],
+                'keyword4' => [
+                    'value' => $money . ' 元',
+                ],
+                'remark' => [
+                    'value' => $remark,
+                ],
+            ],
+        ];
+        return $this->Send_Template_Message($data);
+
+    }
+
+    # 邀请注册成功通知
+    public function Invitation_Register($openid,$title,$nickname,$mobile,$time,$remark,$url=''){
+
+        $data = [
+            'touser' => $openid,
+            'template_id' => 'EcnwVGHweODRpWRc6arlA9Y8etpKnvS7T3Ev9uohStk',
+            'url' => $url,
+            'data' => [
+                'first' => [
+                    'value' => $title,
+                ],
+                'keyword1' => [
+                    'value' => $nickname,
+                ],
+                'keyword2' => [
+                    'value' => $mobile,
+                ],
+                'keyword3' => [
+                    'value' => date('Y年m月d日 H时i分s秒', $time),
+                ],
+                'remark' => [
+                    'value' => $remark,
+                ],
+            ],
+        ];
+        return $this->Send_Template_Message($data);
+
+    }
+
+
+
+    # 提现成功通知
+    public function Withdrawal_Success($openid,$title,$money,$time,$remark,$url=''){
+        $data = [
+            'touser' => $openid,
+            'template_id' => '2kfCT6VDejHU55ttMbZ70rLxrVuq6bjt9ZGtyKqkSE0',
+            'url' => $url,
+            'data' => [
+                'first' => [
+                    'value' => $title,
+                ],
+                'keyword1' => [
+                    'value' => $money . ' 元',
+                ],
+                'keyword2' => [
+                    'value' => date('Y年m月d日 H时i分s秒', $time),
+                ],
+                'remark' => [
+                    'value' => $remark,
+                ],
+            ],
+        ];
+        return $this->Send_Template_Message($data);
+    }
+
+
+    # 购买成功通知
+    public function Purchase_Success($openid,$title,$name,$status,$money,$remark,$url=''){
+
+        $data = [
+            'touser' => $openid,
+            'template_id' => '10Nmjxq1MFRTmjFZMGXNC5ZLzUX_Eq6z5yG15r6KWYU',
+            'url' => $url,
+            'data' => [
+                'first' => [
+                    'value' => $title,
+                ],
+                'keyword1' => [
+                    'value' => $name,
+                ],
+                'keyword2' => [
+                    'value' => $status,
+                ],
+                'keyword3' => [
+                    'value' => $money . ' 元',
+                ],
+                'remark' => [
+                    'value' => $remark,
+                ],
+            ],
+        ];
+        return $this->Send_Template_Message($data);
+    }
+
+    # 发送模板消息
+    public function Send_Template_Message($data){
+        if(!$data){
+            return false;
+        }
+        $conf = Db::name('wx_user')->field('id,appid,appsecret,web_access_token,web_expires')->find();
+        $token = $conf['web_access_token'];
+        $url = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token='.$token;
+        $res = httpRequest($url,'POST',json_encode($data));
+        return $res;
+
     }
 
 }

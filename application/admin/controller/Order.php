@@ -110,6 +110,18 @@ class Order extends Base {
         $orderList = Db::name('order')->where($condition)->limit($Page->firstRow,$Page->listRows)->order($sort_order)->select();
         if ($orderList) {
             $user_ids = array_column($orderList, 'user_id');
+            $order_ids = array_column($orderList, 'order_id');
+            if($order_ids){
+                foreach($order_ids as $oid){
+                    $sql = " select a.order_id,a.goods_name,b.original_img from `tp_order_goods` as a left join `tp_goods` as b on a.goods_id = b.goods_id where a.order_id = '$oid'";
+                    $ogi = Db::query($sql);
+                    if($ogi){
+                        $oginfo[$oid] = $ogi[0];
+                    }
+                }
+            }
+
+
             $avatar = get_avatar($user_ids);
 
             foreach ($orderList as $key => $value) {
@@ -117,6 +129,8 @@ class Order extends Base {
             }
         }
         
+        // dump($oginfo);exit;
+        $this->assign('oginfo',$oginfo);
         $this->assign('orderList',$orderList);
         $this->assign('page',$show);// 赋值分页输出
         $this->assign('pager',$Page);
@@ -814,12 +828,20 @@ class Order extends Base {
     public function deliveryHandle(){
         $orderLogic = new OrderLogic();
 		$data = I('post.');
-		$res = $orderLogic->deliveryHandle($data);
+        $res = $orderLogic->deliveryHandle($data);
 		if($res['status'] == 1){
 			if($data['send_type'] == 2 && !empty($res['printhtml'])){
 				$this->assign('printhtml',$res['printhtml']);
 				return $this->fetch('print_online');
-			}
+            }
+            $osql = "select a.user_id,a.order_sn,b.openid from `tp_order` as a left join `tp_users` as b on a.user_id = b.user_id where a.order_id = '$data[order_id]'";
+            $ou = Db::query($osql);
+            if(isset($ou[0]['openid']) && $ou[0]['openid']){
+                $ou = $ou[0];
+                $goods_name = Db::name('order_goods')->where('order_id', $data['order_id'])->value('goods_name');
+                $this->Out_Order($ou['openid'],'你的宝贝已发出，请耐心等候！', $goods_name,$ou['order_sn'],'神器商城','感谢你的努力付出，有付出就有回报！希望你再接再厉！');
+            }
+
 			$this->success('操作成功',U('Admin/Order/delivery_info',array('order_id'=>$data['order_id'])));
 		}else{
 			$this->error($res['msg'],U('Admin/Order/delivery_info',array('order_id'=>$data['order_id'])));

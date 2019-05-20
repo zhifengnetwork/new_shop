@@ -47,6 +47,7 @@ class Goods extends MobileBase
     {
         $filter_param = array(); // 帅选数组
         $id = I('id/d', 1); // 当前分类id
+        $t = I('t/d', 0);
         $brand_id = I('brand_id/d', 0);
         $spec = I('spec', 0); // 规格
         $attr = I('attr', ''); // 属性
@@ -70,7 +71,12 @@ class Goods extends MobileBase
 
         // 帅选 品牌 规格 属性 价格
         $cat_id_arr = getCatGrandson($id);
-        $goods_where = ['is_on_sale' => 1, 'exchange_integral' => 0, 'cat_id' => ['in', $cat_id_arr]];
+        if($t == 1){
+            $goods_where = ['is_on_sale' => 1, 'exchange_integral' => 0, 'is_recommend' => 1];
+        }else{
+            $goods_where = ['is_on_sale' => 1, 'exchange_integral' => 0, 'cat_id' => ['in', $cat_id_arr]];
+        }
+        
         $filter_goods_id = Db::name('goods')->where($goods_where)->cache(true)->getField("goods_id", true);
 
         // 过滤帅选的结果集里面找商品
@@ -232,21 +238,27 @@ class Goods extends MobileBase
 
         # 用户通过二维码进来，且自身没有上级推荐人时，自动成为分享者的下级，发送微信消息推送通知分享者
         if($share_user && $user_id){
-            $first_leader = Db::name('users')->where('user_id',$user_id)->value('first_leader');
-            if(!$first_leader){
-                $share_user_info = Db::name('users')->field('user_id,openid')->find($share_user);
-                if($share_user_info){
-                    Db::name('users')->where('user_id', $user_id)->update(['first_leader' => $share_user]);
-                    // if($share_user_info['openid']){
-                    //     $wx_content = "会员ID: ".$user_id." 成为了你的下级!";
-                    //     $wechat = new \app\common\logic\wechat\WechatUtil();
-                    //     $share_openid = $share_user_info['openid'];
-                    //     $wechat->sendMsg($share_openid, 'text', $wx_content);
-                    // }
+            $share_user_id = Db::name('users')->where('user_id', $share_user)->value('user_id');
+            if($share_user_id){
+                if($user_id){
+                    $first_leader = Db::name('users')->where('user_id',$user_id)->value('first_leader');
+                    if(!$first_leader){
+                        $share_user_info = Db::name('users')->field('user_id,openid')->find($share_user);
+                        if($share_user_info){
+                            Db::name('users')->where('user_id', $user_id)->update(['first_leader' => $share_user]);
+                            // if($share_user_info['openid']){
+                            //     $wx_content = "会员ID: ".$user_id." 成为了你的下级!";
+                            //     $wechat = new \app\common\logic\wechat\WechatUtil();
+                            //     $share_openid = $share_user_info['openid'];
+                            //     $wechat->sendMsg($share_openid, 'text', $wx_content);
+                            // }
+                        }
+                    }
+                }else{
+                    session('dfc5b',$share_user_id);
                 }
             }
         }
-
 
 
         $recommend_goods = M('goods')->where("is_recommend=1 and is_on_sale=1 and cat_id = {$goods['cat_id']}")->cache(7200)->limit(9)->field("goods_id, goods_name, shop_price")->select();
@@ -267,9 +279,6 @@ class Goods extends MobileBase
         $this->assign('share_url', urldecode($share_url));
         return $this->fetch();
     }
-
-
-
 
     # 商品分享二维码
     public function goods_share_qrcode(){

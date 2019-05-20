@@ -506,7 +506,7 @@ class GoodsLogic extends Model
                     'store_count' => $v['store_count'],
                     'sku' => $v['sku'],
                     'cost_price'=>$v['cost_price'],
-                    'commission'=>$v['commission'],
+                    'commission'=>$v['commission'] ? $v['commission'] : '',
                 ];
                 $specGoodsPrice = Db::name('spec_goods_price')->where(['goods_id' => $data['goods_id'], 'key' => $data['key']])->find();
                 if ($item_img) {
@@ -521,6 +521,7 @@ class GoodsLogic extends Model
                 if($specGoodsPrice){
                     Db::name('spec_goods_price')->where(['goods_id' => $goods_id, 'key' => $k])->update($data);
                 }else{
+                    $data['commission'] =  $data['commission'] ? $data['commission'] : '';
                     Db::name('spec_goods_price')->insert($data);
                 }
 

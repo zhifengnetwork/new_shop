@@ -113,10 +113,10 @@ class UserSign extends Model{
         $num = 1;
         $desc = '签到奖励：'.$money;
         
-        $lastInfo = Db::name('commission_log')->where(['identification'=>1])->order('date desc')->find();
+        $lastInfo = Db::name('commission_log')->where(['identification'=>1, 'user_id'=>$user_id])->order('date desc,id desc')->find();
         if($lastInfo){
             if($lastInfo['date'] == $yesterday){
-                $num += $lastInfo['num'];
+                $num = $num + intval($lastInfo['num']);
             }
         }
         if($this->continued_on_off){
@@ -127,10 +127,9 @@ class UserSign extends Model{
                 $money += $extra_money;
             } 
         }
-
         $insql = "insert into `tp_commission_log` (`user_id`,`identification`,`num`,`money`,`addtime`,`desc`,`date`) values ";
         $insql .= "('$user_id','1','$num','$money','$time','$desc','$date')";
-        // echo $insql;exit;
+        
         $inr = Db::execute($insql);
         if($inr){
             Db::execute("update `tp_users` set `user_money` = `user_money` + '$money', `distribut_money` = `distribut_money` + '$money' where `user_id` = '$user_id'");
