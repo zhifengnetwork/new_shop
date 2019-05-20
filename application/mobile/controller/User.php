@@ -1675,7 +1675,7 @@ class User extends MobileBase
      * @return mixed
      */
     public function setMobile(){
-//        $userLogic = new UsersLogic();
+        $userLogic = new UsersLogic();
 //        $status=0;
         if (IS_POST) {
             $mobile = input('mobile');
