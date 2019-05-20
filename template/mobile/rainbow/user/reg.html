@@ -25,13 +25,14 @@
             <input type="text" name="username" id="username" value="" placeholder="请输入手机号"  class="c-form-txt-normal">
             <span id="mobile_phone_notice"></span>
         </div>
-        <if condition="$regis_sms_enable eq 1">
-            <div class="lsu">
-                <span class="ico ico-v-code"></span>
-                <input class="v-code-input" type="text" id="mobile_code" value="" name="mobile_code" placeholder="请输入验证码" >
-                <a class="btn-text-message" rel="mobile" onClick="sendcode(this)">获取验证码</a>
-            </div>
-        </if>
+
+        <div class="lsu">
+            <span class="ico ico-v-code"></span>
+
+            <input class="v-code-input" type="text" id="mobile_code" value="" name="mobile_code" placeholder="请输入验证码" >
+            <a class="btn-text-message" rel="mobile" id="sendcode">获取验证码</a>
+        </div>
+
         <div class="lsu">
             <span class="ico ico-password"></span>
             <input type="password" id="password" value="" maxlength="16" placeholder="请设置6-16位登录密码" class="c-form-txt-normal" onBlur="check_password();">
@@ -60,7 +61,7 @@
         </div>
         <div class="signup-find">
 
-            <p class="recept">注册即视为同意<a href="{:U('Mobile/Article/agreement',['doc_code'=>'agreement'])}">《开源用户注册协议》</a></p>
+            <!-- <p class="recept">注册即视为同意<a href="{:U('Mobile/Article/agreement',['doc_code'=>'agreement'])}">《开源用户注册协议》</a></p> -->
             <!--<p class="recept">注册即视为同意<a href="javascript:show_agreement();">《开源用户注册协议》</a></p>-->
         </div>
     </form>
@@ -120,46 +121,89 @@
     }
 
     //发送短信验证码
-    function sendcode(obj) {
-        var mobile = $('#username').val();
-        if (mobile == '') {
-            showErrorMsg('手机不能空');
-            flag = false;
-        } else if (checkMobile(mobile)) { //判断手机格式
-            $.ajax({
-                type: "GET",
-                url: "/index.php?m=Home&c=Api&a=issetMobile",//+tab,
-                data: {mobile: mobile},// 你的formid 搜索表单 序列化提交
-                success: function (data) {
-                    if (data == '0') {
-                        $.ajax({
-                            url: '/index.php?m=Home&c=Api&a=send_validate_code&t=' + Math.random(),
-                            type: 'post',
-                            dataType: 'json',
-                            data: {type: $(obj).attr('rel'), send: $.trim($('#username').val()), scene: 1},
-                            success: function (data) {
-                                if (data.status == 1) {
-                                    //成功
-                                    countdown(obj)
-                                    layer.open({content: data.msg,time:2});
-                                } else {
-                                    //失败
-                                    showErrorMsg(data.msg);
-                                }
-                            }
-                        })
-                        flag = true;
-                    } else {
-                        showErrorMsg('* 手机号已存在');
-                        flag = false;
-                    }
-                }
+    $("#sendcode").click(function () {
+        if($(this).hasClass('disabled')) return;
+
+        // var mobile = $('#username').val();
+        // if (mobile == '') {
+        //     showErrorMsg('手机不能空');
+        //     flag = false;
+        // } else if (checkMobile(mobile)) { //判断手机格式
+        //     $.ajax({
+        //         type: "POST",
+        //         url: "/index.php?m=Home&c=Api&a=issetMobile",//+tab,
+        //         data: {mobile: mobile},// 你的formid 搜索表单 序列化提交
+        //         success: function (data) {
+        //             if (data == '0') {
+        //                 $.ajax({
+        //                     url: '/mobile/user/getPhoneVerify',
+        //                     type: 'post',
+        //                     dataType: 'json',
+        //                     data: { phone: mobile, sms_type: 0 },
+        //                     success: function (data) {
+        //                         console.log(data)
+        //                         if (data.code == 0) {
+        //                             //成功
+        //                             countdown(obj)
+        //                             layer.open({content: data.msg,time:2});
+        //                         } else {
+        //                             //失败
+        //                             showErrorMsg(data.msg);
+        //                         }
+        //                     }
+        //                 })
+        //                 flag = true;
+        //             } else {
+        //                 showErrorMsg('* 手机号已存在');
+        //                 flag = false;
+        //             }
+        //         }
+        //     });
+        // } else {
+        //     showErrorMsg('* 手机号码格式不正确');
+        //     flag = false;
+        // }
+        var reg = /^1[34578]\d{9}$/;  /*用户手机号*/
+        var phone = $("#username");
+        var phoneS = $("#username").val();
+        // console.log(phone)
+        if (phone.val() == "") {
+            showErrorMsg('手机不能为空!', { time: 1000 }, function () {
+
             });
-        } else {
-            showErrorMsg('* 手机号码格式不正确');
-            flag = false;
+            return false
         }
-    }
+        if (!reg.test(phone.val())) {
+            showErrorMsg('请输入正确的手机号!', { time: 1000 }, function () {
+
+            });
+            return false
+        }
+        var sms_type = 1;
+
+        // 获取验证码
+        var flag = true;
+        $.ajax({
+            url: '/index.php?m=Mobile&c=User&a=getPhoneVerify',
+            type: 'post',
+            async:false,
+            dataType: 'json',
+            data: { 'phone': phoneS, 'sms_type': sms_type },
+            success: function (msg) {
+                if (msg.code == 0) {
+                    showErrorMsg(msg.msg);
+                    flag = false;
+
+                    return false;
+                }
+            }
+        });
+
+        if (flag) {
+            showErrorMsg('已发送');
+            daojishi(60,this);
+        }
+    })
     $(document).on('keyup', '#password', function() {
         var password = md5($("input[name='auth_code']").val() + this.value);
         $('input[name="password"]').val(password);
@@ -172,6 +216,17 @@
     //    function verify(){
     //        $('#verify_code_img').attr('src','/index.php?m=Home&c=User&a=verify&type=user_reg&r='+Math.random());
     //    }
+    function daojishi(seconds,obj){
+        if (seconds > 1){
+            seconds--;
+            $(obj).text(seconds+"重新获取 ").addClass("disabled");
+            setTimeout(function(){
+                daojishi(seconds,obj);
+            },1000);
+        }else{
+            $(obj).text("获取验证码").removeClass("disabled");//启用按
+        }
+    }
 
     //提交表单
     function checkSubmit()
