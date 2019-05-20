@@ -2714,17 +2714,5 @@ class User extends MobileBase
         exit;
     }
 
-    /**
-     * 获取验证码
-     */
-    public function getPhoneVerify(){
-        $param = input('post.');
-        $sms_type = intval($param['sms_type']);
-        if(!$sms_type || !$param['phone']){
-            return json(array('code' => 0, 'msg' => '缺少参数'));
-        }
-        $data = ['sms_type'=>$sms_type, 'phone'=>$param['phone']];
-        $res = getPhoneCode($data);
-        return json($res);
-    }
+
 }
