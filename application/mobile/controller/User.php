@@ -107,6 +107,17 @@ class User extends MobileBase
         $MenuCfg = new MenuCfg();
         $menu_list = $MenuCfg->where('is_show', 1)->order('menu_id asc')->select();
 
+        $app_config = Db::name('config')->where(['inc_type'=>'shop_info','name'=>['in','android_app_url,ios_app_url']])->field('name,value')->select();
+        if($app_config){
+            foreach($app_config as $v){
+                if($v['value']){
+                    $app[$v['name']] = $v['value'];
+                }
+            }
+            if(isset($app)){
+                $this->assign('app', $app);
+            }
+        }
         $comm = $this->today_commission();
         $this->user['today_comm'] = $comm;
         $this->assign('menu_list', $menu_list);
