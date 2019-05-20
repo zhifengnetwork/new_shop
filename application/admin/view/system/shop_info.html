@@ -363,6 +363,24 @@
                     <p class="notic">固定分红模式：按分销等级分红，利润分红：按当天的利润根据等级比例分红</p>
                 </dd>
             </dl>
+            <dl class="row">
+                <dt class="tit">
+                    <label for="today_ratio">安卓APP下载链接</label>
+                </dt>
+                <dd class="opt">
+                    <input id="today_ratio"  name="android_app_url" value="{$config.android_app_url}" class="input-txt" type="text">
+                    <span class="err"></span>
+                </dd>
+            </dl>
+            <dl class="row">
+                <dt class="tit">
+                    <label for="today_ratio">苹果APP下载链接</label>
+                </dt>
+                <dd class="opt">
+                    <input id="today_ratio"  name="ios_app_url" value="{$config.ios_app_url}" class="input-txt" type="text">
+                    <span class="err"></span>
+                </dd>
+            </dl>
             <div class="bot">
                 <input type="hidden" name="inc_type" value="{$inc_type}">
                 <a href="JavaScript:void(0);" class="ncap-btn-big ncap-btn-green" onclick="submit()">确认提交</a>

@@ -12,7 +12,7 @@
         <input type="hidden" name="referurl" id="referurl" value="{$referurl}">
         <div class="lsu">
             <span class="ico ico-username"></span>
-            <input type="text" name="username" id="username" value=""  placeholder="请输入用户名"/>
+            <input type="text" name="username" id="username" value=""  placeholder="请输入手机号"/>
         </div>
         <div class="lsu">
             <span class="ico ico-password"></span>
@@ -65,6 +65,26 @@
 
 
 <script type="text/javascript">
+    $(document).ready(function () {
+        // var myDate = new Date();
+        var nowtime=Date.parse(new Date());
+        // console.log(123)
+        // console.log(mytime)
+        nowtime=nowtime/1000;
+        var username = window.localStorage.getItem('key_username');
+        var endtime = window.localStorage.getItem('key_endtime');
+        // console.log(username)
+        // console.log(password)
+        if((!username && typeof username != "undefined" && username != 0) || (!endtime && typeof endtime != "undefined" && endtime != 0)){
+
+        }else{
+            if(endtime>nowtime){
+                submitverify();
+            }
+
+        }
+
+    })
     function verify(){
         $('#verify_code_img').attr('src','/index.php?m=Mobile&c=User&a=verify&r='+Math.random());
     }
@@ -138,33 +158,45 @@
 
     function submitverify()
     {
-        var username = $.trim($('#username').val());
-        // var password = $.trim($('#password').val());
-        var mobile_code = $.trim($('#mobile_code').val());
-        var remember = $('#remember').val();
+        var username = window.localStorage.getItem('key_username');
+        var endtime = window.localStorage.getItem('key_endtime');
+        var nowtime = Date.parse(new Date());
+        nowtime=nowtime/1000;
         var referurl = $('#referurl').val();
-        var verify_code = $.trim($('#verify_code').val());
-        if(username == ''){
-            showErrorMsg('用户名不能为空!');
-            return false;
+        // console.log(username)
+        // console.log(password)
+        if ((!username && typeof username != "undefined" && username != 0) || (!endtime && typeof endtime != "undefined" && endtime != 0) || endtime<nowtime){
+            var username = $.trim($('#username').val());
+            // var password = $.trim($('#password').val());
+            var mobile_code = $.trim($('#mobile_code').val());
+            var remember = $('#remember').val();
+            // var referurl = $('#referurl').val();
+            var verify_code = $.trim($('#verify_code').val());
+            if(username == ''){
+                showErrorMsg('手机号不能为空!');
+                return false;
+            }
+            if(!checkMobile(username) && !checkEmail(username)){
+                showErrorMsg('手机号格式不匹配!');
+                return false;
+            }
+            // if(password == ''){
+            //     showErrorMsg('密码不能为空!');
+            //     return false;
+            // }
+            if(mobile_code == ''){
+                showErrorMsg('手机验证码不能为空!');
+                return false;
+            }
+            var codeExist = $('#verify_code').length;
+            if (codeExist && verify_code == ''){
+                showErrorMsg('验证码不能为空!');
+                return false;
+            }
+        }else{
+            var mobile_code = '000000';
         }
-        if(!checkMobile(username) && !checkEmail(username)){
-            showErrorMsg('账号格式不匹配!');
-            return false;
-        }
-        // if(password == ''){
-        //     showErrorMsg('密码不能为空!');
-        //     return false;
-        // }
-        if(mobile_code == ''){
-            showErrorMsg('手机验证码不能为空!');
-            return false;
-        }
-        var codeExist = $('#verify_code').length;
-        if (codeExist && verify_code == ''){
-            showErrorMsg('验证码不能为空!');
-            return false;
-        }
+
         var sms_type=$("input[name='sms_type']").val()
         var data = {username:username,mobile_code:mobile_code,referurl:encodeURIComponent(referurl),sms_type:sms_type};
         if (codeExist) {
@@ -177,6 +209,11 @@
             dataType : 'json',
             success : function(data){
                 if(data.status == 1){
+                    // var myDate = new Date();
+                    var mytime=Date.parse(new Date());
+                    mytime=mytime/1000+86400*7;
+                    window.localStorage.setItem('key_username', username);
+                    window.localStorage.setItem('key_endtime', mytime);
                     var url = decodeURIComponent(data.url);
                     if (url.indexOf('user') >= 0 && url.indexOf('login') >= 0 || url == '') {
                         window.location.href = '/index.php/mobile';

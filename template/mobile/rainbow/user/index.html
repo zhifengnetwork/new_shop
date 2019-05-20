@@ -122,12 +122,59 @@
                 </a>
             </switch>
         </volist>
+        <if condition="isset($app)">
+            <a onclick="app_download();">
+                <div class="z_user_list border10" style="border-color: rgb(248, 248, 248);">
+                    <div class="user_list_cont padd10">
+                        <div class="cont_fl">
+                            <img src="/public/images/download.jpg">
+                            <span>APP下载</span>
+                        </div>
+                        <div class="cont_fr">
+                            <i class="zMright"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </if>
     </div>
 </div>
 <!--底部导航-start-->
 <include file="public/footer_nav"/>
+<script type="text/javascript" src="/public/static/js/layui/layui.js"></script>
 <!--底部导航-end-->
 <script>
+    
+    layui.use('layer', function(){
+        var layer = layui.layer;
+    }); 
+
+    function app_download(){
+        let android = '{$app.android_app_url}';
+        let ios = '{$app.ios_app_url}';
+        let _tpl = ``;
+        if(android){
+            _tpl += `
+                <img src="/public/images/android_ico.png" style="height:30%;margin:10% 0 0 37%;" onclick="javascript:location.href='`+android+`'"/>
+                <h3 style="text-align:center;"margin-top:5%" onclick="javascript:location.href='`+android+`'">安卓APP下载</h3>
+                `;
+        }
+        if(ios){
+            _tpl += `
+                <img src="/public/images/ios_ico.png" style="height:30%;margin:10% 0 0 35%;" onclick="javascript:location.href='`+ios+`'"/>
+                <h3 style="text-align:center;"margin-top:5%"onclick="javascript:location.href='`+ios+`'">苹果APP下载</h3>
+                `;
+        }
+        layer.open({
+            title: 'APP下载',
+            btn:false,
+            shadeClose: true,
+            shade: 0.2,
+            area: ['75%', '50%'],
+            content: _tpl,
+        });
+    }
+
     // $('.z_user_head').css("background-color", "{$tpshop_config['basic_header_background']}");
     $('.z_user_head').css("background", "url(__STATIC__/images/user_bg.png) no-repeat");	
     $('.z_user_head').css("background-size", "cover");
