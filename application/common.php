@@ -1013,7 +1013,7 @@ function update_pay_status($order_sn,$ext=array())
         // 分销商升级, 根据order表查看消费id 达到条件就给他分销商等级升级
         // $Level =new \app\common\logic\LevelLogic();
         // $Level->user_in($order['user_id']);
-        curl($order['user_id']);
+        curl_up($order['user_id']);
 
         // 记录订单操作日志
         $commonOrder = new \app\common\logic\Order();
