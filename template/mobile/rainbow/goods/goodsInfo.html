@@ -143,13 +143,21 @@
                 <span class="similar-product-text">{$goods.goods_name}</span>
                 <span class="similar-product-text" style="color: #f03435;margin-top: -.5rem">{$goods.goods_remark}</span>
             </div>
-            <div class="keep fr">
+            <!--<div class="keep fr">
                 <a href="javascript:collect_goods({$goods.goods_id});" id="favorite_add">
-                    <i class=" <if condition='$collect gt 0'>red</if>"></i>
+                    <i class="<if condition='$collect gt 0'>red</if>"></i>
                     <span>收藏</span>
-                </a>
-            </div>
-            <div class="scunde p">
+                </a>              
+            </div>-->
+           
+            <div class="scunde p" style="position: relative;">
+            	<!--绝对定位 --收藏 -->
+            	<div class="keep fr" style="float: none;position: absolute;top:0;right:0">
+	                <a href="javascript:collect_goods({$goods.goods_id});" id="favorite_add">
+	                    <i class="<if condition='$collect gt 0'>red</if>"></i>
+	                    <span>收藏</span>
+	                </a>              
+	            </div>
                 <span class="red" id="price">￥{$goods.shop_price}</span>
                 <span id="market_price_title">市场价：</span><span class="linethr" id="market_price">{$goods.market_price}</span>
                 <img src="/public/static/images/erweimafengxiang.jpg"  style="float: right;width: 2.5rem;position:absolute;top: 3rem;right: 0;" onclick="share_icon();"/>
@@ -908,6 +916,7 @@
     }
     //点击收藏商品
     function collect_goods(goods_id){
+    	console.log(6666);
         $.ajax({
             type : "GET",
             dataType: "json",
@@ -921,6 +930,7 @@
                 }
             }
         });
+        return false;
     }
     //将选择的属性添加到已选
     function sel() {

@@ -3006,13 +3006,14 @@ input:-ms-input-placeholder {
 	margin:0 auto;
 	background-position-x:0
 }
+
 .de_font .fr .red {
 	background-position-x:-0.810667rem
 }
 .de_font .fr span {
 	display:block;
 	margin-top:.21333rem;
-	font-size:.42667rem
+	font-size:.35rem!important
 }
 .de_font .scunde span{
 	color:#999;
