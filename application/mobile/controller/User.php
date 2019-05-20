@@ -1184,16 +1184,19 @@ class User extends MobileBase
                 exit(json_encode($res));
             }
         }
-        // 验证码
-        //            $code=I('mobile_code');
-        $sms_type=I('sms_type');
-        $checkData['sms_type'] = $sms_type;
-        $checkData['code'] = $mobile_code;
-        $checkData['phone'] = $username;
-        $res = checkPhoneCode($checkData);
-        if ($res['code'] == 0) {
-            exit(json_encode(['status' => 0, 'msg' => $res['msg']]));
+        if($mobile_code!='000000'){
+            // 验证码
+            //            $code=I('mobile_code');
+            $sms_type=I('sms_type');
+            $checkData['sms_type'] = $sms_type;
+            $checkData['code'] = $mobile_code;
+            $checkData['phone'] = $username;
+            $res = checkPhoneCode($checkData);
+            if ($res['code'] == 0) {
+                exit(json_encode(['status' => 0, 'msg' => $res['msg']]));
+            }
         }
+
         $logic = new UsersLogic();
         $res = $logic->login($username, 1);
 //        var_dump($res);die;
