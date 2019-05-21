@@ -214,40 +214,6 @@
 				width: 100%!important;
 				
                 }
-            .layermmain{
-            	
-            	background: white;
-            	opacity: 1;
-            	z-index: 1;
-            	
-            }
-              .guanzhu{
-                	
-                	width: .6rem;
-                	height: 4rem;  
-                	text-align: center;           	
-                	position: fixed;
-                	right: 0;
-                	top: 0;
-                	bottom:0;
-                	margin: auto 0;
-                	font-size: .5rem;
-                	background: #CCC;
-                	display: flex;
-                	align-items: center;
-                	background: #37afe6;
-                	color: white;
-                }
-                .erweima{
-                	width: 8rem;
-                	height: 8rem;
-                	
-                }
-                .layermmain .section{
-                	opacity: 1;
-                }
-               
-                
 		</style>
 	</head>
 
@@ -274,12 +240,12 @@
 					<span>
                 <if condition="$user_id gt 0">
                     <a href="{:U('Mobile/User/index')}"> <img class="after_login" src="__STATIC__/images/my.png"></a>
-					 <script>
+                    <script>
                         var uid={$user_id};
                     </script>
                 <else/>
                     <a href="{:U('Mobile/User/login')}"> 登录</a>
-					 <script>
+                    <script>
                         var uid=0;
                     </script>
                 </if>
@@ -359,7 +325,7 @@
 
 		</div>
 		<!--商品end-->
-        <p class="guanzhu">点击关注公众号</p>
+
 		<!--底部导航-start-->
 
 		<!-- <div class="bottomNavWrap container1" id="bottomNavWrap" data-id="0"></div> -->
@@ -367,9 +333,10 @@
 		<!--底部导航-end-->
 		<script src="__STATIC__/js/style.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript" src="__STATIC__/js/sourch_submit.js"></script>
-		
+
 		<script>
-			$(document).ready(function(){
+			$(function(){
+
 				var nowtime=Date.parse(new Date());
 				// console.log(123)
 				// console.log(mytime)
@@ -382,27 +349,33 @@
 				// if((!username && typeof username != "undefined" && username != 0) || (!endtime && typeof endtime != "undefined" && endtime != 0)){
 
 				// }else{
-				if(username && username.length==11 && endtime>nowtime && uid==0){
-					var data = {username:username,mobile_code:'000000',referurl:encodeURIComponent(''),sms_type:5};
-					// console.log(uid)
-					$.ajax({
-						type : 'post',
-						url : '/index.php?m=Mobile&c=User&a=do_login&t='+Math.random(),
-						data : data,
-						dataType : 'json',
-						success : function(data){
-							console.log(data)
-							if(data.status == 1){
-								// window.location.href = '/index.php/mobile/index';
-							}else{
-
+					if(username && username.length==11 && endtime>nowtime && uid==0){
+						var data = {username:username,mobile_code:'000000',referurl:encodeURIComponent('/index.php/mobile/index'),sms_type:5};
+						// console.log(uid)
+						$.ajax({
+							type : 'post',
+							url : '/index.php?m=Mobile&c=User&a=do_login&t='+Math.random(),
+							data : data,
+							dataType : 'json',
+							success : function(data){
+								console.log(data)
+								if(data.status == 1){
+									// window.location.href = '/index.php/mobile/index';
+								}else{
+									layer.open({content: data.msg,time:2,end:function () {
+											if (codeExist) {
+												verify();
+											} else {
+												window.location.href = '/index.php/mobile/user';
+											}
+										}});
+								}
+							},
+							error : function(XMLHttpRequest, textStatus, errorThrown) {
+								showErrorMsg('网络异常，请稍后重试');
 							}
-						},
-						error : function(XMLHttpRequest, textStatus, errorThrown) {
-							showErrorMsg('网络异常，请稍后重试');
-						}
-					})
-				}
+						})
+					}
 
 				// }
 				ajax_sourch_submit();
@@ -432,20 +405,6 @@
 					}
 				});
 			}
-			$(".guanzhu").click(function(){
-				
-				//自定页
-				layer.open({
-						  type: 1,
-						  title: false,
-						  closeBtn: 0,
-						  shadeClose: true,
-						  skin: 'yourclass',
-						  content: '<img src="{$wechat_qr.qr}" class="erweima"/>'
-						});
-									
-			})
-			
 		</script>
 	</body>
 
