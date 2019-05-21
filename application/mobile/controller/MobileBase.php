@@ -133,6 +133,8 @@ class MobileBase extends Controller {
             $user = $this->user;
             session('user',$user);
 
+            $this->clear_wx_temp_cache($user['user_id']);
+
             # 新版 - 上下级关系绑定
             if(session('dfc5b') && !$this->user['first_leader']){
                 
@@ -154,11 +156,11 @@ class MobileBase extends Controller {
             }
 
         
-            if( !$user['mobile'] && (CONTROLLER_NAME != 'User' || ACTION_NAME != 'setMobile') ){
-                echo "<h1 style='text-align:center; margin-top:30%;'>请先设置手机号码</h1>";
-                echo "<script>setTimeout(function(){window.location.href='/Mobile/User/setMobile'},2000);</script>";
-                exit;
-            }
+            // if( !$user['mobile'] && (CONTROLLER_NAME != 'User' || ACTION_NAME != 'setMobile') ){
+            //     echo "<h1 style='text-align:center; margin-top:30%;'>请先设置手机号码</h1>";
+            //     echo "<script>setTimeout(function(){window.location.href='/Mobile/User/setMobile'},2000);</script>";
+            //     exit;
+            // }
             
             
             // 邀请注册送佣金
@@ -175,7 +177,36 @@ class MobileBase extends Controller {
         }
         
     }
-    
+
+    /**
+     * 清理微信待发模板消息缓存
+     */
+    public function clear_wx_temp_cache($user_id = 0){
+        if($user_id > 0){
+            $f = Db::name('wx_temp_cache')->where('user_id',$user_id)->find();
+        }else{
+            $f = Db::name('wx_temp_cache')->find();
+        }
+        if($f){
+            switch($f['type']){
+                # 购买成功通知
+                case 'Purchase_Success':
+                    $openid = Db::name('users')->where('user_id',$f['user_id'])->value('openid');
+                    if($openid){
+                        $og = Db::name('order_goods')->where('order_id',$f['tid'])->order('rec_id desc')->field('goods_name')->find();
+                        if($og){
+                            $this->Purchase_Success($openid,'商品支付成功！',$og['goods_name'],'支付成功！',$f['money'],'欢迎再次购买！');
+                        }
+                    }
+                    Db::name('wx_temp_cache')->delete($f['id']);
+                break;
+                default:
+                    return false;
+            }
+                
+        }
+
+    }
 
 	
 	/**

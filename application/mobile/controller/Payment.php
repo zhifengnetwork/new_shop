@@ -208,11 +208,6 @@ class Payment extends MobileBase
         $order_id = I('order_id/d');
         $order = Db::name('order')->where("order_id", $order_id)->find();
         if ($order['pay_status'] == 1) {
-            $userinfo = Db::name('users')->field('user_id,nickname,openid,mobile')->where('user_id',$order['user_id'])->find();
-            if($userinfo && $userinfo['openid']){
-                $goods_name = Db::name('order_goods')->where('order_id', $order['order_id'])->value('goods_name');
-                $this->Purchase_Success($userinfo['openid'],'商品支付成功！',$goods_name,'支付成功！',$order['order_amount'],'欢迎再次购买！');
-            }
             $this->assign('order', $order);
             return $this->fetch('success');
         }else {
