@@ -1007,6 +1007,9 @@ function update_pay_status($order_sn,$ext=array())
         // $User->setUserById($order['user_id']);
         // $User->updateUserLevel();
 
+        # 存入一条微信模板消息待发记录
+        $tcmoney = $order['order_amount'] > 0 ? $order['order_amount'] : $order['total_amount'];
+        Db::name('wx_temp_cache')->insert(['user_id'=>$order['user_id'],'type'=>'Purchase_Success','tid'=>$order['order_id'],'money'=>$tcmoney,'time'=>time()]);
         
         $sales = sales($order['order_id']);  //购买返佣
         
