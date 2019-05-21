@@ -152,7 +152,24 @@
     function app_download(){
         let android = '{$app.android_app_url}';
         let ios = '{$app.ios_app_url}';
+        let mobile_validated = '{$mobile_validated}';
         let _tpl = ``;
+
+        if(mobile_validated){
+            layer.open({
+                title:'请先绑定手机号！',
+                content:'<p style="text-align:center;color:red;">请先绑定手机号！</p>',
+                btn:['绑定手机号', '取消'],
+                btnAlign:'c',
+                area:['80%','25%'],
+                shade:0.2,
+                yes:function(){
+                    window.location.href="/Mobile/User/setMobile";
+                }
+            });
+            return false;
+        }
+        
         if(android){
             _tpl += `
                 <img src="/public/images/android_ico.png" style="height:30%;margin:10% 0 0 37%;" onclick="javascript:location.href='`+android+`'"/>
