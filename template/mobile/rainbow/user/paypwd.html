@@ -74,8 +74,6 @@
             return false;
         }
     }
-
-
     //发送短信验证码
     function sendcode(obj){
         if($(obj).hasClass('disabled')) return;
@@ -108,7 +106,7 @@
             }
         }
         $.ajax({
-            url : "/index.php?m=Mobile&c=User&a=getPhoneVerify",
+            url : "/index.php?m=Mobile&c=SendMessage&a=getPhoneVerify",
             type:'post',
             dataType:'json',
             data:{'phone': tel, 'sms_type': 4 },
@@ -128,7 +126,6 @@
             }
         })
     }
-
     //第一步验证
     function nextstep(){
         var tpcode = $('#tpcode').val();
@@ -157,7 +154,6 @@
             }
         })
     }
-
     //提交前验证表单
     function submitverify(){
         var new_password = $('#new_password').val();
@@ -182,9 +178,8 @@
             success:function(data){
                 if(data.status==1){
                     layer.open({content: data.msg,time:2,end:function () {
-                            window.location.href=data.url;
-                        }});
-
+                        window.location.href=data.url;
+                    }});
                 }else{
                     layer.open({content:data.msg,time:2});
                     return false;
