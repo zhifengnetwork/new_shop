@@ -121,6 +121,7 @@ class User extends MobileBase
         $comm = $this->today_commission();
         $this->user['today_comm'] = $comm;
         $this->assign('menu_list', $menu_list);
+        $this->assign('mobile_validated', $this->user['mobile'] ? 0 : 1);
         return $this->fetch();
     }
 
