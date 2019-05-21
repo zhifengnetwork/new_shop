@@ -33,6 +33,9 @@ class Index extends MobileBase {
         $quantum = M('goods_category')->where($where_quantum)->value('id');
         // dump($quantum);die;
 
+        $wechat = Db::name('wx_user')->find();
+        $this->assign('wechat_qr',$wechat);
+
         $this->assign('goods_id',$goods_id);
         $this->assign('black_technology',$black_technology);
         $this->assign('quantum',$quantum);
