@@ -74,6 +74,8 @@
             return false;
         }
     }
+
+
     //发送短信验证码
     function sendcode(obj){
         if($(obj).hasClass('disabled')) return;
@@ -126,6 +128,7 @@
             }
         })
     }
+
     //第一步验证
     function nextstep(){
         var tpcode = $('#tpcode').val();
@@ -154,6 +157,7 @@
             }
         })
     }
+
     //提交前验证表单
     function submitverify(){
         var new_password = $('#new_password').val();
@@ -180,6 +184,7 @@
                     layer.open({content: data.msg,time:2,end:function () {
                         window.location.href=data.url;
                     }});
+
                 }else{
                     layer.open({content:data.msg,time:2});
                     return false;
