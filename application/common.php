@@ -952,6 +952,7 @@ function rechargevip_rebate($order) {
  */
 function update_pay_status($order_sn,$ext=array())
 {
+    write_log('update_pay_status 开始');
     $time=time();
     if(stripos($order_sn,'recharge') !== false){
         //用户在线充值
@@ -1016,7 +1017,12 @@ function update_pay_status($order_sn,$ext=array())
         // 分销商升级, 根据order表查看消费id 达到条件就给他分销商等级升级
         // $Level =new \app\common\logic\LevelLogic();
         // $Level->user_in($order['user_id']);
+
+        write_log('curl_up 调用前');
+
         curl_up($order['user_id']);
+
+        write_log('curl_up 调用后');
 
         // 记录订单操作日志
         $commonOrder = new \app\common\logic\Order();
@@ -1055,13 +1061,35 @@ function update_pay_status($order_sn,$ext=array())
     }
 }
 
+/**
+ * @param $content
+ *  记录日志
+ */
+function write_log($content)
+{
+    $content = "[" . date('Y-m-d H:i:s') . "]" . $content . "\r\n";
+    $dir = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']), '/') . '/logs';
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777, true);
+    }
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777, true);
+    }
+    $path = $dir . '/' . date('Ymd') . '.txt';
+    file_put_contents($path, $content, FILE_APPEND);
+}
+
+
 function curl_up($leaderId){
-    $htt = substr($_SERVER['HTTP_REFERER'],0,strpos($_SERVER['HTTP_REFERER'], '/'));
-    $url = $htt.'//'.$_SERVER['HTTP_HOST'].'/mobile/Cart/curls';
-//    $url = 'http://'.$_SERVER['HTTP_HOST'].'/mobile/Cart/curls';
-//      dump($url);die;
+
+    write_log('curl_up 函数体$leaderId ： '.$leaderId);
+
+    $url = SITE_URL.'/mobile/Cart/curls';
+
+    write_log('curl_up 函数体 $url ： '.$url);
+
     $data = array('leaderId'=>$leaderId);
-    // echo $data;
+
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_POST, 1);
