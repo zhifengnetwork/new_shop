@@ -108,7 +108,7 @@
             }
         }
         $.ajax({
-            url : "/index.php?m=Mobile&c=User&a=getPhoneVerify",
+            url : "/index.php?m=Mobile&c=SendMessage&a=getPhoneVerify",
             type:'post',
             dataType:'json',
             data:{'phone': tel, 'sms_type': 4 },
@@ -182,8 +182,8 @@
             success:function(data){
                 if(data.status==1){
                     layer.open({content: data.msg,time:2,end:function () {
-                            window.location.href=data.url;
-                        }});
+                        window.location.href=data.url;
+                    }});
 
                 }else{
                     layer.open({content:data.msg,time:2});

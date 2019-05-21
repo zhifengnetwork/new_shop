@@ -4527,8 +4527,40 @@ input:-ms-input-placeholder {
 	text-align:center;
 	color:#888;
 	padding:.25rem .24rem .4rem;
-	clear:both
+	clear:both;
+	position:relative
+	
 }
+.detail_ye{
+	
+	color: red;
+	font-size: .6rem;
+	
+	
+}
+.quan{
+	
+	
+	position: absolute;
+	left:50%;
+	top: 50%;
+	transform: translate(-50%,-50%);
+}
+.detail_ye{
+	position:absolute;
+	left:50%;
+	top: 50%;
+	transform: translate(-50%,-50%);
+	-moz-transform: translate(-50%,-50%);
+	-webkit-transform: translate(-50%,-50%);
+	-mis-transform:translate(-50%,-50%);
+	-o-transform:translate(-50%,-50%); 
+	margin: auto	
+}
+.look{
+	padding-top: 3.7rem;
+}
+
 .chidno {
 	display:none
 }
@@ -5103,9 +5135,9 @@ span.mp_mp {
 	text-align:right;
 	padding-right:.5rem;
 }
-.guesslike {
+/*.guesslike {
 	margin-bottom:2.13333rem
-}
+}*/
 .nonenothing {
 	width:8.53333rem;
 	margin:0 auto;
