@@ -15,6 +15,10 @@ class LevelLogic extends Model
     
     public function user_in($leaderId)
     {
+        write_log('user_in 函数体 开始');
+        write_log('user_in 函数体 $leaderId：'.$leaderId);
+
+
         ignore_user_abort(true);
         set_time_limit(0);
         $data = file_get_contents("php://input");
@@ -42,6 +46,9 @@ class LevelLogic extends Model
                 }
             }
         }
+
+        write_log('user_in 函数体 结束');
+
     }
   
     /**
