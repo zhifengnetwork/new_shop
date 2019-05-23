@@ -146,7 +146,7 @@ class Sales extends Model
 
 		//专员等级以上购买返佣
 		if ($user_level > 0) {
-			$my_prize = floatval($comm['preferential'][$user_level]);
+			$my_prize = floatval($comm['preferential'][$user_level])*$order['goods_num'];
 			if ($my_prize > 0) {
 				$user_id = $this->user_id;
 				$total_money = $my_prize;
@@ -413,7 +413,7 @@ class Sales extends Model
 		
 		//专员等级以上购买返佣
 		if ($user_level > 0) {
-			$my_prize = floatval($comm['preferential'][$user_level]);
+			$my_prize = floatval($comm['preferential'][$user_level])*$order['goods_num'];
 			if ($my_prize > 0) {
 				$user_id = $this->user_id;
 				$total_money = $my_prize;
