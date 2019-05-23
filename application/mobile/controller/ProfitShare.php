@@ -60,6 +60,13 @@ class ProfitShare extends MobileBase
             $partnersPartProfit=$this->get_dividend_model(5);
             $managersPartProfit=$this->get_dividend_model(3);
             $inspectorPartProfit=$this->get_dividend_model(4);
+            $today_profit=0;
+            $partners=0;
+            $managers=0;
+            $inspector=0;
+            $partners_ratio=0;
+            $managers_ratio=0;
+            $inspector_ratio=0;
         }
 
 //        if (!isset($today_profit['total'])){
@@ -72,7 +79,12 @@ class ProfitShare extends MobileBase
         $partnersIds=$goodsProfit->get_all_partners(5);
         $managersIds=$goodsProfit->get_all_partners(3);
         $inspectorIds=$goodsProfit->get_all_partners(4);
-
+//        var_dump($partnersIds);
+//        echo "<hr />";
+//        var_dump($managersIds);
+//        echo "<hr />";
+//        var_dump($inspectorIds);
+//        echo "<hr />";
 
 //        if($partners==0){
 //            $data['msg']='暂时没有合伙人';
@@ -130,7 +142,7 @@ class ProfitShare extends MobileBase
                 Db::name('users')->where(['user_id'=>$v])->setInc('user_money',$inspectorPartProfit);
                 $this->set_log($v,$inspectorPartProfit,'该总监获得当日利润分红'.$inspectorPartProfit);
             }
-            echo '执行成功,插入'.$partners+$managers+$inspector.'条记录\n';
+            echo '执行成功,插入'.count($partnersIds)+count($managersIds)+count($inspectorIds).'条记录\n';
 //            var_dump($data);die;
 //            Db::name('profit_dividend_log')->insertAll($data);
             // 提交事务
