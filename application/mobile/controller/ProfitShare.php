@@ -79,12 +79,12 @@ class ProfitShare extends MobileBase
         $partnersIds=$goodsProfit->get_all_partners(5);
         $managersIds=$goodsProfit->get_all_partners(3);
         $inspectorIds=$goodsProfit->get_all_partners(4);
-        var_dump($partnersIds);
-        echo "<hr />";
-        var_dump($managersIds);
-        echo "<hr />";
-        var_dump($inspectorIds);
-        echo "<hr />";
+//        var_dump($partnersIds);
+//        echo "<hr />";
+//        var_dump($managersIds);
+//        echo "<hr />";
+//        var_dump($inspectorIds);
+//        echo "<hr />";
 
 //        if($partners==0){
 //            $data['msg']='暂时没有合伙人';
