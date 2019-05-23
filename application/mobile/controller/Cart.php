@@ -52,6 +52,7 @@ class Cart extends MobileBase {
             if ($user) {
                 $discount = (empty((float)$user['discount'])) ? 1 : $user['discount'];
                 if ($discount != 1) {
+                    $discount = 1;//没有折扣，全部变为1
                     $c = Db::name('cart')->where(['user_id' => $user['user_id'], 'prom_type' => 0])->where('member_goods_price = goods_price')->count();
                     $c && Db::name('cart')->where(['user_id' => $user['user_id'], 'prom_type' => 0])->update(['member_goods_price' => ['exp', 'goods_price*' . $discount]]);
                 }
