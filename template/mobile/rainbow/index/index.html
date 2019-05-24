@@ -15,6 +15,7 @@
 		<script src="__STATIC__/js/layer.js" type="text/javascript"></script>
 		<link rel="shortcut icon" type="image/x-icon" href="{$tpshop_config.shop_info_store_ico|default='/public/static/images/logo/storeico_default.png'}" media="screen" />
 		<style>
+			
 			.header .sea-box span {
 				margin-left: 1rem!important;
 			}
@@ -109,7 +110,7 @@
 			}
 			
 			.nav {
-				margin-top: .9rem;
+				/* margin-top: .9rem; */
 				display: flex;
 				display: -webkit-box;
 				display: -webkit-flex;
@@ -251,37 +252,51 @@
                 .layermmain .section{
                 	opacity: 1;
 				}
+				.tututututu{
+
+						position: relative;
+						overflow: hidden;
+
+				}
 				marquee{
-
-				  background: #f7f7f7;
-				  height: 1rem;
-				  line-height: 1rem;
+				  
+				  
+				  position: absolute;
+				  left: 2.8rem;
 				  font-size: .5rem;
-                  /* color: white */
-
+				  height: 1.5rem;
+				  line-height: 1.75rem;
+				  /* top: 0rem;
+				  right: 2.8rem;
+				  left: 2.8rem;
+				  background: #f7f7f7;
+				  /* color: white */
+				  /* border: 1px solid green;  */
+				  /* overflow: hidden; */
+				
 				}
 				.tubiao{
 
 				
 				  background: #f7f7f7;
-				  height: 1rem;
-				 
-
+				  height: 1.5rem;
+				
 				}
 				.tubiao img{
 					width: .8rem;
 					height: 1rem;
-					margin-left: .3rem
+					margin-left: .3rem;
+					margin-top: .1rem
 				}
                 .tubiao span{
 					 
 					 display: inline-block;
 					 height: 100%;
-					 line-height: 1.08rem;
+					 line-height: 1.72rem;
 					 font-size: .5rem;
 					 margin-left:.2rem;
-					 vertical-align: center;
-					 /* color: white; */
+					 vertical-align: center; 
+				
 
 				}
                 
@@ -343,13 +358,19 @@
 		</div>
 		<!--顶部滚动广告栏-e-->
 		<!-- 公告区域 -->
-		<div class="tubiao">
-           <img src="__STATIC__/images/laba.png"/>
-           <span>公告</span>
-		</div>
-		
+		<div class="tututututu">
+			<div class="tubiao">
+			<img src="__STATIC__/images/laba.png"/>
+			<span>公告</span>
+			</div>
+			<div style="position: relative;right:0rem;top:-1.5rem;height: 1.5rem;">
+			 <marquee>
 
+				{$store_notice}
 
+			 </marquee>
+		   </div>
+        </div>
 
 		<!--nav区域开始-->
 
@@ -490,22 +511,28 @@
 						});
 									
 			})
+				//eleId.style.right ='2.8rem';
 			// 公告区域代码
-			var test1 = function (x, y, text){
-								    // eleId 自己定义的变量名，任意取
-								    // document.createElement ('marquee'); 勿改变
-								        var eleId = document.createElement ('marquee');
-								        eleId.style.position = 'absolute';
-								        eleId.style.left = x + 'rem';
-								        eleId.style.top = y + 'rem';
-								        eleId.innerText = text;
-								        document.body.appendChild (eleId);
-								    }
+			// var test1 = function (x, y, text){
+			// 					    // eleId 自己定义的变量名，任意取
+			// 					    // document.createElement ('marquee'); 勿改变
+			// 					        var eleId = document.createElement ('marquee');
+			// 					        eleId.style.position = 'absolute';
+			// 					        eleId.style.top = y +'rem';
+			// 					        eleId.style.right ='100rem';
+			// 							eleId.style.left ='2.8rem';
+			// 					        eleId.innerText = text;
+			// 					        document.body.appendChild (eleId);
+			// 					    }
+
+			var eleId = document.getElementsByTagName('marquee');
+			
+
 		    window.onload = function ()
 		    {
-		    var abc = "{$store_notice}";
+		//     var abc = "{$store_notice}";
 			// (x轴,y轴)(150,100)
-		        test1 (2.8, 8.5, abc);
+		//         test1 (2.8, 8.5, abc);
 		       
 		    }
 
