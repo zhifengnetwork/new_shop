@@ -36,6 +36,9 @@ class Index extends MobileBase {
         $wechat = Db::name('wx_user')->find();
         $this->assign('wechat_qr',$wechat);
 
+        $store_notice = Db::name('config')->where('name','store_notice')->value('value');
+        $this->assign('store_notice',$store_notice);
+
         $this->assign('goods_id',$goods_id);
         $this->assign('black_technology',$black_technology);
         $this->assign('quantum',$quantum);

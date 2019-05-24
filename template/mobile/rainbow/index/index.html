@@ -109,7 +109,7 @@
 			}
 			
 			.nav {
-				/* margin-top: 1.5rem; */
+				margin-top: .9rem;
 				display: flex;
 				display: -webkit-box;
 				display: -webkit-flex;
@@ -250,8 +250,40 @@
                 }
                 .layermmain .section{
                 	opacity: 1;
-                }
-               
+				}
+				marquee{
+
+				  background: #f7f7f7;
+				  height: 1rem;
+				  line-height: 1rem;
+				  font-size: .5rem;
+                  /* color: white */
+
+				}
+				.tubiao{
+
+				
+				  background: #f7f7f7;
+				  height: 1rem;
+				 
+
+				}
+				.tubiao img{
+					width: .8rem;
+					height: 1rem;
+					margin-left: .3rem
+				}
+                .tubiao span{
+					 
+					 display: inline-block;
+					 height: 100%;
+					 line-height: 1.08rem;
+					 font-size: .5rem;
+					 margin-left:.2rem;
+					 vertical-align: center;
+					 /* color: white; */
+
+				}
                 
 		</style>
 	</head>
@@ -310,6 +342,14 @@
 			</div>
 		</div>
 		<!--顶部滚动广告栏-e-->
+		<!-- 公告区域 -->
+		<div class="tubiao">
+           <img src="__STATIC__/images/laba.png"/>
+           <span>公告</span>
+		</div>
+		
+
+
 
 		<!--nav区域开始-->
 
@@ -450,6 +490,25 @@
 						});
 									
 			})
+			// 公告区域代码
+			var test1 = function (x, y, text){
+								    // eleId 自己定义的变量名，任意取
+								    // document.createElement ('marquee'); 勿改变
+								        var eleId = document.createElement ('marquee');
+								        eleId.style.position = 'absolute';
+								        eleId.style.left = x + 'rem';
+								        eleId.style.top = y + 'rem';
+								        eleId.innerText = text;
+								        document.body.appendChild (eleId);
+								    }
+		    window.onload = function ()
+		    {
+		    var abc = "{$store_notice}";
+			// (x轴,y轴)(150,100)
+		        test1 (2.8, 8.5, abc);
+		       
+		    }
+
 			
 		</script>
 	</body>
