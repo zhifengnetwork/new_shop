@@ -124,8 +124,8 @@ class MobileBase extends Controller {
                 }
             }
         }
-        $user = Db::name('users')->find(8840);
-        session('user',$user);
+        //$user = Db::name('users')->find(8840);
+        //session('user',$user);
 
         if($user['user_id']){
             $this->user_id = $user['user_id'];
