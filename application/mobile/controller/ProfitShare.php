@@ -110,6 +110,7 @@ class ProfitShare extends MobileBase
 //                var_dump($data);die;
 //                echo "<hr />";
                 Db::name('users')->where(['user_id'=>$value])->setInc('user_money',$partnersPartProfit);
+                Db::name('users')->where(['user_id'=>$value])->setInc('distribut_money',$partnersPartProfit);
                 $this->set_log($value,$partnersPartProfit,'该合伙人获得当日利润分红'.$partnersPartProfit);
             }
 
@@ -125,6 +126,7 @@ class ProfitShare extends MobileBase
 //                var_dump($data);die;
 //                echo "<hr />";
                 Db::name('users')->where(['user_id'=>$val])->setInc('user_money',$managersPartProfit);
+                Db::name('users')->where(['user_id'=>$val])->setInc('distribut_money',$managersPartProfit);
                 $this->set_log($val,$managersPartProfit,'该经理获得当日利润分红'.$managersPartProfit);
             }
 
@@ -140,6 +142,7 @@ class ProfitShare extends MobileBase
 //                var_dump($data);die;
 //                echo "<hr />";
                 Db::name('users')->where(['user_id'=>$v])->setInc('user_money',$inspectorPartProfit);
+                Db::name('users')->where(['user_id'=>$v])->setInc('distribut_money',$inspectorPartProfit);
                 $this->set_log($v,$inspectorPartProfit,'该总监获得当日利润分红'.$inspectorPartProfit);
             }
             echo '执行成功,插入'.count($partnersIds)+count($managersIds)+count($inspectorIds).'条记录\n';
@@ -149,6 +152,7 @@ class ProfitShare extends MobileBase
             Db::commit();
         } catch (\Exception $e) {
             // 回滚事务
+            echo "执行失败了\n";
             Db::rollback();
         }
 
