@@ -154,6 +154,8 @@ class Sales extends Model
 				$my_user_money = $my_prize + $user['user_money'];
 				$my_distribut_money = $my_prize + $user['distribut_money'];
 				$bool = M('users')->where('user_id',$user_id)->update(['user_money'=>$my_user_money,'distribut_money'=>$my_distribut_money]);
+				//记录帐户变动
+				// accountLog($value['user_id'],$user_money,0,'自购优惠',$my_distribut_money,$order['order_id'],$order['order_sn']);
 				$result['code'] = 0;
 				$status = 0;
 				if ($bool) {
@@ -347,7 +349,8 @@ class Sales extends Model
 			$distribut_money = $user_money+$value['distribut_money'];
 			
 			$bool = M('users')->where('user_id',$value['user_id'])->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
-			
+			//记录帐户变动
+			// accountLog($value['user_id'],$user_money,0,'自购优惠',$my_distribut_money,$order['order_id'],$order['order_sn']);
 			$result['code'] = 0;
 			$status = 0;
 			if ($bool) {

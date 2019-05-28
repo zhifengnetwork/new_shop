@@ -1121,21 +1121,21 @@ class User extends MobileBase
     /**
      * 定时重新执行返佣失败的数据
      */
-    public function record_again()
-    {
-        //获取所有失败数据
-        $faild_data = Db::name('distrbut_commission_log')->where('status',0)->field('log_id,to_user_id,money')->select();
-        if($faild_data){
-            foreach($faild_data as $k=>$v){
-                $res = Db::name('users')->where('user_id',$v['to_user_id'])->setInc('user_money',$v['money']);//更新用户余额
-                if($res){
-                    //如果更新成功，改变记录状态
-                    $a = Db::name('distrbut_commission_log')->where('log_id',$v['log_id'])->update(['status'=>1]);
-                    echo $a;
-                }
-            }
-        }
-    }
+    // public function record_again()
+    // {
+    //     //获取所有失败数据
+    //     $faild_data = Db::name('distrbut_commission_log')->where('status',0)->field('log_id,to_user_id,money')->select();
+    //     if($faild_data){
+    //         foreach($faild_data as $k=>$v){
+    //             $res = Db::name('users')->where('user_id',$v['to_user_id'])->setInc('user_money',$v['money']);//更新用户余额
+    //             if($res){
+    //                 //如果更新成功，改变记录状态
+    //                 $a = Db::name('distrbut_commission_log')->where('log_id',$v['log_id'])->update(['status'=>1]);
+    //                 echo $a;
+    //             }
+    //         }
+    //     }
+    // }
 
     public function account_detail(){
         $log_id = I('log_id/d',0);
