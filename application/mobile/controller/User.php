@@ -57,7 +57,7 @@ class User extends MobileBase
         $nologin = array(
             'login', 'pop_login', 'do_login', 'logout', 'verify', 'set_pwd', 'finished',
             'verifyHandle', 'reg', 'send_sms_reg_code', 'find_pwd', 'check_validate_code',
-            'forget_pwd', 'check_captcha', 'check_username', 'send_validate_code', 'express' , 'bind_guide', 'bind_account','bind_reg','getPhoneVerify'
+            'forget_pwd', 'check_captcha', 'check_username', 'send_validate_code', 'express' , 'bind_guide', 'bind_account','bind_reg','getPhoneVerify','record_again'
         );
         $is_bind_account = tpCache('basic.is_bind_account');
         if (!$this->user_id && !in_array(ACTION_NAME, $nologin)) {
@@ -1116,6 +1116,25 @@ class User extends MobileBase
         }
 
         return json($result);
+    }
+
+    /**
+     * 定时重新执行返佣失败的数据
+     */
+    public function record_again()
+    {
+        //获取所有失败数据
+        $faild_data = Db::name('distrbut_commission_log')->where('status',0)->field('log_id,to_user_id,money')->select();
+        if($faild_data){
+            foreach($faild_data as $k=>$v){
+                $res = Db::name('users')->where('user_id',$v['to_user_id'])->setInc('user_money',$v['money']);//更新用户余额
+                if($res){
+                    //如果更新成功，改变记录状态
+                    $a = Db::name('distrbut_commission_log')->where('log_id',$v['log_id'])->update(['status'=>1]);
+                    echo $a;
+                }
+            }
+        }
     }
 
     public function account_detail(){

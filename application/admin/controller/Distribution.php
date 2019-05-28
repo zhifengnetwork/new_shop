@@ -9,6 +9,8 @@
  */
 namespace app\admin\controller;
 
+header('content-type: text/html; charset=utf-8');
+
 use think\Db;
 use think\Page;
 use think\Loader;
@@ -253,14 +255,15 @@ class Distribution extends Base
     {
         $Ad = M('distrbut_commission_log');
         $p = input('p/d');
+        
         $type = input('type',0);
         $ctime = urldecode(I('ctime'));
-        $user_name = I('user_name');
+        $user_name = urldecode(I('user_name'));
         $order_sn = I('order_sn');
         $user_type = I('user_type');
         $start_time = I('start_time');
         $end_time = I('end_time');
-        
+        // var_dump($type);die;
         $where = [];
         $log_ids = '';
         $where = get_comm_condition($type); //获取条件
@@ -313,7 +316,7 @@ class Distribution extends Base
         $this->assign('is_type',$is_type);
         $this->assign('type',$type);
         $this->assign('user_type',$user_type);
-        $this->assign('log_ids',$log_ids);
+        $this->assign('log_ids',urldecode($log_ids));
         $this->assign('user_name',$user_name);
         $this->assign('start_time',$start_time);
         $this->assign('end_time',$end_time);
@@ -323,6 +326,7 @@ class Distribution extends Base
         $count = $Ad->where($where)->count();
         $Page = new Page($count, 20);
         $show = $Page->show();
+        // dump($show);die;
         $this->assign('count',$count);
         $this->assign('page', $show);
         return $this->fetch();

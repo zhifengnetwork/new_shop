@@ -84,7 +84,7 @@ class Page{
      * @return string
      */
     public function url($page){
-        return str_replace(urlencode('[PAGE]'), $page, $this->url);
+        return urldecode(str_replace(urlencode('[PAGE]'), $page, $this->url));
     }
 
     /**
