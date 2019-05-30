@@ -1922,3 +1922,23 @@ function checkPhoneCode($data){
     }
     return array('code' => 200, 'msg' => '验证通过');
 }
+
+/**
+ * @param $user_id
+ * @param int $type  用户余额变动类型 （0:未定义  1:签到 2:邀新 3:充值 4:提现 5:下单消费 6:后台调节  7:极差 8:直推 9:同级  10:团队分红 11:自购 12:全球分红）
+ * @param int $user_money
+ * @param int $pay_points
+ * @param string $desc
+ * @param int $distribut_money
+ * @param int $order_id
+ * @param string $order_sn
+ */
+function setAccountLog($user_id,$type=0, $user_money = 0,$pay_points = 0, $desc = '',$frozen_money = 0,$order_id = 0 ,$order_sn = ''){
+    if(is_numeric($user_id) && $user_id>0){
+        $data=array(['user_id'=>$user_id,'type'=>$type,'user_money'=>$user_money,'pay_points'=>$pay_points,'desc'=>$desc,'frozen_money'=>$frozen_money,'order_id'=>$order_id,'order_sn'=>$order_sn]);
+        M('account_log')->add($data);
+        return 1;
+    }else{
+        return 0;
+    }
+}

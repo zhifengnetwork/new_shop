@@ -109,9 +109,15 @@ class ProfitShare extends MobileBase
 //                $data[]=['uid'=>$value,'bonus_money'=>"$partProfit",'today_population'=>$partners,'today_profit'=>"'".$today_profit['total']."'",'today_ratio'=>"$today_ratio",'add_time'=>time()];
 //                var_dump($data);die;
 //                echo "<hr />";
+                //修改用户余额
                 Db::name('users')->where(['user_id'=>$value])->setInc('user_money',$partnersPartProfit);
                 Db::name('users')->where(['user_id'=>$value])->setInc('distribut_money',$partnersPartProfit);
+                //分佣记录表
                 $this->set_log($value,$partnersPartProfit,'该合伙人获得当日利润分红'.$partnersPartProfit);
+                //用户余额变动记录
+                setAccountLog($value,12,$partnersPartProfit,0,"合伙人全球分红");
+//                accountLog($value,$partnersPartProfit,0,"合伙人全球分红",$partnersPartProfit);
+
             }
 
             foreach($managersIds as $ke=>$val){
@@ -128,6 +134,9 @@ class ProfitShare extends MobileBase
                 Db::name('users')->where(['user_id'=>$val])->setInc('user_money',$managersPartProfit);
                 Db::name('users')->where(['user_id'=>$val])->setInc('distribut_money',$managersPartProfit);
                 $this->set_log($val,$managersPartProfit,'该经理获得当日利润分红'.$managersPartProfit);
+//                $this->set_user_log($val,$managersPartProfit,"经理全球分红");
+                setAccountLog($val,12,$managersPartProfit,0,"经理全球分红");
+//                accountLog($val,$managersPartProfit,0,"经理全球分红",$managersPartProfit);
             }
 
             foreach($inspectorIds as $k=>$v){
@@ -143,7 +152,10 @@ class ProfitShare extends MobileBase
 //                echo "<hr />";
                 Db::name('users')->where(['user_id'=>$v])->setInc('user_money',$inspectorPartProfit);
                 Db::name('users')->where(['user_id'=>$v])->setInc('distribut_money',$inspectorPartProfit);
-                $this->set_log($v,$inspectorPartProfit,'该总监获得当日利润分红'.$inspectorPartProfit);
+//                $this->set_log($v,$inspectorPartProfit,'该总监获得当日利润分红'.$inspectorPartProfit);
+//                $this->set_user_log($v,$inspectorPartProfit,"总监全球分红");
+                setAccountLog($v,12,$inspectorPartProfit,0,"总监全球分红");
+
             }
             echo '执行成功,插入'.count($partnersIds)+count($managersIds)+count($inspectorIds).'条记录\n';
 //            var_dump($data);die;
@@ -165,6 +177,12 @@ class ProfitShare extends MobileBase
     private function set_log($user_id,$money,$desc){
         $data=['to_user_id'=>$user_id,'money'=>$money,'create_time'=>time(),'desc'=>$desc,'type'=>4];
         M('distrbut_commission_log')->insert($data);
+
+    }
+    //用户余额变动记录
+    private function set_user_log($user_id,$money,$desc){
+        $data=['user_id'=>$user_id,'user_money'=>$money,'pay_points'=>0,'change_time'=>time(),'desc'=>$desc];
+        M('account_log')->insert($data);
 
     }
     //查询固定分红金额
