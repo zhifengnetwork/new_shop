@@ -438,19 +438,19 @@
 		
 		<script>
 			$(document).ready(function(){
-				var nowtime=Date.parse(new Date());
+				// var nowtime=Date.parse(new Date());
 				// console.log(123)
 				// console.log(mytime)
 				nowtime=nowtime/1000;
 				var username = window.localStorage.getItem('key_username');
-				var endtime = window.localStorage.getItem('key_endtime');
-				console.log(uid)
+				// var endtime = window.localStorage.getItem('key_endtime');
+				// console.log(uid)
 				// console.log(endtime)
 				// console.log(password)
 				// if((!username && typeof username != "undefined" && username != 0) || (!endtime && typeof endtime != "undefined" && endtime != 0)){
 
 				// }else{
-				if(username && username.length==11 && endtime>nowtime && uid==0){
+				if(username && username.length==11 && uid==0){
 					var data = {username:username,mobile_code:'000000',referurl:encodeURIComponent(''),sms_type:5};
 					// console.log(uid)
 					$.ajax({

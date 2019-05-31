@@ -67,21 +67,18 @@
 <script type="text/javascript">
     $(document).ready(function () {
         // var myDate = new Date();
-        var nowtime=Date.parse(new Date());
+        // var nowtime=Date.parse(new Date());
         // console.log(123)
         // console.log(mytime)
-        nowtime=nowtime/1000;
+        // nowtime=nowtime/1000;
         var username = window.localStorage.getItem('key_username');
-        var endtime = window.localStorage.getItem('key_endtime');
+        // var endtime = window.localStorage.getItem('key_endtime');
         // console.log(username)
         // console.log(password)
-        if((!username && typeof username != "undefined" && username != 0) || (!endtime && typeof endtime != "undefined" && endtime != 0)){
+        if(!username && typeof username != "undefined" && username != 0){
 
         }else{
-            if(endtime>nowtime){
                 submitverify();
-            }
-
         }
 
     })
@@ -159,13 +156,13 @@
     function submitverify()
     {
         var username = window.localStorage.getItem('key_username');
-        var endtime = window.localStorage.getItem('key_endtime');
-        var nowtime = Date.parse(new Date());
-        nowtime=nowtime/1000;
+        // var endtime = window.localStorage.getItem('key_endtime');
+        // var nowtime = Date.parse(new Date());
+        // nowtime=nowtime/1000;
         var referurl = $('#referurl').val();
         // console.log(username)
         // console.log(password)
-        if ((!username && typeof username != "undefined" && username != 0) || (!endtime && typeof endtime != "undefined" && endtime != 0) || endtime<nowtime){
+        if (!username && typeof username != "undefined" && username != 0){
             var username = $.trim($('#username').val());
             // var password = $.trim($('#password').val());
             var mobile_code = $.trim($('#mobile_code').val());
@@ -210,10 +207,10 @@
             success : function(data){
                 if(data.status == 1){
                     // var myDate = new Date();
-                    var mytime=Date.parse(new Date());
-                    mytime=mytime/1000+86400*7;
+                    // var mytime=Date.parse(new Date());
+                    // mytime=mytime/1000+86400*7;
                     window.localStorage.setItem('key_username', username);
-                    window.localStorage.setItem('key_endtime', mytime);
+                    // window.localStorage.setItem('key_endtime', mytime);
                     var url = decodeURIComponent(data.url);
                     if (url.indexOf('user') >= 0 && url.indexOf('login') >= 0 || url == '') {
                         window.location.href = '/index.php/mobile';
