@@ -118,10 +118,9 @@ class Sales extends Model
 		}
 
 		$order = $order['data'];
-		//商品总价
-        $goods_price=$order['goods_price']*$order['goods_num'];
-
-        $parents_id = array_reverse($parents_id);	//按原数组倒序排列
+		$goods_price=$order['goods_price']*$order['goods_num'];
+		
+		$parents_id = array_reverse($parents_id);	//按原数组倒序排列
 		$all_user = $this->all_user($parents_id);	//获取所有用户信息
 		
 		$comm = $this->get_goods_prize($is_repeat,$this->goods_id);
@@ -179,10 +178,10 @@ class Sales extends Model
 					'create_time' => time(),
 					'desc' => $msg
 				);
-                //微信公众号消息
-                if($user['openid']){
-                    $this->distribution_success($user['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$my_prize,"感谢你的使用。");
-                }
+				//微信公众号消息
+				if($user['openid']){
+					$this->distribution_success($user['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$my_prize,"感谢你的使用。");	
+				}
 			}
 		}
 		
@@ -239,10 +238,11 @@ class Sales extends Model
 							'create_time' => time(),
 							'desc' => $msg
 						);
-                        //微信公众号消息
-                        if($value['openid']){
-                            $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
-                        }
+						//微信公众号消息
+						if($value['openid']){
+							$this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
+						}
+				
 					}
 				}
 				$msg = "同级奖 ";
@@ -278,10 +278,10 @@ class Sales extends Model
 						'create_time' => time(),
 						'desc' => $msg
 					);
-                    //微信公众号消息
-                    if($value['openid']){
-                        $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
-                    }
+					//微信公众号消息
+					if($value['openid']){
+						$this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
+					}
 				}
 			}
 			//极差奖
@@ -312,10 +312,10 @@ class Sales extends Model
 							'create_time' => time(),
 							'desc' => $msg
 						);
-                        //微信公众号消息
-                        if($value['openid']){
-                            $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
-                        }
+						//微信公众号消息
+					if($value['openid']){
+						$this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
+					}
 					}
 				}
 				$msg = "极差奖 ";
@@ -354,10 +354,10 @@ class Sales extends Model
 						'create_time' => time(),
 						'desc' => $msg
 					);
-                    //微信公众号消息
-                    if($value['openid']){
-                        $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
-                    }
+					//微信公众号消息
+					if($value['openid']){
+						$this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
+					}
 				}
 			}
 			if (!$user_money) {
@@ -408,8 +408,7 @@ class Sales extends Model
 		}
 
 		$order = $order['data'];
-        //商品总价
-        $goods_price=$order['goods_price']*$order['goods_num'];
+		$goods_price=$order['goods_price']*$order['goods_num'];
 		
 		$parents_id = array_reverse($parents_id);	//按原数组倒序排列
 		$all_user = $this->all_user($parents_id);	//获取所有用户信息
@@ -468,10 +467,10 @@ class Sales extends Model
 					'create_time' => time(),
 					'desc' => $msg
 				);
-                //微信公众号消息
-                if($user['openid']){
-                    $this->distribution_success($user['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$my_prize,"感谢你的使用。");
-                }
+				//微信公众号消息
+				if($user['openid']){
+					$this->distribution_success($user['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$my_prize,"感谢你的使用。");
+				}
 			}
 		}
 		
@@ -530,10 +529,10 @@ class Sales extends Model
 							'create_time' => time(),
 							'desc' => $msg
 						);
-                        //微信公众号消息
-                        if($value['openid']){
-                            $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
-                        }
+						//微信公众号消息
+				if($value['openid']){
+					$this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
+				}
 					}
 				} 
 				$msg = "自购同级奖 ";
@@ -570,10 +569,10 @@ class Sales extends Model
 						'create_time' => time(),
 						'desc' => $msg
 					);
-                    //微信公众号消息
-                    if($value['openid']){
-                        $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
-                    }
+					//微信公众号消息
+				if($value['openid']){
+					$this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
+				}
 				}
 			}
 			//极差奖
@@ -604,10 +603,10 @@ class Sales extends Model
 							'create_time' => time(),
 							'desc' => $msg
 						);
-                        //微信公众号消息
-                        if($value['openid']){
-                            $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
-                        }
+						//微信公众号消息
+				if($value['openid']){
+					$this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
+				}
 					}
 				}
 				$msg = "自购极差奖 ";
@@ -647,10 +646,10 @@ class Sales extends Model
 						'create_time' => time(),
 						'desc' => $msg
 					);
-                    //微信公众号消息
-                    if($value['openid']){
-                        $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
-                    }
+					//微信公众号消息
+				if($value['openid']){
+					$this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
+				}
 				}
 			}
 			if (!$user_money) {
@@ -872,9 +871,10 @@ class Sales extends Model
 		}
 	}
 
-    //分销成功发消息
-    public function distribution_success($openid,$title,$goods_name,$goods_price,$money,$remark,$url=''){
-        $time=date("Y-m-d H:i:s",time());
+
+	//分销成功发消息
+	public function distribution_success($openid,$title,$goods_name,$goods_price,$money,$remark,$url=''){
+		$time=date("Y-m-d H:i:s",time());
 
         $data = [
             'touser' => $openid,
@@ -892,8 +892,8 @@ class Sales extends Model
                 ],
                 'keyword3' => [
                     'value' => $money . ' 元',
-                ],
-                'keyword4' => [
+				],
+				'keyword4' => [
                     'value' => $time,
                 ],
                 'remark' => [

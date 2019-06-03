@@ -71,9 +71,20 @@ class User extends Base
 		
         $user_id_arr = get_arr_column($userList, 'user_id');
         if (!empty($user_id_arr)) {
+			// dump($user_id_arr);exit;
+            // $first_leader = DB::query("select first_leader,count(1) as count  from __PREFIX__users where first_leader in(" . implode(',', $user_id_arr) . ")  group by first_leader");
+            // $first_leader = convert_arr_key($first_leader, 'first_leader');
+
+            // $second_leader = DB::query("select second_leader,count(1) as count  from __PREFIX__users where second_leader in(" . implode(',', $user_id_arr) . ")  group by second_leader");
+            // $second_leader = convert_arr_key($second_leader, 'second_leader');
+
+            // $third_leader = DB::query("select third_leader,count(1) as count  from __PREFIX__users where third_leader in(" . implode(',', $user_id_arr) . ")  group by third_leader");
+            // $third_leader = convert_arr_key($third_leader, 'third_leader');
+			
 			foreach($user_id_arr as $v){
                 $last_cout[$v]['direct'] = Db::name('users')->where('first_leader', $v)->count();
                 $last_cout[$v]['team'] = Db::query("select count(*) as count from `__PREFIX__parents_cache` where find_in_set('$v', parents)")[0]['count'];
+				// $last_cout[$v]['team'] = Db::query("select count(*) as count from `__PREFIX__users` where find_in_set('$v', parents)")[0]['count'];
 			}
 			
 			$this->assign('last_cout', $last_cout);
@@ -211,7 +222,8 @@ class User extends Base
 
 
            
-            if($fleader > 0 && $fleader != $u_info['first_leader']){
+//            if($fleader > 0 && $fleader != $u_info['first_leader']){
+            if($fleader != $u_info['first_leader']){
                 $post_data['first_leader'] = $_POST['fleader'];
                 $post_data['second_leader'] = 0;
                 $post_data['third_leader'] = 0;
