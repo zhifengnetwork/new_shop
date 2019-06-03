@@ -1935,7 +1935,7 @@ function checkPhoneCode($data){
  */
 function setAccountLog($user_id,$type=0, $user_money = 0,$pay_points = 0, $desc = '',$frozen_money = 0,$order_id = 0 ,$order_sn = ''){
     if(is_numeric($user_id) && $user_id>0){
-        $data=array(['user_id'=>$user_id,'type'=>$type,'user_money'=>$user_money,'pay_points'=>$pay_points,'desc'=>$desc,'frozen_money'=>$frozen_money,'order_id'=>$order_id,'order_sn'=>$order_sn]);
+        $data=array('user_id'=>$user_id,'type'=>$type,'user_money'=>$user_money,'pay_points'=>$pay_points,'desc'=>$desc,'frozen_money'=>$frozen_money,'order_id'=>$order_id,'order_sn'=>$order_sn,'change_time'=>time());
         M('account_log')->add($data);
         return 1;
     }else{
