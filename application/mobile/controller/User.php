@@ -2527,9 +2527,9 @@ class User extends MobileBase
             $confirm_password = trim(I('confirm_password'));
             $oldpaypwd = trim(I('old_password'));
             //以前设置过就得验证原来密码
-            if(!empty($user['paypwd']) && ($user['paypwd'] != encrypt($oldpaypwd))){
-                $this->ajaxReturn(['status'=>-1,'msg'=>'原密码验证错误！','result'=>'']);
-            }
+//            if(!empty($user['paypwd']) && ($user['paypwd'] != encrypt($oldpaypwd))){
+//                $this->ajaxReturn(['status'=>-1,'msg'=>'原密码验证错误！','result'=>'']);
+//            }
             $userLogic = new UsersLogic();
             $data = $userLogic->paypwd($this->user_id, $new_password, $confirm_password);
             $this->ajaxReturn($data);
