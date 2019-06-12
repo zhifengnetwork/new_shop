@@ -884,6 +884,9 @@ class User extends Base
         }
         $status = $withdrawals['status'];
         $withdrawals['status_code'] = C('WITHDRAW_STATUS')["$status"];
+        //看看这次之后有没有提现了
+        $other=Db::name("withdrawals")->where(['user_id'=>$withdrawals['user_id']])->where('create_time','>',$withdrawals['create_time'])->sum('money');
+        $user['user_money']+=$other;
         $this->assign('user', $user);
         $this->assign('data', $withdrawals);
         return $this->fetch();
