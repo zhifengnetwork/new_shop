@@ -1942,3 +1942,24 @@ function setAccountLog($user_id,$type=0, $user_money = 0,$pay_points = 0, $desc 
         return 0;
     }
 }
+
+/**
+ * @param $user_id
+ * @param int $type  用户余额变动类型 （0:未定义  1:签到 2:邀新 3:充值 4:提现 5:下单消费 6:后台调节  7:极差 8:直推 9:同级  10:团队分红 11:自购 12:全球分红）
+ * @param $change_money   变动金额
+ * @param $balance    变动后用户余额
+ * @param $desc   描述
+ * @param $order_sn   订单编号
+ */
+function setBalanceLog($user_id,$type=0,$change_money=0,$balance=0,$desc='',$order_sn=''){
+    if(is_numeric($user_id) && $user_id>0 && in_array($type,array(0,1,2,3,4,5,6,7,8,9,10,11,12))){
+        $data=array('user_id'=>$user_id,'type'=>$type,'change_money'=>$change_money,'balance'=>$balance,'desc'=>$desc,'order_sn'=>$order_sn,'change_time'=>time());
+        M('change_balance_log')->add($data);
+        return 1;
+    }else{
+        return 0;
+    }
+}
+
+
+

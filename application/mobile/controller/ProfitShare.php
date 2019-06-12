@@ -115,6 +115,9 @@ class ProfitShare extends MobileBase
                 $this->set_log($value,$partnersPartProfit,'该合伙人获得当日利润分红'.$partnersPartProfit);
                 //用户余额变动记录
                 setAccountLog($value,12,$partnersPartProfit,0,"合伙人全球分红");
+                //记录用户余额变动
+                $user_money=Db::name('users')->where(['user_id'=>$value])->value('user_money');
+                setBalanceLog($value,12,$partnersPartProfit,$user_money,'全球分红：'.$partnersPartProfit);
             }
 
             foreach($managersIds as $ke=>$val){
@@ -134,6 +137,9 @@ class ProfitShare extends MobileBase
                 setAccountLog($value,12,$managersPartProfit,0,"经理全球分红");
                 //全球分红存分销记录表
                 $this->set_log($val,$managersPartProfit,'该经理获得当日利润分红'.$managersPartProfit);
+                //记录用户余额变动
+                $user_money=Db::name('users')->where(['user_id'=>$value])->value('user_money');
+                setBalanceLog($value,12,$managersPartProfit,$user_money,'全球分红：'.$managersPartProfit);
             }
 
             foreach($inspectorIds as $k=>$v){
@@ -153,6 +159,9 @@ class ProfitShare extends MobileBase
                 setAccountLog($value,12,$inspectorPartProfit,0,"总监全球分红");
                 //全球分红存分销记录表
                 $this->set_log($v,$inspectorPartProfit,'该总监获得当日利润分红'.$inspectorPartProfit);
+                //记录用户余额变动
+                $user_money=Db::name('users')->where(['user_id'=>$value])->value('user_money');
+                setBalanceLog($value,12,$inspectorPartProfit,$user_money,'全球分红：'.$inspectorPartProfit);
             }
             echo '执行成功,插入'.count($partnersIds)+count($managersIds)+count($inspectorIds).'条记录\n';
 //            var_dump($data);die;

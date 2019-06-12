@@ -183,6 +183,8 @@ class Sales extends Model
                 if($user['openid']){
                     $this->distribution_success($user['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$my_prize,"感谢你的使用。");
                 }
+                //记录用户余额变动
+                setBalanceLog($this->user_id,11,$my_prize,$my_user_money,'自购奖：'.$my_prize,$order['order_sn']);
 			}
 		}
 		
@@ -243,6 +245,8 @@ class Sales extends Model
                         if($value['openid']){
                             $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
                         }
+                        //记录用户余额变动
+                        setBalanceLog($this->user_id,8,$money,$user_money,'直推奖：'.$money,$order['order_sn']);
 					}
 				}
 				$msg = "同级奖 ";
@@ -282,6 +286,8 @@ class Sales extends Model
                     if($value['openid']){
                         $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
                     }
+                    //记录用户余额变动
+                    setBalanceLog($this->user_id,9,$money,$user_money,'同级奖：'.$money,$order['order_sn']);
 				}
 			}
 			//极差奖
@@ -316,6 +322,8 @@ class Sales extends Model
                         if($value['openid']){
                             $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
                         }
+                        //记录用户余额变动
+                        setBalanceLog($this->user_id,8,$money,$user_money,'直推奖：'.$money,$order['order_sn']);
 					}
 				}
 				$msg = "极差奖 ";
@@ -358,6 +366,8 @@ class Sales extends Model
                     if($value['openid']){
                         $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
                     }
+                    //记录用户余额变动
+                    setBalanceLog($this->user_id,7,$money,$user_money,'极差奖：'.$money,$order['order_sn']);
 				}
 			}
 			if (!$user_money) {
@@ -472,6 +482,8 @@ class Sales extends Model
                 if($user['openid']){
                     $this->distribution_success($user['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$my_prize,"感谢你的使用。");
                 }
+                //记录用户余额变动
+                setBalanceLog($this->user_id,11,$my_prize,$my_user_money,'自购奖：'.$my_prize,$order['order_sn']);
 			}
 		}
 		
@@ -534,6 +546,8 @@ class Sales extends Model
                         if($value['openid']){
                             $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
                         }
+                        //记录用户余额变动
+                        setBalanceLog($this->user_id,8,$money,$user_money,'直推奖：'.$money,$order['order_sn']);
 					}
 				} 
 				$msg = "自购同级奖 ";
@@ -574,6 +588,8 @@ class Sales extends Model
                     if($value['openid']){
                         $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
                     }
+                    //记录用户余额变动
+                    setBalanceLog($this->user_id,9,$money,$user_money,'同级奖：'.$money,$order['order_sn']);
 				}
 			}
 			//极差奖
@@ -608,6 +624,8 @@ class Sales extends Model
                         if($value['openid']){
                             $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
                         }
+                        //记录用户余额变动
+                        setBalanceLog($this->user_id,8,$money,$user_money,'直推奖：'.$money,$order['order_sn']);
 					}
 				}
 				$msg = "自购极差奖 ";
@@ -651,6 +669,8 @@ class Sales extends Model
                     if($value['openid']){
                         $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
                     }
+                    //记录用户余额变动
+                    setBalanceLog($this->user_id,7,$money,$user_money,'极差奖：'.$money,$order['order_sn']);
 				}
 			}
 			if (!$user_money) {
@@ -726,7 +746,11 @@ class Sales extends Model
 		$distribut_money = $money + $leader['distribut_money'];
 		$msg = "团队分红 ". $money . "（元），商品：".$order['goods_num']." 件，比率：".$goods['prize_ratio']."%";
 
-		$bool = M('users')->where('user_id',$first_leader)->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
+		$bool = M('users')->where('user_id',$leader['user_id'])->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
+
+        //记录用户余额变动
+        setBalanceLog($leader['user_id'],10,$money,$user_money,'团队分红：'.$money,$order['order_sn']);
+
 
 		$data[] = array(
 			'user_id' => $this->user_id,
