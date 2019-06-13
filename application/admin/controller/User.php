@@ -884,6 +884,9 @@ class User extends Base
         }
         $status = $withdrawals['status'];
         $withdrawals['status_code'] = C('WITHDRAW_STATUS')["$status"];
+        //看看这次之后有没有提现了
+        $other=Db::name("withdrawals")->where(['user_id'=>$withdrawals['user_id']])->where('create_time','>',$withdrawals['create_time'])->sum('money');
+        $user['user_money']+=$other;
         $this->assign('user', $user);
         $this->assign('data', $withdrawals);
         return $this->fetch();
@@ -918,8 +921,12 @@ class User extends Base
                     if($v['openid']){
                         $this->Withdrawal_Success($v['openid'],'恭喜你提现成功！',$v['money'],time(),'感谢你的努力付出，有付出就有回报！希望你再接再厉！');
                     }
-
-
+                    //记录用户余额变动
+                    $user_money=Db::name('users')->where(['user_id'=>$v['user_id']])->value('user_money');
+                    //看看这次之后有没有提现了
+                    $other=Db::name("withdrawals")->where(['user_id'=>$v['user_id']])->where('create_time','>',$v['create_time'])->sum('money');
+                    $user_money+=$other;
+                    setBalanceLog($v['user_id'],2,$v['money'],$user_money,'成功提现：'.$v['money']);
                 }
             }
             if($status != 1){

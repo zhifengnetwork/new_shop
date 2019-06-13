@@ -65,7 +65,6 @@ class PlaceOrder
         $this->addOrder();
         $this->addOrderGoods();
         $this->addShopOrder();
-
         Hook::listen('user_add_order', $this->order);//下单行为
         $reduce = tpCache('shopping.reduce');
         if($reduce== 1 || empty($reduce)){
@@ -412,8 +411,11 @@ class PlaceOrder
             }
             if($this->pay->getUserMoney() > 0){
                 $user->user_money = $user->user_money - $this->pay->getUserMoney();// 抵扣余额
+                //记录用户余额变动
+                setBalanceLog($order['user_id'],5,$this->pay->getUserMoney(),$user->user_money,'下单消费：'.$this->pay->getUserMoney());
             }
             $user->save();
+
             $accountLogData = [
                 'user_id' => $order['user_id'],
                 'user_money' => -$this->pay->getUserMoney(),

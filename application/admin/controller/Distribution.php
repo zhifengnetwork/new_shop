@@ -289,7 +289,7 @@ class Distribution extends Base
             $where['order_sn'] = ['like',"%$order_sn%"];
         }
         
-        $res = $Ad->where($where)->order('log_id','desc')->page($p . ',20')->select();
+        $res = $Ad->where($where)->order('create_time','desc')->page($p . ',20')->select();
         
         if ($res) {
             foreach ($res as $val) {

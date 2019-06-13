@@ -39,20 +39,6 @@ function share_deal_after($xiaji,$shangji){
     return true;
 }
 
-//二维数组排序
-function towArraySort ($data,$key,$order = SORT_ASC) {
-    try{
-        //        dump($data);
-        $last_names = array_column($data,$key);
-        array_multisort($last_names,$order,$data);
-//        dump($data);
-        return $data;
-    }catch (\Exception $e){
-        return false;
-    }
-
-}
-
 //获取用户所有上级id
 function get_parents_ids($user_id){
     $parents_cache = M('parents_cache')->where('user_id',$user_id)->order('sort','asc')->select();
@@ -1956,6 +1942,7 @@ function setAccountLog($user_id,$type=0, $user_money = 0,$pay_points = 0, $desc 
         return 0;
     }
 }
+
 /**
  * @param $user_id
  * @param int $type  用户余额变动类型 （0:未定义  1:签到 2:邀新 3:充值 4:提现 5:下单消费 6:后台调节  7:极差 8:直推 9:同级  10:团队分红 11:自购 12:全球分红）
@@ -1973,3 +1960,6 @@ function setBalanceLog($user_id,$type=0,$change_money=0,$balance=0,$desc='',$ord
         return 0;
     }
 }
+
+
+
