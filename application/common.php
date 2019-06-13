@@ -39,6 +39,20 @@ function share_deal_after($xiaji,$shangji){
     return true;
 }
 
+//二维数组排序
+function towArraySort ($data,$key,$order = SORT_ASC) {
+    try{
+        //        dump($data);
+        $last_names = array_column($data,$key);
+        array_multisort($last_names,$order,$data);
+//        dump($data);
+        return $data;
+    }catch (\Exception $e){
+        return false;
+    }
+
+}
+
 //获取用户所有上级id
 function get_parents_ids($user_id){
     $parents_cache = M('parents_cache')->where('user_id',$user_id)->order('sort','asc')->select();

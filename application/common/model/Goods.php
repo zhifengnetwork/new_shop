@@ -12,7 +12,7 @@
  * Date: 2015-09-09
  */
 namespace app\common\model;
-
+use think\AjaxPage;
 use think\Db;
 use think\Model;
 
@@ -197,4 +197,19 @@ class Goods extends Model
             return $price = round($data['shop_price'] - $data['exchange_integral'] / 10, 2);
         }
     }
+
+    public function getGoodsList ($keyword = '',$cat_id = '',$page = 1) {
+        $where['goods_name'] = ['like','%'.str_replace(" ",'',$keyword).'%'];
+        $count     = M('Goods')->where($where)->count();
+        $num       = 6;
+        $allpage   = ceil($count/$num);
+        $start     = ($page - 1)  *  $num;
+        $goodsList = M('Goods')->where($where)->order('goods_id')->field('goods_id,goods_name,original_img,market_price,shop_price')->limit($start,$num)->select();
+        $data['total']        =  $count;
+        $data['per_page']     = $num;
+        $data['last_page']    = $allpage;
+        $data['current_page'] = $page;
+        $data['list']   =  $goodsList;
+        return $data;
+     }
 }

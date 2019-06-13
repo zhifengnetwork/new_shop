@@ -44,6 +44,7 @@ class Index extends MobileBase {
         $this->assign('quantum',$quantum);
         //首页商品
         $where = [
+            
             'is_recommend' => 1,
             'exchange_integral'=>0,  //积分商品不显示
             'is_on_sale' => 1,
@@ -52,7 +53,7 @@ class Index extends MobileBase {
         $favourite_goods = Db::name('goods')->where($where)->order('sort DESC')->page(1,C('PAGESIZE'))->cache(true,TPSHOP_CACHE_TIME)->select();//首页推荐商品
         $this->assign('favourite_goods',$favourite_goods);
 
-		return $this->fetch();
+		return $this->fetch('index');
 	}
     public function index3(){
         $diy_index = M('mobile_template')->where('is_index=1')->field('template_html,block_info')->find();
