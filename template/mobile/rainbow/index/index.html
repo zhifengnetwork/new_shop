@@ -31,7 +31,6 @@
 	              background:linear-gradient(rgba(0,0,0,0.3),rgba(255,255,255,0));*/
 				-webkit-transition: -webkit-transform 3s, opacity 4s, background 10s;
 				/* background: ; */
-
 			}
 			
 			@media screen and (min-width:1300px) {
@@ -210,49 +209,92 @@
 				font-size: .5rem;
 			}
 			/* banner ban1 */
-			.banner{
-				
-				padding-top:1.8rem;
+			
+			.banner {
+				padding-top: 1.8rem;
 			}
 			
 			.guesslike ul li .similer-product img {
 				width: 100%!important;
-				
-                }
-            .layermmain{
-            	
-            	background: white;
-            	opacity: 1;
-            	z-index: 1;
-            	
-            }
-              .guanzhu{
-                	
-                	width: .6rem;
-                	height: 4rem;  
-                	text-align: center;           	
-                	position: fixed;
-                	right: 0;
-                	top: 0;
-                	bottom:0;
-                	margin: auto 0;
-                	font-size: .5rem;
-                	background: #CCC;
-                	display: flex;
-                	align-items: center;
-                	background: #37afe6;
-                	color: white;
-                }
-                .erweima{
-                	width: 8rem;
-                	height: 8rem;
-                	
-                }
-                .layermmain .section{
-                	opacity: 1;
-                }
-               
-                
+			}
+			
+			.layermmain {
+				background: white;
+				opacity: 1;
+				z-index: 1;
+			}
+			
+			.guanzhu {
+				width: .6rem;
+				height: 4rem;
+				text-align: center;
+				position: fixed;
+				right: 0;
+				top: 0;
+				bottom: 0;
+				margin: auto 0;
+				font-size: .5rem;
+				background: #CCC;
+				display: flex;
+				align-items: center;
+				background: #37afe6;
+				color: white;
+			}
+			
+			.erweima {
+				width: 8rem;
+				height: 8rem;
+			}
+			
+			.layermmain .section {
+				opacity: 1;
+			}
+			
+			.gonggao {
+				height: 1.2rem;
+				line-height: 1.2rem;
+				width: 2.5rem;
+				text-align: center;
+				border: 1px solid green;
+				vertical-align: bottom;
+			}
+			
+			#scroll_div {
+				height: 1.2rem;
+				line-height: 1.2rem;
+				overflow: hidden;
+				white-space: nowrap;
+				flex: 1;
+				background-color: #fff;
+				color: #999999;
+				text-align: center;
+				display: inline-block;
+				vertical-align: top;
+				background: red;
+				font-size: .6rem;
+				color: white;
+			}
+			
+			.gongao_pic {
+				width: 1rem;
+				margin-top: -.1rem;
+			}
+			
+			#scroll_begin,
+			#scroll_end {
+				display: inline;
+				border: 3px solid blue;
+			}
+			
+			.xixi {
+				display: flex;
+				background: black;
+			}
+			
+			.gonggao_span {
+				color: white;
+				font-size: .6rem;
+			}
 		</style>
 	</head>
 
@@ -310,6 +352,7 @@
 			</div>
 		</div>
 		<!--顶部滚动广告栏-e-->
+		<!--公告区域-->
 
 		<!--nav区域开始-->
 
@@ -332,7 +375,7 @@
 				<!-- <div class="banner banner_imgs">
 					<img src="__STATIC__/images/tp-will.png" alt="即将上线"/>
 				</div> -->
-				<div class="likeshop " >
+				<div class="likeshop ">
 					<div id="J_ItemList">
 						<ul class="product single_item info">
 						</ul>
@@ -364,21 +407,21 @@
 
 		</div>
 		<!--商品end-->
-        <p class="guanzhu">点击关注公众号</p>
+		<p class="guanzhu">点击关注公众号</p>
 		<!--底部导航-start-->
 
 		<!-- <div class="bottomNavWrap container1" id="bottomNavWrap" data-id="0"></div> -->
-		<include file="public/footer_nav"/>
+		<include file="public/footer_nav" />
 		<!--底部导航-end-->
 		<script src="__STATIC__/js/style.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript" src="__STATIC__/js/sourch_submit.js"></script>
-		
+
 		<script>
-			$(document).ready(function(){
-				var nowtime=Date.parse(new Date());
+			$(document).ready(function(e) {
+				var nowtime = Date.parse(new Date());
 				// console.log(123)
 				// console.log(mytime)
-				nowtime=nowtime/1000;
+				nowtime = nowtime / 1000;
 				var username = window.localStorage.getItem('key_username');
 				var endtime = window.localStorage.getItem('key_endtime');
 				console.log(uid)
@@ -387,23 +430,28 @@
 				// if((!username && typeof username != "undefined" && username != 0) || (!endtime && typeof endtime != "undefined" && endtime != 0)){
 
 				// }else{
-				if(username && username.length==11 && endtime>nowtime && uid==0){
-					var data = {username:username,mobile_code:'000000',referurl:encodeURIComponent(''),sms_type:5};
+				if(username && username.length == 11 && endtime > nowtime && uid == 0) {
+					var data = {
+						username: username,
+						mobile_code: '000000',
+						referurl: encodeURIComponent(''),
+						sms_type: 5
+					};
 					// console.log(uid)
 					$.ajax({
-						type : 'post',
-						url : '/index.php?m=Mobile&c=User&a=do_login&t='+Math.random(),
-						data : data,
-						dataType : 'json',
-						success : function(data){
+						type: 'post',
+						url: '/index.php?m=Mobile&c=User&a=do_login&t=' + Math.random(),
+						data: data,
+						dataType: 'json',
+						success: function(data) {
 							console.log(data)
-							if(data.status == 1){
+							if(data.status == 1) {
 								// window.location.href = '/index.php/mobile/index';
-							}else{
+							} else {
 
 							}
 						},
-						error : function(XMLHttpRequest, textStatus, errorThrown) {
+						error: function(XMLHttpRequest, textStatus, errorThrown) {
 							showErrorMsg('网络异常，请稍后重试');
 						}
 					})
@@ -411,46 +459,64 @@
 
 				// }
 				ajax_sourch_submit();
+
 			});
 			/**
-			* 继续加载猜您喜欢
-			* */
+			 * 继续加载猜您喜欢
+			 * */
 			var before_request = 1; // 上一次请求是否已经有返回来, 有才可以进行下一次请求
 			var page = 0;
-			function ajax_sourch_submit(){
-				if(before_request == 0)// 上一次请求没回来 不进行下一次请求
+
+			function ajax_sourch_submit() {
+				if(before_request == 0) // 上一次请求没回来 不进行下一次请求
 					return false;
 				before_request = 0;
 				page++;
 				$.ajax({
-					type : "get",
-					url:"/index.php?m=Mobile&c=Index&a=ajaxGetMore&p="+page,
-					success: function(data)
-					{
-						if(data){
+					type: "get",
+					url: "/index.php?m=Mobile&c=Index&a=ajaxGetMore&p=" + page,
+					success: function(data) {
+						if(data) {
 							$("#J_ItemList>ul").append(data);
 							before_request = 1;
-						}else{
+						} else {
 							$('.get_more').hide();
 							$('.get_end').show();
 						}
 					}
 				});
 			}
-			$(".guanzhu").click(function(){
-				
+			$(".guanzhu").click(function() {
+
 				//自定页
 				layer.open({
-						  type: 1,
-						  title: false,
-						  closeBtn: 0,
-						  shadeClose: true,
-						  skin: 'yourclass',
-						  content: '<img src="{$wechat_qr.qr}" class="erweima"/>'
-						});
-									
+					type: 1,
+					title: false,
+					closeBtn: 0,
+					shadeClose: true,
+					skin: 'yourclass',
+					content: '<img src="{$wechat_qr.qr}" class="erweima"/>'
+				});
+
 			})
-			
+            //html,js实现文本横向滚动（跑马灯）效果
+			var test1 = function(x, y, text)   {   // eleId 自己定义的变量名，任意取
+				   // document.createElement ('marquee'); 勿改变
+				    
+				var eleId = document.createElement('marquee');    
+				eleId.style.position = 'absolute';    
+				eleId.style.left = x + 'rem';    
+				eleId.style.top = y + 'rem';    
+				eleId.innerText = text;    
+				document.body.appendChild(eleId);  
+			}     
+			window.onload = function()   {  
+				var abc = "下周一三五停电，下周二四六停水。请各位业主相互转告";
+                //(x轴,y轴)(150,100)    
+				test1(1, 3, abc);   
+				 
+				  
+			}
 		</script>
 	</body>
 
