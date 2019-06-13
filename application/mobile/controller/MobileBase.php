@@ -35,8 +35,23 @@ class MobileBase extends Controller {
      */
     public function _initialize() {
 
-
         session('user'); //不用这个在忘记密码不能获取session('validate_code');
+        if(!isset($user)) $user = session('user');
+        $dfc5b = I('dfc5b',0);
+//        var_dump($dfc5b);
+        if($dfc5b && !session('dfc5b')){
+            if(!$user['user_id'] || $dfc5b != $user['user_id']){
+                $dfc5b_user = Db::name('users')->where('user_id', $dfc5b)->value('openid');
+//                var_dump($dfc5b_user);die;
+                    if($dfc5b_user){
+                    session('dfc5b_user', $dfc5b_user);
+                    session('dfc5b', $dfc5b);
+                    $this->redirect('/Mobile/User/login.html');
+                }else{
+                    session('dfc5b', 0);
+                }
+            }
+        }
 //        Session::start();
         header("Cache-control: private");  // history.back返回后输入框值丢失问题 参考文章 http://www.tp-shop.cn/article_id_1465.html  http://blog.csdn.net/qinchaoguang123456/article/details/29852881
         $this->session_id = session_id(); // 当前的 session_id
@@ -110,24 +125,13 @@ class MobileBase extends Controller {
 		// 扫码上下级缓存
 		$this->share_poster();
 
-        if(!isset($user)) $user = session('user');
-        $dfc5b = I('dfc5b',0);
-        if($dfc5b && !session('dfc5b')){
-            if(!$user['user_id'] || $dfc5b != $user['user_id']){
-                $dfc5b_user = Db::name('users')->where('user_id', $dfc5b)->value('user_id,openid');
-                if($dfc5b_user){
-                    session('dfc5b_user', $dfc5b_user);
-                    session('dfc5b', $dfc5b);
-                    $this->redirect('/Mobile/User/login.html');
-                }else{
-                    session('dfc5b', 0);
-                }
-            }
-        }
+
+
         // $user = Db::name('users')->find(17657);
         // session('user',$user);
 
         if($user['user_id']){
+//            var_dump($_SESSION);
             $this->user_id = $user['user_id'];
             $this->user = Db::name('users')->find($this->user_id);
             $user = $this->user;
@@ -140,11 +144,18 @@ class MobileBase extends Controller {
                 
                 $dfc5b = session('dfc5b');
                 if($dfc5b != $this->user_id){
+
                     $dfc5b_res = Db::name('users')->where('user_id', $this->user_id)->update(['first_leader' => $dfc5b]);
                     if($dfc5b_res){
                         $dfc5b_user = session('dfc5b_user');
-                        if($dfc5b_user['openid']){
-                            $this->Invitation_Register($dfc5b_user['openid'],'恭喜你邀请注册成功！',$user['nickname'],$user['mobile'],time(),'恭喜你又收纳一名得力爱将，你的团队越来越大！');
+//                        if($this->user_id=='17657'){
+//                            session('dfc5b','');
+//                            session('dfc5b_user','');
+//                            var_dump($dfc5b_user);die;
+//                        }
+
+                        if($dfc5b_user){
+                            $this->Invitation_Register($dfc5b_user,'恭喜你邀请注册成功！',$user['nickname'],$user['mobile'],time(),'恭喜你又收纳一名得力爱将，你的团队越来越大！');
                         }
                         session('dfc5b',0);
                         session('dfc5b_user', '');
@@ -178,6 +189,7 @@ class MobileBase extends Controller {
         
     }
 
+
     /**
      * 清理微信待发模板消息缓存
      */
@@ -207,6 +219,7 @@ class MobileBase extends Controller {
         }
 
     }
+    
 
 	
 	/**
@@ -226,7 +239,9 @@ class MobileBase extends Controller {
 			if($cache){
                 if($user_temp['user_id'] != $cache['share_user']){
                     Db::execute("update `tp_users` set `first_leader` = '".$cache['share_user']."' where `user_id` = '".$user_temp['user_id']."'");
-                    $share_user_openid = Db::name('users')->field('id,openid')->where('user_id',$cache['share_user'])->value('openid');
+//                    $share_user_openid = Db::name('users')->field('id,openid')->where('user_id',$cache['share_user'])->value('openid');
+                    $share_user_openid = Db::name('users')->where('user_id',$cache['share_user'])->value('openid');
+//                    var_dump($share_user_openid);die;
                     if($share_user_openid){
                         // $wx_content = "会员ID: ".$user_temp['user_id']." 成为了你的下级!";
                         // $wechat = new \app\common\logic\wechat\WechatUtil();

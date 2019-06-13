@@ -43,7 +43,7 @@ class System extends Base
 		$this->assign('group_list',$group_list);
 		$inc_type =  I('get.inc_type','shop_info');
 		$this->assign('inc_type',$inc_type);
-		$config = tpCache($inc_type);
+		$config = tpCache($inc_type);//dump($config);die;
 		if($inc_type == 'shop_info'){
 			$province = M('region')->where(array('parent_id'=>0))->select();
 			$city =  M('region')->where(array('parent_id'=>$config['province']))->select();

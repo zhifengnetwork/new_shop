@@ -118,8 +118,10 @@ class Sales extends Model
 		}
 
 		$order = $order['data'];
-		
-		$parents_id = array_reverse($parents_id);	//按原数组倒序排列
+		//商品总价
+        $goods_price=$order['goods_price']*$order['goods_num'];
+
+        $parents_id = array_reverse($parents_id);	//按原数组倒序排列
 		$all_user = $this->all_user($parents_id);	//获取所有用户信息
 		
 		$comm = $this->get_goods_prize($is_repeat,$this->goods_id);
@@ -146,11 +148,11 @@ class Sales extends Model
 
 		//专员等级以上购买返佣
 		if ($user_level > 0) {
-			$my_prize = floatval($comm['preferential'][$user_level]);
+			$my_prize = floatval($comm['preferential'][$user_level])*$order['goods_num'];
 			if ($my_prize > 0) {
 				$user_id = $this->user_id;
 				$total_money = $my_prize;
-				$user = M('users')->where('user_id',$user_id)->field('user_money,distribut_money')->find();
+				$user = M('users')->where('user_id',$user_id)->field('user_money,distribut_money,openid')->find();
 				$my_user_money = $my_prize + $user['user_money'];
 				$my_distribut_money = $my_prize + $user['distribut_money'];
 				$bool = M('users')->where('user_id',$user_id)->update(['user_money'=>$my_user_money,'distribut_money'=>$my_distribut_money]);
@@ -177,6 +179,12 @@ class Sales extends Model
 					'create_time' => time(),
 					'desc' => $msg
 				);
+                //微信公众号消息
+                if($user['openid']){
+                    $this->distribution_success($user['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$my_prize,"感谢你的使用。");
+                }
+                //记录用户余额变动
+                setBalanceLog($this->user_id,11,$my_prize,$my_user_money,'自购奖：'.$my_prize,$order['order_sn']);
 			}
 		}
 		
@@ -233,6 +241,12 @@ class Sales extends Model
 							'create_time' => time(),
 							'desc' => $msg
 						);
+                        //微信公众号消息
+                        if($value['openid']){
+                            $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
+                        }
+                        //记录用户余额变动
+                        setBalanceLog($this->user_id,8,$money,$user_money,'直推奖：'.$money,$order['order_sn']);
 					}
 				}
 				$msg = "同级奖 ";
@@ -268,6 +282,12 @@ class Sales extends Model
 						'create_time' => time(),
 						'desc' => $msg
 					);
+                    //微信公众号消息
+                    if($value['openid']){
+                        $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
+                    }
+                    //记录用户余额变动
+                    setBalanceLog($this->user_id,9,$money,$user_money,'同级奖：'.$money,$order['order_sn']);
 				}
 			}
 			//极差奖
@@ -298,6 +318,12 @@ class Sales extends Model
 							'create_time' => time(),
 							'desc' => $msg
 						);
+                        //微信公众号消息
+                        if($value['openid']){
+                            $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
+                        }
+                        //记录用户余额变动
+                        setBalanceLog($this->user_id,8,$money,$user_money,'直推奖：'.$money,$order['order_sn']);
 					}
 				}
 				$msg = "极差奖 ";
@@ -336,6 +362,12 @@ class Sales extends Model
 						'create_time' => time(),
 						'desc' => $msg
 					);
+                    //微信公众号消息
+                    if($value['openid']){
+                        $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
+                    }
+                    //记录用户余额变动
+                    setBalanceLog($this->user_id,7,$money,$user_money,'极差奖：'.$money,$order['order_sn']);
 				}
 			}
 			if (!$user_money) {
@@ -386,6 +418,8 @@ class Sales extends Model
 		}
 
 		$order = $order['data'];
+        //商品总价
+        $goods_price=$order['goods_price']*$order['goods_num'];
 		
 		$parents_id = array_reverse($parents_id);	//按原数组倒序排列
 		$all_user = $this->all_user($parents_id);	//获取所有用户信息
@@ -413,11 +447,11 @@ class Sales extends Model
 		
 		//专员等级以上购买返佣
 		if ($user_level > 0) {
-			$my_prize = floatval($comm['preferential'][$user_level]);
+			$my_prize = floatval($comm['preferential'][$user_level])*$order['goods_num'];
 			if ($my_prize > 0) {
 				$user_id = $this->user_id;
 				$total_money = $my_prize;
-				$user = M('users')->where('user_id',$user_id)->field('user_money,distribut_money')->find();
+				$user = M('users')->where('user_id',$user_id)->field('user_money,distribut_money,openid')->find();
 				$my_user_money = $my_prize + $user['user_money'];
 				$my_distribut_money = $my_prize + $user['distribut_money'];
 				$bool = M('users')->where('user_id',$user_id)->update(['user_money'=>$my_user_money,'distribut_money'=>$my_distribut_money]);
@@ -444,6 +478,12 @@ class Sales extends Model
 					'create_time' => time(),
 					'desc' => $msg
 				);
+                //微信公众号消息
+                if($user['openid']){
+                    $this->distribution_success($user['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$my_prize,"感谢你的使用。");
+                }
+                //记录用户余额变动
+                setBalanceLog($this->user_id,11,$my_prize,$my_user_money,'自购奖：'.$my_prize,$order['order_sn']);
 			}
 		}
 		
@@ -502,6 +542,12 @@ class Sales extends Model
 							'create_time' => time(),
 							'desc' => $msg
 						);
+                        //微信公众号消息
+                        if($value['openid']){
+                            $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
+                        }
+                        //记录用户余额变动
+                        setBalanceLog($this->user_id,8,$money,$user_money,'直推奖：'.$money,$order['order_sn']);
 					}
 				} 
 				$msg = "自购同级奖 ";
@@ -538,6 +584,12 @@ class Sales extends Model
 						'create_time' => time(),
 						'desc' => $msg
 					);
+                    //微信公众号消息
+                    if($value['openid']){
+                        $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
+                    }
+                    //记录用户余额变动
+                    setBalanceLog($this->user_id,9,$money,$user_money,'同级奖：'.$money,$order['order_sn']);
 				}
 			}
 			//极差奖
@@ -568,6 +620,12 @@ class Sales extends Model
 							'create_time' => time(),
 							'desc' => $msg
 						);
+                        //微信公众号消息
+                        if($value['openid']){
+                            $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
+                        }
+                        //记录用户余额变动
+                        setBalanceLog($this->user_id,8,$money,$user_money,'直推奖：'.$money,$order['order_sn']);
 					}
 				}
 				$msg = "自购极差奖 ";
@@ -607,6 +665,12 @@ class Sales extends Model
 						'create_time' => time(),
 						'desc' => $msg
 					);
+                    //微信公众号消息
+                    if($value['openid']){
+                        $this->distribution_success($value['openid'],"你好，你已分销商品成功。",$order['goods_name'],$goods_price,$money,"感谢你的使用。");
+                    }
+                    //记录用户余额变动
+                    setBalanceLog($this->user_id,7,$money,$user_money,'极差奖：'.$money,$order['order_sn']);
 				}
 			}
 			if (!$user_money) {
@@ -682,7 +746,11 @@ class Sales extends Model
 		$distribut_money = $money + $leader['distribut_money'];
 		$msg = "团队分红 ". $money . "（元），商品：".$order['goods_num']." 件，比率：".$goods['prize_ratio']."%";
 
-		$bool = M('users')->where('user_id',$first_leader)->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
+		$bool = M('users')->where('user_id',$leader['user_id'])->update(['user_money'=>$user_money,'distribut_money'=>$distribut_money]);
+
+        //记录用户余额变动
+        setBalanceLog($leader['user_id'],10,$money,$user_money,'团队分红：'.$money,$order['order_sn']);
+
 
 		$data[] = array(
 			'user_id' => $this->user_id,
@@ -755,7 +823,7 @@ class Sales extends Model
 	//获取所有用户信息
 	public function all_user($parents_id)
 	{
-		$all = M('users')->where('user_id','in',$parents_id)->column('user_id,first_leader,distribut_level,is_lock,user_money,distribut_money,is_distribut');
+		$all = M('users')->where('user_id','in',$parents_id)->column('user_id,first_leader,distribut_level,is_lock,user_money,distribut_money,is_distribut,openid');
 		$result = array();
 
 		foreach ($parents_id as $key => $value) {
@@ -827,4 +895,49 @@ class Sales extends Model
 			M('users')->where('user_id','in',$parents_id)->update(['is_cash'=>1]);
 		}
 	}
+
+    //分销成功发消息
+    public function distribution_success($openid,$title,$goods_name,$goods_price,$money,$remark,$url=''){
+        $time=date("Y-m-d H:i:s",time());
+
+        $data = [
+            'touser' => $openid,
+            'template_id' => '6kBWThyD-i4OCEMdkQIYSdEEEV-PljfTiOX0T0mjpOg',
+            'url' => $url,
+            'data' => [
+                'first' => [
+                    'value' => $title,
+                ],
+                'keyword1' => [
+                    'value' => $goods_name,
+                ],
+                'keyword2' => [
+                    'value' => $goods_price . ' 元',
+                ],
+                'keyword3' => [
+                    'value' => $money . ' 元',
+                ],
+                'keyword4' => [
+                    'value' => $time,
+                ],
+                'remark' => [
+                    'value' => $remark,
+                ],
+            ],
+        ];
+        return $this->Send_Template_Message($data);
+    }
+
+    # 发送模板消息
+    public function Send_Template_Message($data){
+        if(!$data){
+            return false;
+        }
+        $conf = Db::name('wx_user')->field('id,appid,appsecret,web_access_token,web_expires')->find();
+        $token = $conf['web_access_token'];
+        $url = 'https://api.weixin.qq.com/cgi-bin/message/template/send?access_token='.$token;
+        $res = httpRequest($url,'POST',json_encode($data));
+        return $res;
+
+    }
 }

@@ -135,7 +135,29 @@
     $(function(){
         //默认选中第一个
         $('.pay-list-4 div ul li:first').find('.che').addClass('check_t').end().find(':radio').prop('checked',true);
+
+        setTimeout(function () {
+            checkorder();
+                  }, 1000);
+
     })
+    //检查订单是否支付
+    function  checkorder() {
+        $.ajax({
+            type: "post",
+            url: "{:U('Mobile/Cart/check_order')}",
+            data: {order_id: "{$order.order_id}"},
+            dataType: 'json',
+            success: function (data) {
+                if (data.status == 1) {
+                    location.href = "{:U('Mobile/Payment/pay_success',['order_id'=>$order.order_id])}";
+                    //location.href = "{:U('Home/Cart/cart4',array('order_id'=>$order_id,'master_order_sn'=>$master_order_sn))}";
+                }
+            }
+        });
+        setTimeout(checkorder,1000);
+    }
+
     //切换支付方式
     function changepay(obj){
         $(obj).find('.che').addClass('check_t').parents('li').siblings('li').find('.che').removeClass('check_t');

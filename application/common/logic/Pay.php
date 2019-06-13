@@ -364,7 +364,8 @@ class Pay
         if(empty($this->user['discount'])){
             return 1;
         }else{
-            return $this->user['discount'];
+            return 1;   //该项目没折扣，只能返回1
+            // return $this->user['discount'];
         }
     }
 

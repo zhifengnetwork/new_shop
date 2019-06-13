@@ -45,7 +45,16 @@ function goods_name($goods_id){
 }
 
 /**
- * 获取头像
+ * 获取单个头像
+ */
+function get_a_avatar($user_id){
+	$avatar = M('users')->where('user_id',$user_id)->value('head_pic');
+
+	return $avatar;
+}
+
+/**
+ * 批量获取头像
  */
 function get_avatar($ids){
 	$ids = array_unique($ids);

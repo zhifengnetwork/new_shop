@@ -94,6 +94,9 @@ class UserInvite extends Model{
             $res = Db::execute($insql);
             if($res){
                 Db::execute("update `tp_users` set `user_money` = `user_money` + '$money', `distribut_money` = `distribut_money` + '$money' where `user_id` = '$user_id'");
+                //记录用户余额变动
+                $user_money=Db::name('users')->where(['user_id'=>$user_id])->value('user_money');
+                setBalanceLog($user_id,2,$money,$user_money,'邀请奖励：'.$money);
                 return true;
             }
         }

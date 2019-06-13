@@ -174,24 +174,25 @@
             <li class="li1">
                 <span>
                     <!-- <p>{$first_count}</p> -->
-                    <a href="javascript:void(0)" onclick="get_distribut(1)">一级分销</a>
+                    <a href="javascript:void(0)" onclick="get_distribut(1)">城市</a>
                 </span>
             </li>
             <li class="li1">
                 <span>
                     <!-- <p>{$second_count}</p> -->
-                    <a href="javascript:void(0)" onclick="get_distribut(2)">二级分销</a>
+                    <a href="javascript:void(0)" onclick="get_distribut(2)">乡镇</a>
                 </span>
             </li>
             <li class="li1">
                 <span>
                     <!-- <p>{$third_count}</p> -->
-                    <a href="javascript:void(0)" onclick="get_distribut(3)">三级分销</span></a>
+                    <a href="javascript:void(0)" onclick="get_distribut(3)">村庄</span></a>
                 </span>
             </li>
         </ul>
         <ul class="re_tit">
             <li class="li1"><span>用户</span></li>
+            <li class="li1"><span>ID</span></li>
             <li class="li2" ><span>等级</span></li>
             <li class="li3"><span>所得佣金</span></li>
             <li class="li1"><span>操作</span></li>
@@ -260,8 +261,9 @@
                         var head_pic = data[i].head_pic ? data[i].head_pic : '/public/images/user_default_icon.jpg';
                         var url = '/Mobile/User/purchase_log';
                         html += '<ul class="ul_liebiao"><li class="li1" style="margin:line-height;"><span><img src="' + head_pic
-                             + '" style="border-radius:50%;" class="touxiang"><span class="nickname">' + user_name
-                             + '</span></span></li><li class="li2" style="width:30%;"><span>' + data[i].level_name
+                             + '" style="border-radius:50%;" class="touxiang"><span class="nickname">' +user_name
+                             + '</span></span></li><li class="li2" style="width:20%;">'+data[i].user_id
+                             + '</li><li class="li2" style="width:30%;"><span>' + data[i].level_name
                              + '</span></li><li class="li2"><span>' + data[i].distribut_money
                              + '</span></li><li class="li1" style="width:25%; margin:line-height;"><span><a href="' + url 
                              + '?id=' + data[i].user_id 

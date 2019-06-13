@@ -52,6 +52,7 @@ class Cart extends MobileBase {
             if ($user) {
                 $discount = (empty((float)$user['discount'])) ? 1 : $user['discount'];
                 if ($discount != 1) {
+                    $discount = 1;//没有折扣，全部变为1
                     $c = Db::name('cart')->where(['user_id' => $user['user_id'], 'prom_type' => 0])->where('member_goods_price = goods_price')->count();
                     $c && Db::name('cart')->where(['user_id' => $user['user_id'], 'prom_type' => 0])->update(['member_goods_price' => ['exp', 'goods_price*' . $discount]]);
                 }
@@ -62,6 +63,8 @@ class Cart extends MobileBase {
     //异步调用升级
     public function curls()
     {
+        write_log('curls 函数体 进来');
+
         ignore_user_abort(true);
         set_time_limit(0);
         $data = file_get_contents("php://input");//接收json数据
@@ -69,6 +72,9 @@ class Cart extends MobileBase {
         $leaderId=input('leaderId');
         $le = new LevelLogic();
         $ll = $le->user_in($leaderId);//dump($ll);//die;
+
+        write_log('curls 函数体 结束');
+
     }
 
 
@@ -341,6 +347,20 @@ class Cart extends MobileBase {
         $this->assign('bankCodeList',$bankCodeList);
         $this->assign('pay_date',date('Y-m-d', strtotime("+1 day")));
         return $this->fetch();
+    }
+
+    /**
+     * ajax 检查订单是否支付成功
+     */
+    public function check_order($order_id)
+    {
+        // 如果已经支付过的订单直接到订单详情页面. 不再进入支付页面
+        $order_status = Db::name('order')->where('order_id',$order_id)->value('pay_status');
+        if($order_status == 1){
+            $this->ajaxReturn(['status'=>1,'msg'=>'支付成功','result'=>'']);
+        }else{
+            $this->ajaxReturn(['status'=>-1,'msg'=>"还没支付"]);
+        }
     }
 
     /**

@@ -276,7 +276,7 @@ body{
                     var html = '<ul class="tit_ul">';
                     var str = '';
                     for (let i = 0; i < data.length; i++) {
-                        str = (data[i].status == 1) ? "成功" : "失败";
+                        str = (data[i].status == 1) ? "成功" : "成功";
                         html += '<li class="list_item"><span><p style="margin-bottom: 0.2rem;">金额：' + data[i].money +
                         '</p><p>' + data[i].create_time +
                         '</p></span><span>' + str +

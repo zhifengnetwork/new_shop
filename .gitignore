@@ -11,3 +11,4 @@
 cron.txt
 cron_team.sh
 /sql
+/logs/*

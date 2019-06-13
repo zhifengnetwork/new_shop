@@ -109,6 +109,9 @@ return	array(
 					array('name' => '新闻列表', 'act'=>'newsList', 'op'=>'News'),
 					array('name' => '新闻分类', 'act'=>'categoryList', 'op'=>'News'),
 			)),
+			array('name' => '首页自定义','child'=>array(
+				array('name' => '首页自定义', 'act'=>'shop', 'op'=>'Index'),
+		)),
 	)),
 		
 	// 'marketing'=>array('name'=>'营销','child'=>array(

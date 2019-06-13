@@ -39,6 +39,20 @@ function share_deal_after($xiaji,$shangji){
     return true;
 }
 
+//二维数组排序
+function towArraySort ($data,$key,$order = SORT_ASC) {
+    try{
+        //        dump($data);
+        $last_names = array_column($data,$key);
+        array_multisort($last_names,$order,$data);
+//        dump($data);
+        return $data;
+    }catch (\Exception $e){
+        return false;
+    }
+
+}
+
 //获取用户所有上级id
 function get_parents_ids($user_id){
     $parents_cache = M('parents_cache')->where('user_id',$user_id)->order('sort','asc')->select();
@@ -952,6 +966,7 @@ function rechargevip_rebate($order) {
  */
 function update_pay_status($order_sn,$ext=array())
 {
+    write_log('update_pay_status 开始');
     $time=time();
     if(stripos($order_sn,'recharge') !== false){
         //用户在线充值
@@ -1016,7 +1031,12 @@ function update_pay_status($order_sn,$ext=array())
         // 分销商升级, 根据order表查看消费id 达到条件就给他分销商等级升级
         // $Level =new \app\common\logic\LevelLogic();
         // $Level->user_in($order['user_id']);
+
+        write_log('curl_up 调用前');
+
         curl_up($order['user_id']);
+
+        write_log('curl_up 调用后');
 
         // 记录订单操作日志
         $commonOrder = new \app\common\logic\Order();
@@ -1055,13 +1075,35 @@ function update_pay_status($order_sn,$ext=array())
     }
 }
 
+/**
+ * @param $content
+ *  记录日志
+ */
+function write_log($content)
+{
+    $content = "[" . date('Y-m-d H:i:s') . "]" . $content . "\r\n";
+    $dir = rtrim(str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']), '/') . '/logs';
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777, true);
+    }
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777, true);
+    }
+    $path = $dir . '/' . date('Ymd') . '.txt';
+    file_put_contents($path, $content, FILE_APPEND);
+}
+
+
 function curl_up($leaderId){
-    $htt = substr($_SERVER['HTTP_REFERER'],0,strpos($_SERVER['HTTP_REFERER'], '/'));
-    $url = $htt.'//'.$_SERVER['HTTP_HOST'].'/mobile/Cart/curls';
-//    $url = 'http://'.$_SERVER['HTTP_HOST'].'/mobile/Cart/curls';
-//      dump($url);die;
+
+    write_log('curl_up 函数体$leaderId ： '.$leaderId);
+
+    $url = SITE_URL.'/mobile/Cart/curls';
+
+    write_log('curl_up 函数体 $url ： '.$url);
+
     $data = array('leaderId'=>$leaderId);
-    // echo $data;
+
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $url);
     curl_setopt($ch, CURLOPT_POST, 1);
@@ -1791,7 +1833,8 @@ function check_mobile_number($mobile)
     if (!is_numeric($mobile)) {
         return false;
     }
-    $reg = '#^13[\d]{9}$|^14[5,7]{1}\d{8}$|^15[^4]{1}\d{8}$|^17[0,6,7,8]{1}\d{8}$|^18[\d]{9}$#';
+//    $reg = '#^13[\d]{9}$|^14[5,7]{1}\d{8}$|^15[^4]{1}\d{8}$|^17[0,6,7,8]{1}\d{8}$|^18[\d]{9}$#';
+    $reg = "/^1[3456789]\d{9}$/";
 
     return preg_match($reg, $mobile) ? true : false;
 }
@@ -1892,4 +1935,41 @@ function checkPhoneCode($data){
         return array('code' => 0, 'msg' => $msg);
     }
     return array('code' => 200, 'msg' => '验证通过');
+}
+
+/**
+ * @param $user_id
+ * @param int $type  用户余额变动类型 （0:未定义  1:签到 2:邀新 3:充值 4:提现 5:下单消费 6:后台调节  7:极差 8:直推 9:同级  10:团队分红 11:自购 12:全球分红）
+ * @param int $user_money
+ * @param int $pay_points
+ * @param string $desc
+ * @param int $distribut_money
+ * @param int $order_id
+ * @param string $order_sn
+ */
+function setAccountLog($user_id,$type=0, $user_money = 0,$pay_points = 0, $desc = '',$frozen_money = 0,$order_id = 0 ,$order_sn = ''){
+    if(is_numeric($user_id) && $user_id>0){
+        $data=array('user_id'=>$user_id,'type'=>$type,'user_money'=>$user_money,'pay_points'=>$pay_points,'desc'=>$desc,'frozen_money'=>$frozen_money,'order_id'=>$order_id,'order_sn'=>$order_sn,'change_time'=>time());
+        M('account_log')->add($data);
+        return 1;
+    }else{
+        return 0;
+    }
+}
+/**
+ * @param $user_id
+ * @param int $type  用户余额变动类型 （0:未定义  1:签到 2:邀新 3:充值 4:提现 5:下单消费 6:后台调节  7:极差 8:直推 9:同级  10:团队分红 11:自购 12:全球分红）
+ * @param $change_money   变动金额
+ * @param $balance    变动后用户余额
+ * @param $desc   描述
+ * @param $order_sn   订单编号
+ */
+function setBalanceLog($user_id,$type=0,$change_money=0,$balance=0,$desc='',$order_sn=''){
+    if(is_numeric($user_id) && $user_id>0 && in_array($type,array(0,1,2,3,4,5,6,7,8,9,10,11,12))){
+        $data=array('user_id'=>$user_id,'type'=>$type,'change_money'=>$change_money,'balance'=>$balance,'desc'=>$desc,'order_sn'=>$order_sn,'change_time'=>time());
+        M('change_balance_log')->add($data);
+        return 1;
+    }else{
+        return 0;
+    }
 }

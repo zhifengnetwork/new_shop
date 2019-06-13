@@ -15,6 +15,7 @@
 		<script src="__STATIC__/js/layer.js" type="text/javascript"></script>
 		<link rel="shortcut icon" type="image/x-icon" href="{$tpshop_config.shop_info_store_ico|default='/public/static/images/logo/storeico_default.png'}" media="screen" />
 		<style>
+			
 			.header .sea-box span {
 				margin-left: 1rem!important;
 			}
@@ -108,7 +109,8 @@
 			}
 			
 			.nav {
-				margin-top: 1.5rem;
+				
+				/* margin-top: .9rem; */
 				display: flex;
 				display: -webkit-box;
 				display: -webkit-flex;
@@ -209,92 +211,96 @@
 				font-size: .5rem;
 			}
 			/* banner ban1 */
-			
-			.banner {
-				padding-top: 1.8rem;
+			.banner{
+				
+				padding-top:2.1rem;
 			}
 			
 			.guesslike ul li .similer-product img {
 				width: 100%!important;
-			}
-			
-			.layermmain {
-				background: white;
-				opacity: 1;
-				z-index: 1;
-			}
-			
-			.guanzhu {
-				width: .6rem;
-				height: 4rem;
-				text-align: center;
-				position: fixed;
-				right: 0;
-				top: 0;
-				bottom: 0;
-				margin: auto 0;
-				font-size: .5rem;
-				background: #CCC;
-				display: flex;
-				align-items: center;
-				background: #37afe6;
-				color: white;
-			}
-			
-			.erweima {
-				width: 8rem;
-				height: 8rem;
-			}
-			
-			.layermmain .section {
-				opacity: 1;
-			}
-			
-			.gonggao {
-				height: 1.2rem;
-				line-height: 1.2rem;
-				width: 2.5rem;
-				text-align: center;
-				border: 1px solid green;
-				vertical-align: bottom;
-			}
-			
-			#scroll_div {
-				height: 1.2rem;
-				line-height: 1.2rem;
-				overflow: hidden;
-				white-space: nowrap;
-				flex: 1;
-				background-color: #fff;
-				color: #999999;
-				text-align: center;
-				display: inline-block;
-				vertical-align: top;
-				background: red;
-				font-size: .6rem;
-				color: white;
-			}
-			
-			.gongao_pic {
-				width: 1rem;
-				margin-top: -.1rem;
-			}
-			
-			#scroll_begin,
-			#scroll_end {
-				display: inline;
-				border: 3px solid blue;
-			}
-			
-			.xixi {
-				display: flex;
-				background: black;
-			}
-			
-			.gonggao_span {
-				color: white;
-				font-size: .6rem;
-			}
+				
+                }
+            .layermmain{
+            	
+            	background: white;
+            	opacity: 1;
+            	z-index: 1;
+            	
+            }
+              .guanzhu{
+                	
+                	width: .6rem;
+                	height: 4rem;  
+                	text-align: center;           	
+                	position: fixed;
+                	right: 0;
+                	top: 0;
+                	bottom:0;
+                	margin: auto 0;
+                	font-size: .5rem;
+                	background: #CCC;
+                	display: flex;
+                	align-items: center;
+                	background: #37afe6;
+                	color: white;
+                }
+                .erweima{
+                	width: 8rem;
+                	height: 8rem;
+                	
+                }
+                .layermmain .section{
+                	opacity: 1;
+				}
+				.tututututu{
+
+						position: relative;
+						overflow: hidden;
+						height: 1.5rem;
+
+				}
+				marquee{
+				  
+				  
+				  position: absolute;
+				  left: 2.8rem;
+				  font-size: .5rem;
+				  height: 1.5rem;
+				  line-height: 1.75rem;
+				  /* top: 0rem;
+				  right: 2.8rem;
+				  left: 2.8rem;
+				  background: #f7f7f7;
+				  /* color: white */
+				  /* border: 1px solid green;  */
+				  /* overflow: hidden; */
+				
+				}
+				.tubiao{
+
+				
+				  background: #f7f7f7;
+				  height: 1.5rem;
+				
+				}
+				.tubiao img{
+					width: .8rem;
+					height: 1rem;
+					margin-left: .3rem;
+					margin-top: .1rem
+				}
+                .tubiao span{
+					 
+					 display: inline-block;
+					 height: 100%;
+					 line-height: 1.72rem;
+					 font-size: .5rem;
+					 margin-left:.2rem;
+					 vertical-align: center; 
+				
+
+				}
+                
 		</style>
 	</head>
 
@@ -352,7 +358,20 @@
 			</div>
 		</div>
 		<!--顶部滚动广告栏-e-->
-		<!--公告区域-->
+		<!-- 公告区域 -->
+		<div class="tututututu">
+			<div class="tubiao">
+			<img src="__STATIC__/images/laba.png"/>
+			<span>公告</span>
+			</div>
+			<div style="position: relative;right:0rem;top:-1.5rem;height: 1.5rem;">
+			 <marquee>
+
+				{$store_notice}
+
+			 </marquee>
+		   </div>
+        </div>
 
 		<!--nav区域开始-->
 
@@ -378,6 +397,22 @@
 				<div class="likeshop ">
 					<div id="J_ItemList">
 						<ul class="product single_item info">
+							<foreach name="favourite_goods" item="v">
+								<li>
+									<div class="similer-product products_kuang">
+										<a href="{:U('Mobile/Goods/goodsInfo',array('id'=>$v[goods_id]))}" title="{$v.goods_name}">
+											<img src="{$v[goods_id]|goods_thum_images=400,400}"/>
+											<span class="similar-product-text">{$v[goods_name]|getSubstr=0,20}</span>
+										</a>
+										<span class="similar-product-price">
+											¥<span class="big-price">{$v[shop_price]}</span>
+											<a href="{:U('Goods/goodsList',['id'=>$v['cat_id']])}" title="{$v.goods_name}">
+												<span class="guess-button J_ping">看相似</span>
+											</a>
+										</span>
+									</div>
+								</li>
+							</foreach>
 						</ul>
 					</div>
 				</div>
@@ -417,26 +452,21 @@
 		<script type="text/javascript" src="__STATIC__/js/sourch_submit.js"></script>
 
 		<script>
-			$(document).ready(function(e) {
-				var nowtime = Date.parse(new Date());
+			$(document).ready(function(){
+				// var nowtime=Date.parse(new Date());
 				// console.log(123)
 				// console.log(mytime)
-				nowtime = nowtime / 1000;
+				// nowtime=nowtime/1000;
 				var username = window.localStorage.getItem('key_username');
-				var endtime = window.localStorage.getItem('key_endtime');
-				console.log(uid)
+				// var endtime = window.localStorage.getItem('key_endtime');
+				// console.log(uid)
 				// console.log(endtime)
 				// console.log(password)
 				// if((!username && typeof username != "undefined" && username != 0) || (!endtime && typeof endtime != "undefined" && endtime != 0)){
 
 				// }else{
-				if(username && username.length == 11 && endtime > nowtime && uid == 0) {
-					var data = {
-						username: username,
-						mobile_code: '000000',
-						referurl: encodeURIComponent(''),
-						sms_type: 5
-					};
+				if(username && username.length==11 && uid==0){
+					var data = {username:username,mobile_code:'000000',referurl:encodeURIComponent(''),sms_type:5};
 					// console.log(uid)
 					$.ajax({
 						type: 'post',
@@ -458,17 +488,15 @@
 				}
 
 				// }
-				ajax_sourch_submit();
-
+				// ajax_sourch_submit();
 			});
 			/**
 			 * 继续加载猜您喜欢
 			 * */
 			var before_request = 1; // 上一次请求是否已经有返回来, 有才可以进行下一次请求
-			var page = 0;
-
-			function ajax_sourch_submit() {
-				if(before_request == 0) // 上一次请求没回来 不进行下一次请求
+			var page = 1;
+			function ajax_sourch_submit(){
+				if(before_request == 0)// 上一次请求没回来 不进行下一次请求
 					return false;
 				before_request = 0;
 				page++;
@@ -499,24 +527,32 @@
 				});
 
 			})
-            //html,js实现文本横向滚动（跑马灯）效果
-			var test1 = function(x, y, text)   {   // eleId 自己定义的变量名，任意取
-				   // document.createElement ('marquee'); 勿改变
-				    
-				var eleId = document.createElement('marquee');    
-				eleId.style.position = 'absolute';    
-				eleId.style.left = x + 'rem';    
-				eleId.style.top = y + 'rem';    
-				eleId.innerText = text;    
-				document.body.appendChild(eleId);  
-			}     
-			window.onload = function()   {  
-				var abc = "下周一三五停电，下周二四六停水。请各位业主相互转告";
-                //(x轴,y轴)(150,100)    
-				test1(1, 3, abc);   
-				 
-				  
-			}
+				//eleId.style.right ='2.8rem';
+			// 公告区域代码
+			// var test1 = function (x, y, text){
+			// 					    // eleId 自己定义的变量名，任意取
+			// 					    // document.createElement ('marquee'); 勿改变
+			// 					        var eleId = document.createElement ('marquee');
+			// 					        eleId.style.position = 'absolute';
+			// 					        eleId.style.top = y +'rem';
+			// 					        eleId.style.right ='100rem';
+			// 							eleId.style.left ='2.8rem';
+			// 					        eleId.innerText = text;
+			// 					        document.body.appendChild (eleId);
+			// 					    }
+
+			var eleId = document.getElementsByTagName('marquee');
+			
+
+		    window.onload = function ()
+		    {
+		//     var abc = "{$store_notice}";
+			// (x轴,y轴)(150,100)
+		//         test1 (2.8, 8.5, abc);
+		       
+		    }
+
+			
 		</script>
 	</body>
 

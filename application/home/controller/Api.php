@@ -197,7 +197,6 @@ class Api extends Base {
         $checkData['code'] = $code;
         $checkData['phone'] = $mobile;
         $res = checkPhoneCode($checkData);
-
         if ($res['code'] == 0) {
             return json(['code' => 0, 'msg' => $res['msg']]);
         }else{
@@ -270,21 +269,33 @@ class Api extends Base {
             $shipping_code = '';
                 break;
         }
-        
+
         $condition = array(
             'shipping_code' => $shipping_code,
             'invoice_no' => $invoice_no,
         );
         $is_exists = M('delivery_express')->where($condition)->find();
+
+       
        //判断物流记录表是否已有记录,没有则去请求新数据
         if($is_exists){
             $result = unserialize($is_exists['result']);
+//            if($invoice_no=='8060175081273327979'){
+//                var_dump($result);die;
+//            }
+            if($result['msg']=='没有消息'){
+                $result = $this->getDelivery($shipping_code, $invoice_no);
+//            var_dump($result);die;
+                $result = json_decode($result, true);
 
+                $flag = $this->insertData($result, $shipping_code, $invoice_no);
+                return $result;
+            }
             //1为订单签收状态,订1单已经签收,已签收则不去请求新数据
             if($is_exists['issign'] == 1){
-
                 return $rejson ? json($result) : $result;
             }
+
             $pre_time = time();
             $flag_time = (int)$is_exists['update_time'];
             $space_time = $pre_time - $flag_time;
@@ -302,13 +313,13 @@ class Api extends Base {
             
             $result = $this->getDelivery($shipping_code, $invoice_no);
             $result = json_decode($result, true);
-            
             //更新表数据
             $flag = $this->updateData($result, $is_exists['id']);
             return $result;
             
         }else{
             $result = $this->getDelivery($shipping_code, $invoice_no);
+//            var_dump($result);die;
             $result = json_decode($result, true);
 
             $flag = $this->insertData($result, $shipping_code, $invoice_no);
@@ -324,7 +335,6 @@ class Api extends Base {
         $host = "https://wuliu.market.alicloudapi.com";//api访问链接
         $path = "/kdi";//API访问后缀
         $method = "GET";
-        
         //物流
         $appcode = 'c5ccb196109848fe8ea5e1668410132a';//替换成自己的阿里云appcode
         $headers = array();
@@ -332,7 +342,7 @@ class Api extends Base {
         $querys = "no=".$invoice_no."&type=".$shipping_code;  //参数写在这里
         $bodys = "";
         $url = $host . $path . "?" . $querys;//url拼接
-        
+
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
         curl_setopt($curl, CURLOPT_URL, $url);
@@ -347,7 +357,7 @@ class Api extends Base {
             curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
         }
-        
+
         return curl_exec($curl);
     }
 

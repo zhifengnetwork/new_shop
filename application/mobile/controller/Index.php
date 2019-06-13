@@ -36,11 +36,25 @@ class Index extends MobileBase {
         $wechat = Db::name('wx_user')->find();
         $this->assign('wechat_qr',$wechat);
 
+        $store_notice = Db::name('config')->where('name','store_notice')->value('value');
+        $this->assign('store_notice',$store_notice);
+
         $this->assign('goods_id',$goods_id);
         $this->assign('black_technology',$black_technology);
         $this->assign('quantum',$quantum);
+        //首页商品
+        $where = [
+            
+            'is_recommend' => 1,
+            'exchange_integral'=>0,  //积分商品不显示
+            'is_on_sale' => 1,
+            'virtual_indate' => ['exp', ' = 0 OR virtual_indate > ' . time()]
+        ];
+        $favourite_goods = Db::name('goods')->where($where)->order('sort DESC')->page(1,C('PAGESIZE'))->cache(true,TPSHOP_CACHE_TIME)->select();//首页推荐商品
+        $this->assign('favourite_goods',$favourite_goods);
 
-		return $this->fetch();
+		return $this->fetch('shenqi');
+		// return $this->fetch('index');
 	}
     public function index3(){
         $diy_index = M('mobile_template')->where('is_index=1')->field('template_html,block_info')->find();
