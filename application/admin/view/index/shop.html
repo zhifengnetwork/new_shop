@@ -294,7 +294,86 @@
                       </div>
   
                     </div>
-  
+                    <!--店招模块 box，拖拽的div-->
+                    <div class="modle_box" v-if="v.id == 'shopinviting'? true:''" :key="v.id" @click="editMode(v.id,v.key_num)" >
+                        <!-- :style="{textAlign:v.params.alignPosition,color:v.params.textColor,backgroundColor:v.params.bgColor}" -->
+                        <div :class="v.params.style" :style="{'background-image':'url('+v.data.icon+')',}">
+                            <div class="shop_boxson">
+                                <img src="../../img/1.jpg" :class="v.params.show"/>
+                                <p :class="v.params.nameshow">神器商城</p>
+                            </div>
+                            <div :class="v.params.navshow">
+                                <div class="shop_boxson_item">
+                                    <i class="iconfont" :style="{'color':v.params.backColor}">&#xe77e;</i>
+                                    <p class="icon_title" :style="{'color':v.params.backColor}">首页</p>
+                                </div><div class="shop_boxson_item">
+                                    <i class="iconfont" :style="{'color':v.params.backColor}">&#xe64a;</i>
+                                    <p class="icon_title" :style="{'color':v.params.backColor}">全部商品</p>
+                                </div><div class="shop_boxson_item">
+                                    <i class="iconfont" :style="{'color':v.params.backColor}">&#xe601;</i>
+                                    <p class="icon_title" :style="{'color':v.params.backColor}">促销商品</p>
+                                </div><div class="shop_boxson_item">
+                                    <i class="iconfont" :style="{'color':v.params.backColor}">&#xe646;</i>
+                                    <p class="icon_title" :style="{'color':v.params.backColor}">店铺公告</p>
+                                </div>			
+                            </div>
+                        </div>
+                      </div>
+                      <!--滑动按钮组模块 box，拖拽的div-->
+										<div class="modle_box" v-if="v.id == 'slidingBtnId'? true:''" :key="v.id" @click="editMode(v.id,v.key_num)">
+											<div class="slidingBtn">
+												<div class="slidingBtn_list" :style="{background:v.params.background}">
+													<div class="slidingBtn_tips" v-if="v.data.btnList.length == 0">
+														请添加按钮
+													</div>
+													<div class="slidingBtn_item" v-for="item in v.data.btnList">
+														<a v-if="item.text==''" :style="{color:item.sizeColor}">{{item.default}}</a>
+														<a v-if="item.text!=''" :style="{color:item.sizeColor}">{{item.text}}</a>
+													</div>
+												</div>
+											</div>
+											<!--删除按钮 wrap-->
+											<div class="cursor_wrap">
+												<p class="cursor_box_del" @click.stop="delDataFun(i)">移除</p>
+											</div>
+											<!--选中-虚框-->
+											<p class="border_line" :class="puStateObj['key_num'] == i ? 'border_box' : ''"></p>
+										</div>
+                      <!--滑动商品组模块 box，拖拽的div-->
+										<div class="modle_box" v-if="v.id == 'slidingShopId'? true:''" :key="v.id" @click="editMode(v.id,v.key_num)" :style="{background:v.params.background}">
+											<div class="slidingShop">
+												<div class="slidingShop_title" :style="{color:v.params.titleColor}" v-if="v.params.titleText!=''&&v.params.title=='true'">{{v.params.titleText}}</div>
+												<div class="slidingShop_title" :style="{color:v.params.titleColor}" v-if="v.params.titleText==''&&v.params.title=='true'">{{v.params.default}}</div>
+												<div class="slidingShop_list">
+													<div class="slidingShop_item" v-for="item in v.data.msg">
+														<div class="slidingShop_item_imgwrap">
+															<img class="slidingShop_item_img" :src="item.img">
+															<div class="modle_shop_attr" :class="v.params.attr"></div>
+														</div>
+														<div class="slidingShop_item_info">
+															<p class="slidingShop_item_name" :class="v.params.name">{{item.goods_name}}</p>
+															<div :class="v.params.price">
+																<p class="slidingShop_item_price">￥{{item.price}}<s>￥{{item.original_price}}</s></p>
+																<div class="slidingShop_item_buybtn" :class="v.params.btnStyle"></div>
+															</div>
+														</div>
+													</div>
+												</div>
+												<!--初始化(无商品)-->
+												<p class="modle_shop_init" v-show="v['data']['msg'].length == 0 ?true:false">一个商品都没有...</p>
+											</div>
+										</div>
+                      <!--固定搜索栏模板 box，拖拽的div-->
+                      <div class="modle_box" v-if="v.id == 'fixedsId'? true:''" :key="v.id" @click="editMode(v.id,v.key_num)">
+                          <div class="fixeds_wrap" :style="{'background':v.params.backColor}">
+                              <div class="res" :style="{'background':v.params.backColor}">
+                                  <form action="#" :style="{'border-color':v.params.borderColor}" :class="[v.params.resStyle,v.params.reswStyle]">
+                                      <input type="submit" class="searchBtn" value="">
+                                      <input type="text" class="searchText" :placeholder="v.data.tipeText_null" :style="{'color':v.params.textColor}" v-model="v.data.tipeText">
+                                  </form>
+                              </div>               
+                          </div>
+                          </div>
                     <!--标题模块 box，拖拽的div-->
                     <div class="modle_box" v-if="v.id == 'titleId'? true:''" :key="v.id">
                       <div class="title"

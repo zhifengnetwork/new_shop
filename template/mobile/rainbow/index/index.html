@@ -32,7 +32,6 @@
 	              background:linear-gradient(rgba(0,0,0,0.3),rgba(255,255,255,0));*/
 				-webkit-transition: -webkit-transform 3s, opacity 4s, background 10s;
 				/* background: ; */
-
 			}
 			
 			@media screen and (min-width:1300px) {
@@ -395,7 +394,7 @@
 				<!-- <div class="banner banner_imgs">
 					<img src="__STATIC__/images/tp-will.png" alt="即将上线"/>
 				</div> -->
-				<div class="likeshop " >
+				<div class="likeshop ">
 					<div id="J_ItemList">
 						<ul class="product single_item info">
 							<foreach name="favourite_goods" item="v">
@@ -443,15 +442,15 @@
 
 		</div>
 		<!--商品end-->
-        <p class="guanzhu">点击关注公众号</p>
+		<p class="guanzhu">点击关注公众号</p>
 		<!--底部导航-start-->
 
 		<!-- <div class="bottomNavWrap container1" id="bottomNavWrap" data-id="0"></div> -->
-		<include file="public/footer_nav"/>
+		<include file="public/footer_nav" />
 		<!--底部导航-end-->
 		<script src="__STATIC__/js/style.js" type="text/javascript" charset="utf-8"></script>
 		<script type="text/javascript" src="__STATIC__/js/sourch_submit.js"></script>
-		
+
 		<script>
 			$(document).ready(function(){
 				// var nowtime=Date.parse(new Date());
@@ -470,19 +469,19 @@
 					var data = {username:username,mobile_code:'000000',referurl:encodeURIComponent(''),sms_type:5};
 					// console.log(uid)
 					$.ajax({
-						type : 'post',
-						url : '/index.php?m=Mobile&c=User&a=do_login&t='+Math.random(),
-						data : data,
-						dataType : 'json',
-						success : function(data){
+						type: 'post',
+						url: '/index.php?m=Mobile&c=User&a=do_login&t=' + Math.random(),
+						data: data,
+						dataType: 'json',
+						success: function(data) {
 							console.log(data)
-							if(data.status == 1){
+							if(data.status == 1) {
 								// window.location.href = '/index.php/mobile/index';
-							}else{
+							} else {
 
 							}
 						},
-						error : function(XMLHttpRequest, textStatus, errorThrown) {
+						error: function(XMLHttpRequest, textStatus, errorThrown) {
 							showErrorMsg('网络异常，请稍后重试');
 						}
 					})
@@ -492,8 +491,8 @@
 				// ajax_sourch_submit();
 			});
 			/**
-			* 继续加载猜您喜欢
-			* */
+			 * 继续加载猜您喜欢
+			 * */
 			var before_request = 1; // 上一次请求是否已经有返回来, 有才可以进行下一次请求
 			var page = 1;
 			function ajax_sourch_submit(){
@@ -502,32 +501,31 @@
 				before_request = 0;
 				page++;
 				$.ajax({
-					type : "get",
-					url:"/index.php?m=Mobile&c=Index&a=ajaxGetMore&p="+page,
-					success: function(data)
-					{
-						if(data){
+					type: "get",
+					url: "/index.php?m=Mobile&c=Index&a=ajaxGetMore&p=" + page,
+					success: function(data) {
+						if(data) {
 							$("#J_ItemList>ul").append(data);
 							before_request = 1;
-						}else{
+						} else {
 							$('.get_more').hide();
 							$('.get_end').show();
 						}
 					}
 				});
 			}
-			$(".guanzhu").click(function(){
-				
+			$(".guanzhu").click(function() {
+
 				//自定页
 				layer.open({
-						  type: 1,
-						  title: false,
-						  closeBtn: 0,
-						  shadeClose: true,
-						  skin: 'yourclass',
-						  content: '<img src="{$wechat_qr.qr}" class="erweima"/>'
-						});
-									
+					type: 1,
+					title: false,
+					closeBtn: 0,
+					shadeClose: true,
+					skin: 'yourclass',
+					content: '<img src="{$wechat_qr.qr}" class="erweima"/>'
+				});
+
 			})
 				//eleId.style.right ='2.8rem';
 			// 公告区域代码
