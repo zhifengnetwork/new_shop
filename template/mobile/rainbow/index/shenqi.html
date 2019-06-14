@@ -343,40 +343,97 @@
 <script src="__PUBLIC__/js/jqueryUrlGet.js"></script>
 <!--获取get参数插件-->
 <script>
+	$(document).ready(function(){
+				// var nowtime=Date.parse(new Date());
+				// console.log(123)
+				// console.log(mytime)
+				// nowtime=nowtime/1000;
+				var username = window.localStorage.getItem('key_username');
+				// var endtime = window.localStorage.getItem('key_endtime');
+				// console.log(uid)
+				// console.log(endtime)
+				// console.log(password)
+				// if((!username && typeof username != "undefined" && username != 0) || (!endtime && typeof endtime != "undefined" && endtime != 0)){
 
-	$(".guanzhu").click(function () {
+				// }else{
+				if(username && username.length==11 && uid==0){
+					var data = {username:username,mobile_code:'000000',referurl:encodeURIComponent(''),sms_type:5};
+					// console.log(uid)
+					$.ajax({
+						type: 'post',
+						url: '/index.php?m=Mobile&c=User&a=do_login&t=' + Math.random(),
+						data: data,
+						dataType: 'json',
+						success: function(data) {
+							console.log(data)
+							if(data.status == 1) {
+								// window.location.href = '/index.php/mobile/index';
+							} else {
 
-		//自定页
-		layer.open({
-			type: 1,
-			title: false,
-			closeBtn: 0,
-			shadeClose: true,
-			skin: 'yourclass',
-			content: '<img src="{$wechat_qr.qr}" class="erweima"/>'
-		});
-
-	})
-	$(document).ready(function () {
-		var cart_cn = getCookie('cn');
-		if (cart_cn == '') {
-			$.ajax({
-				type: "GET",
-				url: "/index.php?m=Home&c=Cart&a=header_cart_list",//+tab,
-				success: function (data) {
-					cart_cn = getCookie('cn');
-					$('#cart_quantity').html(cart_cn);
+							}
+						},
+						error: function(XMLHttpRequest, textStatus, errorThrown) {
+							showErrorMsg('网络异常，请稍后重试');
+						}
+					})
 				}
-			});
-		}
-		$('#cart_quantity').html(cart_cn);
-	});
 
-	set_first_leader();//设置推荐人
-	if ($(".footer ul li a").hasClass("yello")) {
-		$(".footer ul li .yello").find(".icon_tp2").show();
-		$(".footer ul li .yello").find(".icon_tp1").hide();
-	}
+				// }
+				// ajax_sourch_submit();
+			});
+			/**
+			 * 继续加载猜您喜欢
+			 * */
+			var before_request = 1; // 上一次请求是否已经有返回来, 有才可以进行下一次请求
+			var page = 1;
+			function ajax_sourch_submit(){
+				if(before_request == 0)// 上一次请求没回来 不进行下一次请求
+					return false;
+				before_request = 0;
+				page++;
+				$.ajax({
+					type: "get",
+					url: "/index.php?m=Mobile&c=Index&a=ajaxGetMore&p=" + page,
+					success: function(data) {
+						if(data) {
+							$("#J_ItemList>ul").append(data);
+							before_request = 1;
+						} else {
+							$('.get_more').hide();
+							$('.get_end').show();
+						}
+					}
+				});
+			}
+			$(".guanzhu").click(function() {
+
+				//自定页
+				layer.open({
+					type: 1,
+					title: false,
+					closeBtn: 0,
+					shadeClose: true,
+					skin: 'yourclass',
+					content: '<img src="{$wechat_qr.qr}" class="erweima"/>'
+				});
+
+			})
+				//eleId.style.right ='2.8rem';
+			// 公告区域代码
+			// var test1 = function (x, y, text){
+			// 					    // eleId 自己定义的变量名，任意取
+			// 					    // document.createElement ('marquee'); 勿改变
+			// 					        var eleId = document.createElement ('marquee');
+			// 					        eleId.style.position = 'absolute';
+			// 					        eleId.style.top = y +'rem';
+			// 					        eleId.style.right ='100rem';
+			// 							eleId.style.left ='2.8rem';
+			// 					        eleId.innerText = text;
+			// 					        document.body.appendChild (eleId);
+			// 					    }
+
+			var eleId = document.getElementsByTagName('marquee');
+
 	window.onload = function () {
 		new Vue({
 			el: "#app",
