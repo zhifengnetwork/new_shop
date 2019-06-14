@@ -107,10 +107,10 @@
                 </td>
                 <td>
                     <div style="text-align: center; width: 160px;">
-                       <if condition='$vo[status] eq 1'>
-                          <button data-toggle="button" class="btn btn-primary active qi" @click.stop="prohibition($event)" attr_url="{:url('index/page_enable',['id'=>$vo.id,'status'=>0])}" type="button" aria-pressed="true" status="{$vo.status}" page_id="{$vo.id}">启用</button>
+                       <if condition='$vo[status] eq 0'>
+                          <button data-toggle="button" class="btn btn-primary active qi" @click.stop="prohibition($event)" attr_url="{:U('shop/page_enable',['id'=>$vo.id,'status'=>1])}" type="button" aria-pressed="true" status="{$vo.status}" page_id="{$vo.id}">启用</button>
                           <else />
-                          <button data-toggle="button" class="btn btn-primary active qi" @click.stop="prohibition($event)" attr_url="{:url('index/page_enable',['id'=>$vo.id,'status'=>1])}" type="button" aria-pressed="true" status="{$vo.status}" page_id="{$vo.id}">禁止</button>
+                          <button data-toggle="button" class="btn btn-primary active qi" @click.stop="prohibition($event)" attr_url="{:U('shop/page_enable',['id'=>$vo.id,'status'=>0])}" type="button" aria-pressed="true" status="{$vo.status}" page_id="{$vo.id}">禁止</button>
                         </if>
                       </div>
                </td>
@@ -614,10 +614,12 @@ $(document).ready(function(){
 			/*禁用 || 启用*/
 			prohibition(_eve){
 				var page_state = _eve.target.getAttribute('attr_url');
+        var status = _eve.target.getAttribute('status');
 				console.log('启用||禁用',page_state);
 				/*axios=>请求-页面数据*/
 				axios.get(page_state, {
-					
+          // id:
+					// status:status,
 				})
 				.then(function (response) {
 					console.log(response['data']);

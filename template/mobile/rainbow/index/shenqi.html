@@ -87,11 +87,13 @@
 		<!--搜索模块 box-->
 		<div class="modle_box" v-if="v.id == 'searchId'? true:''" :key="v.id">
 			<div class="search" :style="{'background':v.params.backColor}">
+					<a href="{:U('Goods/ajaxSearch')}"  :style="{color:v.params.textColor}">
 				<form action="#" :style="{'border-color':v.params.borderColor}" :class="v.params.reStyle">
-					<input type="submit" class="searchBtn" value="">
-					<input type="text" class="searchText" :placeholder="v.data.tipeText"
-						:style="{'color':v.params.textColor}">
+							<input type="submit" class="searchBtn" value="">
+							<input type="text" class="searchText" :placeholder="v.data.tipeText"
+								:style="{'color':v.params.textColor}">
 				</form>
+			</a>
 				<!--跳转-搜索页面-->
 				<a class="mask_input"></a>
 			</div>
@@ -208,10 +210,12 @@
 		 <div class="modle_box" v-if="v.id == 'fixedsId'? true:''" :key="v.id">
 			<div class="fixeds_wrap" :style="{'background':v.params.backColor}">
 				<div class="res" :style="{'background':v.params.backColor}">
+				<a href="{:U('Goods/ajaxSearch')}"  :style="{color:v.params.textColor}">
 					<form action="#" :style="{'border-color':v.params.borderColor}" :class="[v.params.resStyle,v.params.reswStyle]">
-						<input type="submit" class="searchBtn" value="">
-						<input type="text" class="searchText" :placeholder="v.data.tipeText_null" :style="{'color':v.params.textColor}" v-model="v.data.tipeText">
+						  <input type="submit" class="searchBtn" value="">
+						  <input type="text" class="searchText" :placeholder="v.data.tipeText_null" :style="{'color':v.params.textColor}" v-model="v.data.tipeText">
 					</form>
+				</a>
 				</div>
 			</div>
 		</div>

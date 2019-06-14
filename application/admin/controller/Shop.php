@@ -184,6 +184,37 @@ class Shop extends Base
     }
 
 
+    public function page_enable () {
+        $id     = request()->param('id',0,'intval');
+        $status = request()->param('status',0,'intval');
+        if (!empty($id)){
+            $getPage = model('DiyEweiShop')->where(['id'=>$id])->find();
+            if (!empty($getPage)){
+                if ($getPage['status'] == $status){
+                    model('DiyEweiShop')->where(['id'=>$getThisEnablePage['id']])->update(['status'=>$status]);
+                }else{
+                    if ($status == 1){
+                        $getThisEnablePage = model('DiyEweiShop')->where(['status'=>1])->find();
+                        if (!empty($getThisEnablePage)){
+                            model('DiyEweiShop')->where(['id'=>$getThisEnablePage['id']])->update(['status'=>0]);
+                        }
+                    }
+                    $updateThisPage = model('DiyEweiShop')->where(['id'=>$id])->update(['status'=>$status]);
+                    if ($updateThisPage){
+                        $this->ajaxReturn(['code'=>1, 'msg'=>'操作成功','data'=>[]]);
+                    }else{
+                        $this->ajaxReturn(['code'=>0, 'msg'=>'操作失败','data'=>[]]);
+                    }
+                }
+            }else{
+                $this->ajaxReturn(['code'=>0, 'msg'=>'页面不存在！','data'=>[]]);
+            }
+        }else{
+            $this->ajaxReturn(['code'=>0, 'msg'=>'id不存在','data'=>[]]);
+        }
+    }
+
+
     public function shop_img(){
         $img      = I('img');
         if(empty($img)){

@@ -51,9 +51,15 @@ class Index extends MobileBase {
         ];
         $favourite_goods = Db::name('goods')->where($where)->order('sort DESC')->page(1,C('PAGESIZE'))->cache(true,TPSHOP_CACHE_TIME)->select();//首页推荐商品
         $this->assign('favourite_goods',$favourite_goods);
+        $res = Db::name('diy_ewei_shop')->where(['status' => 1])->find();
+        if(!empty($res)){
+            return $this->fetch('shenqi');
+        }else{
+            return $this->fetch('index');
+        }
 
-		return $this->fetch('shenqi');
-		// return $this->fetch('index');
+		
+		
 	}
     public function index3(){
         $diy_index = M('mobile_template')->where('is_index=1')->field('template_html,block_info')->find();
