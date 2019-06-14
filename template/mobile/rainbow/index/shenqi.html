@@ -63,9 +63,12 @@
 		.icon_tps img {
 			width: .5rem
 		}
+		[v-cloak]{
+		  display:none;
+		}
 	</style>
 </head>
-<div id="app" class="home">
+<div id="app" class="home" v-cloak>
 	<!--div 循环-->
 	<div class="drag_box" v-for="(v,i) in backData['data']">
 		<!--轮播图 box-->
