@@ -44,7 +44,6 @@ class Index extends MobileBase {
         $this->assign('quantum',$quantum);
         //首页商品
         $where = [
-            
             'is_recommend' => 1,
             'exchange_integral'=>0,  //积分商品不显示
             'is_on_sale' => 1,
