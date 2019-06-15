@@ -1445,7 +1445,7 @@
 								navcolor:"backColor",			
 							},
 							data: {
-								icon: '../../img/0006.png',
+								icon: '__PAGE__/img/0006.png',
 							}
 						},
                 /*搜索框，数据初始化*/
@@ -2304,15 +2304,15 @@
                         console.log(response['data']);
                         if(response['data']['code'] == 1) {
                         	
-                            var re_data = response['data']['data'];
+                            var re_data = response['data'];
                             /*成功之后=>清除-本地数据,在更新*/
                             that.comm_data = [];
                             /*循环赋值*/
                             console.log(re_data);
-
-                            for(var g = 0; g < re_data.length; g++) {
+                           
+                            for(var g = 0; g <  re_data['data'].length; g++) {
                                 /*(深克隆)赋值给页面渲染的data*/
-                                that.comm_data.push(clones(re_data[g]));
+                                that.comm_data.push(clones(re_data['data'][g]));
                             }
                             /*暂无该商品*/
 							if(that.comm_data.length == 0){
@@ -2469,9 +2469,8 @@
                     .then(function(response) {
                         console.log(response['data']);
                         if(response['data']['code'] == 1){
-                            alert(response['data']['msg']);
                             /*页面跳转*/
-                            window.location.href = "index?id="+ response['data']['data']['id'];
+                            window.location.href = "{:U('index/shop')}?id="+ response['data']['data']['id'];
                         }else {
                             /*保存失败*/
                             alert(response['data']['msg']);
@@ -2496,7 +2495,7 @@
              * id=> 后台获取绑定(默认:0)。
              * **/
              //"{$id}" 获取不到
-            that.backData['page_id'] = {$id};
+            that.backData['page_id'] = "{$id}";
             console.log('编辑id:',that.backData['page_id']);
             /*axios=>请求-页面数据*/
 			axios.post("{:U('shop/getShopData')}", {

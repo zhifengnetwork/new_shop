@@ -2483,6 +2483,7 @@
                     .then(function(response) {
                         console.log(response['data']);
                         if(response['data']['code'] == 1){
+                            console.log(response['data']['data']['id']);
                             alert(response['data']['msg']);
                             window.location.href = "{:U('index/pageedit')}"+"?id="+ response['data']['data']['id'];
                         }else {

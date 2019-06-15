@@ -218,13 +218,13 @@
                         <div class="modle_shop_item" v-if="v.params.listStyle=='modle_shop_item'"
                           v-for="item in v.data.msg">
                           <div class="modle_shop_img">
-                            <img :src="item.img" alt="">
+                            <img :src="item.original_img" alt="">
                             <div class="modle_shop_attr" :class="v.params.attr"></div>
                           </div>
                           <div class="modle_shop_info">
                             <p class="modle_shop_name">{{item.goods_name}}</p>
                             <p class="modle_shop_price" :class="v.params.price">
-                              ￥{{item.price}}<s>￥{{item.original_price}}</s>
+                              ￥{{item.shop_price}}<s>￥{{item.market_price}}</s>
                             </p>
                             <div class="modle_shop_buybtn" :class="v.params.btnStyle"></div>
                           </div>
@@ -233,10 +233,10 @@
                         <div :class="v.params.listStyle"
                           v-if="v.params.listStyle!='modle_shop_item'" v-for="item in v.data.msg">
                           <div class="modle_shop_img">
-                            <img :src="item.img" alt="">
+                            <img :src="item.original_img" alt="">
                             <div class="modle_shop_attr" :class="v.params.attr"></div>
                             <p class="modle_shop_price" :class="v.params.price">
-                              ￥{{item.price}}<s>￥{{item.original_price}}</s>
+                              ￥{{item.shop_price}}<s>￥{{item.market_price}}</s>
                             </p>
                           </div>
                           <div class="modle_shop_info" :class="v.params.name">
@@ -347,13 +347,13 @@
 												<div class="slidingShop_list">
 													<div class="slidingShop_item" v-for="item in v.data.msg">
 														<div class="slidingShop_item_imgwrap">
-															<img class="slidingShop_item_img" :src="item.img">
+															<img class="slidingShop_item_img" :src="item.original_img">
 															<div class="modle_shop_attr" :class="v.params.attr"></div>
 														</div>
 														<div class="slidingShop_item_info">
 															<p class="slidingShop_item_name" :class="v.params.name">{{item.goods_name}}</p>
 															<div :class="v.params.price">
-																<p class="slidingShop_item_price">￥{{item.price}}<s>￥{{item.original_price}}</s></p>
+																<p class="slidingShop_item_price">￥{{item.shop_price}}<s>￥{{item.market_price}}</s></p>
 																<div class="slidingShop_item_buybtn" :class="v.params.btnStyle"></div>
 															</div>
 														</div>
