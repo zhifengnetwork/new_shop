@@ -20,7 +20,8 @@
 	<link href="https://cdn.bootcss.com/Swiper/4.5.0/css/swiper.css" rel="stylesheet">
 	<script src="__PUBLIC__/js/global.js"></script>
 	<script src="__STATIC__/js/mobile-util.js" type="text/javascript" charset="utf-8"></script>
-	<script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+	<script type="text/javascript" src="__PUBLIC__/static/js/jquery.js"></script>
+	<script type="text/javascript" src="__PUBLIC__/static/js/jquery-ui/jquery-ui.min.js"></script>
 	<script src="https://cdn.bootcss.com/Swiper/4.5.0/js/swiper.js"></script>
 	<style>
 		.guanzhu {
@@ -65,6 +66,15 @@
 		}
 		[v-cloak]{
 		  display:none;
+		}
+		.layermcont{
+			background:white;
+		}
+		.erweima{
+				width:3rem;
+		}
+		.laymshade{
+			background:white
 		}
 	</style>
 </head>
@@ -224,7 +234,7 @@
 			<!-- :style="{textAlign:v.params.alignPosition,color:v.params.textColor,backgroundColor:v.params.bgColor}" -->
 			<div :class="v.params.style" :style="{'background-image':'url('+v.data.icon+')',}">
 				<div class="shop_boxson">
-					<img src="__PAGE__/img/1.jpg" :class="v.params.show"/>
+					<img src="__PUBLIC__/page/img/1.jpg" :class="v.params.show"/>
 					<p :class="v.params.nameshow">神器商城</p>
 				</div>
 				<div :class="v.params.navshow">
@@ -250,7 +260,7 @@
 			<div class="notice" :style="{backgroundColor:v.params.bgColor}">
 				<div class="notice_icon">
 					<!-- <img class="vertical_centering" src="v['data']['icon']" /> -->
-					<img class="vertical_centering" src="/static/img/home/notice-icon.png" />
+					<img class="vertical_centering" src="__PUBLIC__/page/img/pc/notice-icon.png" />
 				</div>
 
 				<div class="scroll_notice">

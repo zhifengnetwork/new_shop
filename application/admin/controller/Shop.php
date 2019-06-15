@@ -107,18 +107,6 @@ class Shop extends Base
         }
     }
 
-    public function shopImageDel()
-    {
-        $path = input('filename','');
-        Db::name('goods_images')->where("image_url",$path)->delete();
-    }
-
-    
-    public function getKeysList () {
-        $list = model('DiyKeys')->where('status',1)->select();
-        return json($list);
-    }
-
     public function editShop () {
             $id        = I('id');
             $page_name = I('page_name');
@@ -170,16 +158,6 @@ class Shop extends Base
             $this->ajaxReturn(['code'=>1,'msg'=>"操作成功",'total' => $data['total'],'per_page'=>$data['per_page'],'last_page' => $data['last_page'],'current_page' => $data['current_page'],'data' =>$data['list']]);
         }else{
             $this->ajaxReturn(['code'=>0,'msg'=>'还没有商品哦','data'=>'']);
-        }
-    }
-
-    public function categoryList () {
-        $list  = Db::table('category')->order('sort DESC,cat_id ASC')->select();
-        if (!empty($list)){
-            $list  = getTree1($list);
-            return json(['code'=>1,'msg'=>'','data'=>$list]);
-        }else{
-            return json(['code'=>0,'msg'=>'没有数据哦','data'=>$list]);
         }
     }
 

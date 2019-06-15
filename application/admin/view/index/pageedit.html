@@ -2,9 +2,6 @@
 <body style="background-color: rgb(255, 255, 255); overflow: auto; cursor: default; -moz-user-select: inherit;">
 <link rel="stylesheet" href="__PAGE__/css/pc/public/public.css" />
 <link rel="stylesheet" href="__PAGE__/css/pc/edit_index.css" />
-
-<script src="__PAGE__/js/pc/public/
-.js"></script>
 <script src="__PAGE__/js/pc/public/axios.js"></script>
 <script src="__PAGE__/js/pc/public/swiper.min.js"></script>
 <div class="wrapper_page" id="edit_app_wrap">
@@ -479,11 +476,11 @@
                             </div>
                             <div class="edit_link">
                                 <div class="edit_shop">商品名称<span>{{v.goods_name}}</span></div>
-                                <div class="edit_shop">商品价格<span>￥{{v.price}}<s>￥{{v.original_price}}</s></span></div>
+                                <div class="edit_shop">商品价格<span>￥{{v.shop_price}}<s>￥{{v.market_price}}</s></span></div>
                             </div>
                             <!--删除按钮-->
                             <div class="edit_del" @click="delItem(i)">
-                                <img src="../../img/pc/delete_icon.png" alt="">
+                                <img src="__ROOT__/public/img/pc/delete_icon.png" alt="">
                             </div>
                         </div>
                         <p class="edit_sub" @click.stop="two_way_button()">添加一个商品</p>
@@ -1494,7 +1491,7 @@
                                 text: '按钮文字',
                                 texts: '',
                                 locationS: '',
-                                url: '__PAGE__/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
+                                url: '__ROOT__/public/page/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
                                 siezColor: '#333333',
                                 newLoc: '',
                             },
@@ -1503,7 +1500,7 @@
                                 text: '按钮文字',
                                 texts: '',
                                 locationS: '',
-                                url: '__PAGE__/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
+                                url: '__ROOT__/public/page/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
                                 siezColor: '#333333',
                                 newLoc: '',
                             },
@@ -1512,7 +1509,7 @@
                                 text: '按钮文字',
                                 texts: '',
                                 locationS: '',
-                                url: '__PAGE__/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
+                                url: '__ROOT__/public/page/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
                                 siezColor: '#333333',
                                 newLoc: '',
                             },
@@ -1521,7 +1518,7 @@
                                 text: '按钮文字',
                                 texts: '',
                                 locationS: '',
-                                url: '__PAGE__/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
+                                url: '__ROOT__/public/page_/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
                                 siezColor: '#333333',
                                 newLoc: '',
                             },
@@ -2184,7 +2181,7 @@
                         text: '按钮文字',
                         texts: '',
                         locationS: '',
-                        url: '__PAGE__/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
+                        url: '__ROOT__/public/page/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
                         siezColor: '#333333',
                         newLoc: '',
                     })

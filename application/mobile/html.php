@@ -22,6 +22,7 @@ return [
         ],
         'view_replace_str'  =>  [
             '__PUBLIC__'=>'/public',
+            '__PAGE__'=>'/public/page',
             '__STATIC__' => '/template/mobile/rainbow/static',
             '__ROOT__'=>''
         ]

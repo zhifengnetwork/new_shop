@@ -563,11 +563,11 @@
                                             </div>
                                             <div class="edit_link">
                                                 <div class="edit_shop">商品名称<span>{{v.goods_name}}</span></div>
-                                                <div class="edit_shop">商品价格<span>￥{{v.price}}<s>￥{{v.original_price}}</s></span></div>
+                                                <div class="edit_shop">商品价格<span>￥{{v.shop_price}}<s>￥{{v.market_price}}</s></span></div>
                                             </div>
                                             <!--删除按钮-->
                                             <div class="edit_del" @click="delItem(i)">
-                                                <img src="../../img/pc/delete_icon.png" alt="">
+                                                <img src="__PAGE__/img/pc/delete_icon.png" alt="">
                                             </div>
                                         </div>
                                         <p class="edit_sub" @click.stop="two_way_button()">添加一个商品</p>
@@ -1021,8 +1021,8 @@
                                                 <img :src="v.original_img" />
                                             </div>
                                             <div>
-                                                <span class="primary">￥{{v.market_price}}</span>
-                                                <del class="fracture">￥{{v.shop_price}}</del>
+                                                <span class="primary">￥{{v.shop_price}}</span>
+                                                <del class="fracture">￥{{v.market_price}}</del>
                                             </div>
                                             <p>{{v.goods_name}}</p>
                                         </div>
@@ -1382,7 +1382,7 @@
 		//									/*商品名称*/
 		//									goods_name: "82年阔落",
 		//									/*商品封面*/
-		//									img: "../../img/0004.png",
+		//									img: "__PAGE__/img/0004.png",
 		//									/*限时卖开始时间*/
 		//									limited_end: 0,
 		//									/*限时卖结束时间*/
@@ -1451,7 +1451,7 @@
 								navcolor:"backColor",			
 							},
 							data: {
-								icon: '../../img/0006.png',
+								icon: '__PAGE__/img/0006.png',
 							}
 						},
                 /*搜索框，数据初始化*/
@@ -1497,7 +1497,7 @@
                                 text: '按钮文字',
                                 texts: '',
                                 locationS: '',
-                                url: '__PAGE__/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
+                                url: '__ROOT__/public/page/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
                                 siezColor: '#333333',
                                 newLoc: '',
                             },
@@ -1506,7 +1506,7 @@
                                 text: '按钮文字',
                                 texts: '',
                                 locationS: '',
-                                url: '__PAGE__/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
+                                url: '__ROOT__/public/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
                                 siezColor: '#333333',
                                 newLoc: '',
                             },
@@ -1515,7 +1515,7 @@
                                 text: '按钮文字',
                                 texts: '',
                                 locationS: '',
-                                url: '__PAGE__/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
+                                url: '__ROOT__/public/page/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
                                 siezColor: '#333333',
                                 newLoc: '',
                             },
@@ -1524,7 +1524,7 @@
                                 text: '按钮文字',
                                 texts: '',
                                 locationS: '',
-                                url: '__PAGE__/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
+                                url: '__ROOT__/public/page/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
                                 siezColor: '#333333',
                                 newLoc: '',
                             },
@@ -1637,7 +1637,7 @@
                         // 更多链接
                         moreUrl: '',
                         /*公告图标*/
-                        icon: '__PAGE__/img/pc/notice-icon.png',
+                        icon: '_ROOT__/public/page/img/pc/notice-icon.png',
                     }
                 },
                 /*辅助空白，数据初始化*/
@@ -2183,7 +2183,7 @@
                         text: '按钮文字',
                         texts: '',
                         locationS: '',
-                        url: '__PAGE__/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
+                        url: '/public/page/img/pc/phone/d058ccbf6c81800aedd20eb5b43533fa828b4752.jpg',
                         siezColor: '#333333',
                         newLoc: '',
                     })
