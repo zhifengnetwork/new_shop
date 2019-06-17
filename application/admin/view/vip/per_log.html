@@ -29,7 +29,7 @@
 				<h5>(共{$count}条记录)</h5>
 			</div>
 			<div title="刷新数据" class="pReload"><i class="fa fa-refresh"></i></div>
-			<form class="navbar-form form-inline" id="search-form" method="get" action="{:U('Distribution/per_log')}" onsubmit="return check_form();">
+			<form class="navbar-form form-inline" id="search-form" method="get" action="{:U('Vip/per_log')}" onsubmit="return check_form();">
 				<input type="hidden" name="ctime" id="ctime" value="{$ctime}">
 				<div class="sDiv">
 					<div class="sDiv2" style="margin-right: 10px;">
@@ -98,9 +98,9 @@
 						<th align="center" abbr="article_time" axis="col6" class="">
 							<div style="text-align: center; width: 200px;" class="">描述</div>
                         </th>
-                        <th align="center" abbr="article_time" axis="col6" class="">
-							<div style="text-align: center; width: 200px;" class="">操作</div>
-						</th>
+                        <!--<th align="center" abbr="article_time" axis="col6" class="">-->
+							<!--<div style="text-align: center; width: 200px;" class="">操作</div>-->
+						<!--</th>-->
 						<th style="width:100%" axis="col7">
 							<div></div>
 						</th>
@@ -148,11 +148,11 @@
 							<td align="center" class="">
 								<div style="text-align: center; width: 200px;">{$vo.note}</div>
                             </td>
-                            <td align="center" class="handle">
-								<div style="text-align: center; width: 200px; max-width:200px;">
-									<a class="btn blue" href="{:U('Distribution/log_detail',array('id'=>$vo['performance_id']))}"><i class="fa fa-search"></i>查看</a>
-								</div>
-							</td>
+                            <!--<td align="center" class="handle">-->
+								<!--<div style="text-align: center; width: 200px; max-width:200px;">-->
+									<!--<a class="btn blue" href="{:U('Distribution/log_detail',array('id'=>$vo['performance_id']))}"><i class="fa fa-search"></i>查看</a>-->
+								<!--</div>-->
+							<!--</td>-->
 							<td align="" class="" style="width: 100%;">
 								<div>&nbsp;</div>
 							</td>
