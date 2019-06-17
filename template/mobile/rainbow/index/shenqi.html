@@ -147,25 +147,25 @@
 					:href="'{:U('Mobile/Goods/goodsInfo',[],false)}/id/'+item.goods_id">
 
 					<div class="modle_shop_img">
-						<img :src="item.img" alt="">
+						<img :src="item.original_img" alt="">
 						<div class="modle_shop_attr" :class="v.params.attr"></div>
 					</div>
 					<div class="modle_shop_info">
 						<p class="modle_shop_name">{{item.goods_name}}</p>
 						<div class="modle_shop_price" :class="v.params.price">
-							￥{{item.price}}<s>￥{{item.original_price}}</s>
+							￥{{item.shop_price}}<s>￥{{item.market_price}}</s>
 							<div class="modle_shop_buybtn" :class="v.params.btnStyle"></div>
 						</div>
 					</div>
 				</a>
 				<!-- 显示多个 -->
 				<a :class="v.params.listStyle" v-if="v.params.listStyle!='modle_shop_item'" v-for="item in v.data.msg"
-					href="#">
+					:href="'{:U('Mobile/Goods/goodsInfo',[],false)}/id/'+item.goods_id">
 					<div class="modle_shop_img">
-						<img :src="item.img" alt="">
+						<img :src="item.original_img" alt="">
 						<div class="modle_shop_attr" :class="v.params.attr"></div>
 						<p class="modle_shop_price" :class="v.params.price">
-							￥{{item.price}}<s>￥{{item.original_price}}</s>
+							￥{{item.shop_price}}<s>￥{{item.market_price}}</s>
 						</p>
 					</div>
 					<div class="modle_shop_info" :class="v.params.name">
@@ -1678,7 +1678,7 @@
 .res .searchBtn {
 	width: 40px;
 	height: 40px;
-	background: url(../../img/pc/searchObj/search_ico.png) no-repeat center;
+	background: url(__PAGE__/img/pc/searchObj/search_ico.png) no-repeat center;
 	background-size: 60%;
 	float: left;
 	border: 0;

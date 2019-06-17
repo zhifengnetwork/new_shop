@@ -683,6 +683,36 @@ class User extends MobileBase
         return $this->fetch();
     }
 
+
+    /**
+     * 我的VIP
+     */
+    public function team_vip_list()
+    {
+        $user_id = $this->user_id;
+         
+        $leader_id = M('users')->where('user_id',$user_id)->value('first_leader');
+        $leader = M('users')->where('user_id',$leader_id)->field('nickname,mobile,head_pic')->find();
+        $first = M('users')->where(['first_leader' =>$user_id,'end_time' => ['neq' ,0]])->column('user_id');
+        $second = $first ? M('users')->where(['first_leader'=>['in',$first],'end_time' => ['neq',0]])->column('user_id') : [];
+        $third = $second ? M('users')->where(['first_leader'=>['in',$second],'end_time' => ['neq',0]])->column('user_id') : [];
+
+        $first_count = count($first);
+        $second_count = count($second);
+        $third_count = count($third);
+
+        $team_count = Db::query("SELECT count(*) as count FROM tp_parents_vip_cache where find_in_set('$user_id',`parents`)");
+        //$team_count = Db::query("SELECT count(*) as count FROM tp_users where find_in_set('$user_id',`parents`)");
+
+        $this->assign('first_count',$first_count);
+        $this->assign('second_count',$second_count);
+        $this->assign('third_count',$third_count);
+        $this->assign('team_count',$team_count[0]['count'] ? $team_count[0]['count'] : 0);
+        $this->assign('leader',$leader);
+        // $this->assign('count',$count);
+        // $this->assign('team',$team_list);
+        return $this->fetch();
+    }
     /**
      * 三级分销
      */
@@ -692,9 +722,55 @@ class User extends MobileBase
         $leader_ids = I('ids',[]);
         $type = I('type',1);
         $page = I('page',1);
-
+       
         $where = array();
+       
+        switch($type){
+            //一级
+            case 1:
+                $where['first_leader'] = $user_id;
+                break;
+            //二级
+            case 2:
+                $first = M('users')->where('first_leader',$user_id)->column('user_id');
+                $where['first_leader'] = $first ? ['in',$first] : array();
+                break;
+            //三级
+            case 3:
+                $first = M('users')->where('first_leader',$user_id)->column('user_id');
+                $second = $first ? M('users')->where(['first_leader'=>['in',$first]])->column('user_id') : [];
+                $where['first_leader'] = $second ? ['in',$second] : array();
+                break;
+            default: break;
+        }
 
+        $team_list = array();
+        if ($where['first_leader']) {
+            //获取对应下级id的数据
+            $team_list = Db::name('users')->where($where)->field('user_id,nickname,mobile,distribut_level,distribut_money,head_pic')->page($page,15)->select();
+        }
+
+        $level = M('agent_level')->column('level,level_name');
+
+        foreach($team_list as $k1 => $v1){
+            $team_list[$k1]['level_name'] = $level[$v1['distribut_level']];
+        }
+
+        return json($team_list);
+    }
+
+
+    /**
+     * 三级分销VIP
+     */
+    public function three_vip_level()
+    {
+        $user_id = $this->user_id;
+        $leader_ids = I('ids',[]);
+        $type = I('type',1);
+        $page = I('page',1);
+        $where = array();
+        $where['end_time']     = ['neq',0];
         switch($type){
             //一级
             case 1:

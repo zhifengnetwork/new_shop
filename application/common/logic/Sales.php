@@ -85,6 +85,8 @@ class Sales extends Model
 		return $reward;
 	}
 
+
+
 	// //是否重复购买
 	// public function repeat_buy($user_id,$goods_id)
 	// {

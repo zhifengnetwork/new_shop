@@ -49,6 +49,28 @@ class Distribution extends Base
         return $this->fetch();
     }
 
+
+     /**
+     * VIP等级列表
+     */
+    public function agent_vip_level()
+    {
+        $Ad = M('agent_vip_level');
+        $p = $this->request->param('p');
+        $res = $Ad->order('level_id')->page($p . ',10')->select();
+        if ($res) {
+            foreach ($res as $val) {
+                $list[] = $val;
+            }
+        }
+        $this->assign('list', $list);
+        $count = $Ad->count();
+        $Page = new Page($count, 10);
+        $show = $Page->show();
+        $this->assign('page', $show);
+        return $this->fetch();
+    }
+
     /**
      * 分销商等级
      */
