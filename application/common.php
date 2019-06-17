@@ -244,6 +244,75 @@ function getGoodsSpecImg($goods_id,$item_id){
 }
 
 /**
+ *  分类缩略图 给于标签调用 拿出分类表的 image 原始图来裁切出来的
+ * @param type $goods_id  商品分类id
+ * @param type $width     生成缩略图的宽度
+ * @param type $height    生成缩略图的高度
+ * @ahthor zgp 2019.6.17
+ */
+function cate_thum_images($goods_id, $width, $height,$item_id=0)
+{
+    if (empty($goods_id)) return '';
+    //判断缩略图是否存在
+    $path = UPLOAD_PATH."category/thumb/$goods_id/";
+    $goods_thumb_name = "category_thumb_{$goods_id}_{$item_id}_{$width}_{$height}";
+
+    // 这个商品 已经生成过这个比例的图片就直接返回了
+    if (is_file($path . $goods_thumb_name . '.jpg')) return '/' . $path . $goods_thumb_name . '.jpg';
+    if (is_file($path . $goods_thumb_name . '.jpeg')) return '/' . $path . $goods_thumb_name . '.jpeg';
+    if (is_file($path . $goods_thumb_name . '.gif')) return '/' . $path . $goods_thumb_name . '.gif';
+    if (is_file($path . $goods_thumb_name . '.png')) return '/' . $path . $goods_thumb_name . '.png';
+    $original_img = '';//先定义空字符变量
+    if($item_id){
+        $original_img = Db::name('goods_category')->where("id", $goods_id)->cache(true, 30, 'image')->value('image');
+    }
+    if(empty($original_img)){
+        $original_img = Db::name('goods_category')->where("id", $goods_id)->cache(true, 30, 'image')->value('image');
+    }
+
+
+    if (empty($original_img)) {
+        return '/template/mobile/rainbow/static/images/zy.png';
+    }
+
+    if(tpCache('oss.oss_switch')){
+        $ossClient = new \app\common\logic\OssLogic;
+        if (($ossUrl = $ossClient->getGoodsThumbImageUrl($original_img, $width, $height))) {
+            return $ossUrl;
+        }
+    }
+
+    $original_img = '.' . $original_img; // 相对路径
+    if (!is_file($original_img)) {
+        return '/template/mobile/rainbow/static/images/zy.png';
+    }
+
+    try {
+        require_once 'vendor/topthink/think-image/src/Image.php';
+        require_once 'vendor/topthink/think-image/src/image/Exception.php';
+        if(strstr(strtolower($original_img),'.gif'))
+        {
+            require_once 'vendor/topthink/think-image/src/image/gif/Encoder.php';
+            require_once 'vendor/topthink/think-image/src/image/gif/Decoder.php';
+            require_once 'vendor/topthink/think-image/src/image/gif/Gif.php';
+        }
+        $image = \think\Image::open($original_img);
+
+        $goods_thumb_name = $goods_thumb_name . '.' . $image->type();
+        // 生成缩略图
+        !is_dir($path) && mkdir($path, 0777, true);
+        // 参考文章 http://www.mb5u.com/biancheng/php/php_84533.html  改动参考 http://www.thinkphp.cn/topic/13542.html
+        $image->thumb($width, $height, 2)->save($path . $goods_thumb_name, NULL, 100); //按照原图的比例生成一个最大为$width*$height的缩略图并保存
+        $img_url = '/' . $path . $goods_thumb_name;
+        return $img_url;
+    } catch (think\Exception $e) {
+
+        return $original_img;
+    }
+}
+
+
+/**
  *  商品缩略图 给于标签调用 拿出商品表的 original_img 原始图来裁切出来的
  * @param type $goods_id  商品id
  * @param type $width     生成缩略图的宽度
@@ -252,7 +321,6 @@ function getGoodsSpecImg($goods_id,$item_id){
  */
 function goods_thum_images($goods_id, $width, $height,$item_id=0)
 {
-
     if (empty($goods_id)) return '';
     //判断缩略图是否存在
     $path = UPLOAD_PATH."goods/thumb/$goods_id/";
@@ -1264,7 +1332,7 @@ function order_give($order)
  */
 function get_goods_category_tree(){
     $tree = $arr = $result = array();
-    $cat_list = M('goods_category')->cache(true)->where(['is_show' => 1])->order('sort_order')->select();//所有分类
+    $cat_list = M('goods_category')->where(['is_show' => 1])->order('sort_order')->select();//所有分类
     if($cat_list){
         foreach ($cat_list as $val){
             if($val['level'] == 2){
