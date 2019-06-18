@@ -380,7 +380,7 @@
 			<span><a href="{:U('Mobile/User/sign_list')}"><img src="__STATIC__/images/sign_in.gif"/><p>现金签到</p></a></span>
 			<span><a href="{:U('Mobile/Goods/goodsList',array('id'=>$black_technology))}"><img src="__STATIC__/images/black_technology.png"/><p>黑科技馆</p></a></span>
 			<span><a href="{:U('Mobile/Goods/goodsList',array('id'=>$quantum))}"><img src="__STATIC__/images/quantum.png"/><p>量子体验</p></a></span>
-			<span><a href="#"><img src="__STATIC__/images/the_pig.gif"/><p>猪年大发</p></a></span>
+			<span id="vip"><a href="#"><img src="__STATIC__/images/the_pig.gif"/><p>猪年大发</p></a></span>
 		</div>
 
 		<!--nav区域结束-->
@@ -444,6 +444,10 @@
 		<!--商品end-->
 		<p class="guanzhu">点击关注公众号</p>
 		<!--底部导航-start-->
+		<form method="post"  id="recharge_form" action="{:U('Mobile/Payment/getvipPay')}">
+			<div class="loginsingup-input mobil_topup" style="padding:0 0.64rem;">
+					<input type="hidden" name="order_id" value="{$order.order_id}">
+		</form>
 
 		<!-- <div class="bottomNavWrap container1" id="bottomNavWrap" data-id="0"></div> -->
 		<include file="public/footer_nav" />
@@ -490,6 +494,9 @@
 				// }
 				// ajax_sourch_submit();
 			});
+			$('#vip').on('click',function(){
+				$('#recharge_form').submit();
+			})
 			/**
 			 * 继续加载猜您喜欢
 			 * */

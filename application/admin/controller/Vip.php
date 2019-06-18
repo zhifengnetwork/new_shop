@@ -33,6 +33,7 @@ class Vip extends Base
      * @return mixed
      */
     public function commission_log(){
+        
         $Ad = M('vip_commission_log');
         $p = input('p/d');
 
@@ -112,142 +113,7 @@ class Vip extends Base
         return $this->fetch();
     }
 
-    /**
-     * 业绩日志
-     * @return mixed
-     */
-    public function per_log(){
-        $Ad = M('agent_performance_log');
-        $p = input('p/d');
-        $ctime = urldecode(I('ctime'));
-        $user_name = I('user_name');
-        $order_sn = I('order_sn');
-        $permin = I('permin');
-        $permax = I('permax');
-        $start_time = I('start_time');
-        $end_time = I('end_time');
-
-        $where = [];
-
-        if($user_name){
-            $user['nickname'] = ['like', "%$user_name%"];
-            $id_list = M('users')->where($user)->column('user_id');
-            $where['user_id'] = $id_list ? ['in',$id_list] : '';
-        }
-        if($ctime){
-            $gap = explode(' - ', $ctime);
-            $where['create_time'] = [['>= time',strtotime($start_time)],['< time',strtotime($end_time." 23:59:59")],'and'];
-        }
-        if ($order_sn) {
-            $order_ids = M('order')->where('order_sn','like',"%$order_sn%")->column('order_id');
-            $where['order_id'] = ['in',$order_ids];
-        }
-        if ($permin || $permax) {
-            $where['money'] = ['between',[floatval($permin),floatval($permax)]];
-        }
-
-        //vip购买的才显示
-        $where['is_vip'] = 1;
-        $res = $Ad->where($where)->order('performance_id','desc')->page($p . ',20')->select();
-        $user_ids = array();
-        if ($res) {
-            foreach ($res as $val) {
-                $list[] = $val;
-            }
-            $user_ids = array_column($list, 'user_id');
-            $avatar = get_avatar($user_ids);
-            foreach ($list as $key => $value) {
-                $list[$key]['head_pic'] = $avatar[$value['user_id']];
-            }
-        }
-
-        $total_per = $Ad->where($where)->sum('money');
-
-        $this->assign('total_per',$total_per);
-        $this->assign('user_name',$user_name);
-        $this->assign('start_time',$start_time);
-        $this->assign('end_time',$end_time);
-        $this->assign('ctime',$gap[0].' - '.$gap[1]);
-        $this->assign('order_sn',$order_sn);
-        $this->assign('permin',$permin);
-        $this->assign('permax',$permax);
-        $this->assign('list', $list);
-        $count = $Ad->where($where)->count();
-        $Page = new Page($count, 20);
-        $show = $Page->show();
-        $this->assign('count',$count);
-        $this->assign('page', $show);
-        return $this->fetch();
-    }
-
-    /**
-     * vip业绩
-     * @return mixed
-     */
-    public function per_list(){
-        $Ad = M('agent_performance');
-        $p = input('p/d');
-        $ctime = urldecode(I('ctime'));
-        $ttype = I('ttype');
-        $user_name = I('user_name');
-        $min = I('min');
-        $max = I('max');
-        $per_type = I('per_type');
-        $where = [];
-        $start_time = I('start_time');
-        $end_time = I('end_time');
-
-        if($user_name){
-            $user['nickname'] = ['like', "%$user_name%"];
-
-            $id_list = M('users')->where($user)->column('user_id');
-
-            $where['user_id'] = $id_list ? ['in',$id_list] : '';
-        }
-
-        if($ctime){
-            $gap = explode(' - ', $ctime);
-            $time_val = array('1'=>"create_time",'2'=>"update_time");
-            $where[$time_val[$ttype]] = [['>= time',strtotime($start_time)],['< time',strtotime($end_time." 23:59:59")],'and'];
-        }
-
-        if ($min || $max) {
-            $val = array('1'=>"ind_per",'2'=>"agent_per",'3'=>"ind_goods_sum",'4'=>"agent_goods_sum");
-            $where[$val[$per_type]] = ['between',[floatval($min),floatval($max)]];
-        }
-
-        //vip购买的才显示
-        $where['is_vip'] = 1;
-        $res = $Ad->where($where)->order('performance_id','desc')->page($p . ',20')->select();
-        if ($res) {
-            foreach ($res as $val) {
-                $list[] = $val;
-            }
-            $user_ids = array_column($list, 'user_id');
-            $avatar = get_avatar($user_ids);
-
-            foreach ($list as $key => $value) {
-                $list[$key]['head_pic'] = $avatar[$value['user_id']];
-            }
-        }
-
-        $this->assign('user_name',$user_name);
-        $this->assign('start_time',$start_time);
-        $this->assign('end_time',$end_time);
-        $this->assign('ctime',$gap[0].' - '.$gap[1]);
-        $this->assign('ttype',$ttype);
-        $this->assign('min',$min);
-        $this->assign('max',$max);
-        $this->assign('per_type',$per_type);
-        $this->assign('list', $list);
-        $count = $Ad->where($where)->count();
-        // $count = $Ad->count();
-        $Page = new Page($count, 20);
-        $show = $Page->show();
-        $this->assign('count',$count);
-        $this->assign('page', $show);
-        return $this->fetch();
-    }
+   
 
     //购买返佣
     public function export_commission_log()

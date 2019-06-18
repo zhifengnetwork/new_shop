@@ -178,6 +178,70 @@ class Payment extends MobileBase
         return $this->fetch('recharge'); //分跳转 和不 跳转
     }
 
+
+    public function getvipPay()
+    {
+        header("Content-type:text/html;charset=utf-8");
+        $order_id = I('order_id/d'); //订单id
+        if(is_ios()  && empty($order_id)){
+            $order_id = session('pay_order_id');
+        }
+        $user = session('user');
+        $data['account'] = I('account');
+        if ($order_id > 0) {
+            M('buy_vip')->where(array('order_id' => $order_id, 'user_id' => $user['user_id']))->save($data);
+        } else {
+            $body = 'VIP购买';
+        	$data['user_id']  = $user['user_id'];
+            $data['nickname'] = $user['nickname'];
+            $data['account']  = 1;
+        	$data['order_sn'] = 'vip'.get_rand_str(10,0,1);
+        	$data['ctime']    = time();
+        	$order_id = M('buy_vip')->add($data);
+        }
+        if ($order_id) {
+            $order = M('recharge')->where("order_id", $order_id)->find();
+            if (is_array($order) && $order['pay_status'] == 0) {
+                $order['order_amount'] = $order['account'];
+                $pay_radio = $_REQUEST['pay_radio'];
+                $config_value = parse_url_param($pay_radio); // 类似于 pay_code=alipay&bank_code=CCB-DEBIT 参数
+                $config_value['body'] = $body; // 加上body 微信需要
+                $payment_arr = M('Plugin')->where("`type` = 'payment'")->getField("code,name");
+                M('buy_vip')->where("order_id", $order_id)->save(array('pay_code' => $this->pay_code, 'pay_name' => $payment_arr[$this->pay_code]));
+                //微信JS支付
+                if ($this->pay_code == 'weixin' && $_SESSION['openid'] && strstr($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger')) {
+                    $code_str = $this->payment->getJSAPI($order);
+                    exit($code_str);
+                } elseif ($this->pay_code == 'weixinH5') {
+                    //微信H5支付
+                    $return = $this->payment->get_code($order, $config_value);
+                    if ($return['status'] != 1) {
+                        $this->error($return['msg']);
+                    }
+                    $this->assign('deeplink', $return['result']);
+                } else {
+                    $code_str = $this->payment->get_code($order, $config_value);
+                }
+            } else {
+                $this->error('此购买订单，已完成支付!');
+            }
+        } else {
+            $this->error('提交失败,参数有误!');
+        }
+        $this->assign('code_str', $code_str);
+        $this->assign('order_id', $order_id);
+        return $this->fetch('recharge'); //分跳转 和不 跳转
+    }
+
+
+    
+
+
+
+
+
+
+
     // 服务器点对点 // http://www.tp-shop.cn/index.php/Home/Payment/notifyUrl
     public function notifyUrl()
     {

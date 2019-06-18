@@ -1051,11 +1051,11 @@ function rechargevip_rebate($order) {
 }
 
 /**
- * 购买VIP返利上级
+ * 购买VIP返佣
  * $user_id 用户ID
  */
-function buy_vip_rebate($user_id = 0,$order_sn = 0){
-    $first_leader = M('users')->where(['user_id' => $user_id,'end_time' => ['lt',time()]])->value('first_leader');
+function buy_vip_rebate($user_id = 8840,$order_sn = 0,$order_id=0){
+    $first_leader = M('users')->where(['user_id' => $user_id,'end_time' => ['gt',time()]])->value('first_leader');
     if($first_leader != 0 && $first_leader > 0){
          $num ++;
          $my_prize = 0.1;
@@ -1065,11 +1065,35 @@ function buy_vip_rebate($user_id = 0,$order_sn = 0){
          $distribut_money_vip = $my_prize + $user['distribut_money_vip'];
          $bool = M('users')->where('user_id',$user_id)->update(['user_money'=>$my_user_money,'distribut_money'=>$my_distribut_money,'distribut_money_vip' => $distribut_money_vip]);
          //记录用户余额变动
-         setBalanceLog($first_leader,13,$my_prize,$my_user_money,'VIP奖：'.$my_prize,$order['order_sn']);
+         setBalanceLog($first_leader,13,$my_prize,$my_user_money,'VIP返佣奖：'.$my_prize,$order_sn);
+         //购买VIP返佣日志
+         vip_commission_log($order_id,$user_id,$first_leader,$order_sn,0.1);
          if($num < 6){
-             $this->buy_vip_rebate($first_leader); 
+             buy_vip_rebate($first_leader,$order_sn,$order_id); 
          }
     }
+}
+
+
+/***
+ * 购买VIP商品佣金日志
+ */
+function vip_commission_log($order_id,$user_id,$to_user_id,$order_sn,$money){
+    $data = array(
+        'order_id'   =>   $order_id,
+        'user_id'    =>   $user_id,
+        'to_user_id' =>   $to_user_id,
+        'money'      =>   '0.1',
+        'order_sn'   =>   $order_sn,
+        'goods_id'   =>   0,
+        'num'        =>   1,
+        'type'       =>   1,
+        'distribut_type' => 1,    
+        'status'         => 1,
+        'money'          => $money,
+        'create_time'    => time(),
+    );
+    $bool = M('vip_commission_log')->insert($data);
 }
 
 /**
@@ -1094,8 +1118,14 @@ function update_pay_status($order_sn,$ext=array())
             $msg = '会员充值购买VIP';
         }
         accountLog($order['user_id'],$order['account'],0, $msg, 0, 0, $order_sn);
+    }else if(stripos($order_sn,'vip') !== false){
+        //用户在线充值
+        $order = M('buy_vip')->where(['order_sn' => $order_sn, 'pay_status' => 0])->find();
+        if (!$order) return false;// 看看有没已经处理过这笔订单  支付宝返回不重复处理操作
+        M('buy_vip')->where("order_sn",$order_sn)->save(array('pay_status'=>1,'pay_time'=>$time));
+        buy_vip_rebate($order['user_id'],$order['order_sn'],$order['order_id']);
     }else{
-        // 如果这笔订单已经处理过了
+         // 如果这笔订单已经处理过了
         $count = M('order')->master()->where("order_sn = :order_sn and (pay_status = 0 OR pay_status = 2)")->bind(['order_sn'=>$order_sn])->count();   // 看看有没已经处理过这笔订单  支付宝返回不重复处理操作
         if($count == 0) return false;
         // 找出对应的订单
@@ -1139,12 +1169,9 @@ function update_pay_status($order_sn,$ext=array())
         # 存入一条微信模板消息待发记录
         $tcmoney = $order['order_amount'] > 0 ? $order['order_amount'] : $order['total_amount'];
         Db::name('wx_temp_cache')->insert(['user_id'=>$order['user_id'],'type'=>'Purchase_Success','tid'=>$order['order_id'],'money'=>$tcmoney,'time'=>time()]);
-        if($order['is_vip']){
-            buy_vip_rebate($order['user_id'],$order['order_sn']);
-        }else{
-             //购买返佣
-            $sales = sales($order['order_id']);
-        }
+        //购买返佣
+        $sales = sales($order['order_id']);
+       
         
          
 
@@ -1197,6 +1224,9 @@ function update_pay_status($order_sn,$ext=array())
         $wechat = new \app\common\logic\WechatLogic;
         $wechat->sendTemplateMsgOnPaySuccess($order);
     }
+
+
+
 }
 
 /**
@@ -2089,7 +2119,7 @@ function setAccountLog($user_id,$type=0, $user_money = 0,$pay_points = 0, $desc 
  * @param $order_sn   订单编号
  */
 function setBalanceLog($user_id,$type=0,$change_money=0,$balance=0,$desc='',$order_sn=''){
-    if(is_numeric($user_id) && $user_id>0 && in_array($type,array(0,1,2,3,4,5,6,7,8,9,10,11,12))){
+    if(is_numeric($user_id) && $user_id>0 && in_array($type,array(0,1,2,3,4,5,6,7,8,9,10,11,12,13))){
         $data=array('user_id'=>$user_id,'type'=>$type,'change_money'=>$change_money,'balance'=>$balance,'desc'=>$desc,'order_sn'=>$order_sn,'change_time'=>time());
         M('change_balance_log')->add($data);
         return 1;
