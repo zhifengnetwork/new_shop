@@ -183,6 +183,7 @@ body{
                     <li onclick="all_record('income',4)">分红</li>
                     <li onclick="all_record('income',5)">自购优惠</li>
                     <li onclick="all_record('income',6)">全球分红</li>
+                    <li onclick="all_record('income',7)">VIP奖励</li>
                 </ul>
                 <div class="box_box"> 
                     <div class="box2" style="display:block;">
@@ -199,6 +200,9 @@ body{
                     </div>
                     <div class="box2">
                        
+                    </div>
+                    <div class="box2">
+                      
                     </div>
                     <div class="box2">
                       
@@ -267,7 +271,7 @@ body{
             data: {'type':type,'distribut_type':distribut_type,'page':page},
             url: '/mobile/user/get_record',
             success: function(data){
-                // console.log(data);
+                console.log(data);
                 $(".box_box .box2").removeClass("wu")
                 $(".box1 .tit").removeClass("wu")
                 if (data.length > 0) {

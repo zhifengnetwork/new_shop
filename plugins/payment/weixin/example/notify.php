@@ -52,18 +52,19 @@ class PayNotifyCallBack extends WxPayNotify
         if (strlen($order_sn) > 18) {
             $order_sn = substr($order_sn, 0, 18);
         }
-
+       
         //用户在线充值
         if (stripos($order_sn, 'recharge') !== false) {
             $order_amount = M('recharge')->where(['order_sn' => $order_sn, 'pay_status' => 0])->value('account');
-        } else {
+        } else if(stripos($order_sn, 'vip') !== false){
+            $order_sn = substr($order_sn, 0, 13);
+            $order_amount = M('buy_vip')->where(['order_sn' => $order_sn, 'pay_status' => 0])->value('account');
+        }else{
             $order_amount = M('order')->where(['order_sn' => "$order_sn"])->value('order_amount');
         }
-
         if ((string)($order_amount * 100) != (string)$data['total_fee']) {
             return false; //验证失败
         }
-
         update_pay_status($order_sn, array('transaction_id' => $data["transaction_id"])); // 修改订单支付状态
 		
 		return true;

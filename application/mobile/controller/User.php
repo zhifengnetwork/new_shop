@@ -121,8 +121,10 @@ class User extends MobileBase
 
         
         $comm = $this->today_commission();
+        $is_vip = $this->user['end_time'] > time()?1:0;
         $this->user['today_comm'] = $comm;
         $this->assign('menu_list', $menu_list);
+        $this->assign('is_vip', $is_vip);
         $this->assign('mobile_validated', $this->user['mobile'] ? 0 : 1);
         return $this->fetch();
     }
@@ -135,12 +137,13 @@ class User extends MobileBase
         $where['type'] = ['in',[1,2,3]];
 
         $comm = Db::name('distrbut_commission_log')->where($where)->order('log_id','desc')->whereTime('create_time','today')->sum('money');
+        $vip  = Db::name('vip_commission_log')->where(['to_user_id' =>$user_id ])->order('log_id','desc')->whereTime('create_time','today')->sum('money');
 
         // $where['type'] = 4;
         // $comm2 = Db::name('distrbut_commission_log')->where($where)->order('log_id','desc')->whereTime('create_time','yesterday')->sum('money');
 
-        // $money = $comm1 + $comm2;
-        return $comm;
+        $money = $comm + $vip;
+        return $money;
     }
 
     //待收益
@@ -778,13 +781,13 @@ class User extends MobileBase
                 break;
             //二级
             case 2:
-                $first = M('users')->where('first_leader',$user_id)->column('user_id');
+                $first = M('users')->where(['first_leader' => $user_id , 'end_time' => ['neq' ,0]])->column('user_id');
                 $where['first_leader'] = $first ? ['in',$first] : array();
                 break;
             //三级
             case 3:
-                $first = M('users')->where('first_leader',$user_id)->column('user_id');
-                $second = $first ? M('users')->where(['first_leader'=>['in',$first]])->column('user_id') : [];
+                $first = M('users')->where(['first_leader' => $user_id , 'end_time' => ['neq' ,0]])->column('user_id');
+                $second = $first ? M('users')->where(['first_leader'=>['in',$first],'end_time' => ['neq',0]])->column('user_id') : [];
                 $where['first_leader'] = $second ? ['in',$second] : array();
                 break;
             default: break;
@@ -793,7 +796,7 @@ class User extends MobileBase
         $team_list = array();
         if ($where['first_leader']) {
             //获取对应下级id的数据
-            $team_list = Db::name('users')->where($where)->field('user_id,nickname,mobile,distribut_level,distribut_money,head_pic')->page($page,15)->select();
+            $team_list = Db::name('users')->where($where)->field('user_id,nickname,mobile,distribut_level,distribut_money_vip,head_pic')->page($page,15)->select();
         }
 
         $level = M('agent_level')->column('level,level_name');
@@ -818,6 +821,28 @@ class User extends MobileBase
             ->where('order.user_id',$id)
             ->order('order.pay_time','desc')
             ->field('goods.rec_id,order.pay_time,goods.goods_price,goods.goods_num')
+            ->limit(50)
+            ->select();
+
+        $user_info = Db::name('users')->where('user_id',$id)->field('nickname,mobile,head_pic')->find();
+
+        $this->assign('info',$user_info);
+        $this->assign('log',$log);
+        return $this->fetch();
+    }
+
+     /**
+     * 下级购买记录
+     */
+    public function vip_purchase_log()
+    {
+        $id = input('id/d');
+
+        $log = Db::name('buy_vip')
+            ->distinct(true)
+            ->where(['user_id' => $id ,'pay_status' => 1])
+            ->order('order_id desc')
+            ->field('account,ctime')
             ->limit(50)
             ->select();
 
@@ -1176,9 +1201,13 @@ class User extends MobileBase
         $result = array();
 
         if ($type == 'income') {
-            $where = get_comm_condition($distribut_type); //获取条件
 
-            $result = M('distrbut_commission_log')->where('to_user_id',$user_id)->where($where)->order('create_time','desc')->field('log_id,money,status,order_id,create_time')->page($page,15)->select();
+            $where = get_comm_condition($distribut_type); //获取条件
+            if($distribut_type == 7){
+                $result = M('vip_commission_log')->where('to_user_id',$user_id)->where($where)->order('create_time','desc')->field('log_id,money,status,order_id,create_time')->page($page,15)->select();
+            }else{
+                $result = M('distrbut_commission_log')->where('to_user_id',$user_id)->where($where)->order('create_time','desc')->field('log_id,money,status,order_id,create_time')->page($page,15)->select();
+            }
 
             foreach ($result as $key => $value) {
                 $result[$key]['create_time'] = date('Y-m-d H:i',$value['create_time']);
@@ -2211,6 +2240,7 @@ class User extends MobileBase
                 $bankCodeList[$val['code']] = unserialize($val['bank_code']);
             }
         }
+       
         $bank_img = include APP_PATH . 'home/bank.php'; // 银行对应图片
         $this->assign('paymentList', $paymentList);
         $this->assign('bank_img', $bank_img);

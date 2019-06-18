@@ -33,13 +33,19 @@ class Index extends MobileBase {
         $quantum = M('goods_category')->where($where_quantum)->value('id');
         // dump($quantum);die;
 
+         //微信浏览器
+         if (strstr($_SERVER['HTTP_USER_AGENT'], 'MicroMessenger')) {
+            $pay_code = 'weixin';
+         }else{
+            $pay_code = 'weixinH5';
+         }
         $wechat = Db::name('wx_user')->find();
         $this->assign('wechat_qr',$wechat);
 
         $store_notice = Db::name('config')->where('name','store_notice')->value('value');
         $this->assign('store_notice',$store_notice);
-
         $this->assign('goods_id',$goods_id);
+        $this->assign('pay_code',$pay_code);
         $this->assign('black_technology',$black_technology);
         $this->assign('quantum',$quantum);
         //首页商品

@@ -14,6 +14,11 @@
                     <if condition="isset($agnet_name[$user.distribut_level])">
                         {$agnet_name[$user.distribut_level]}
                     </if>
+
+                    <if condition="$is_vip eq 1">
+                      &nbsp;<span style="color:red">VIP</span> 
+                    </if>
+                    
                 </a>
             </div>
             <div class="user_top_name">
@@ -155,7 +160,7 @@
         let mobile_validated = '{$mobile_validated}';
         let _tpl = ``;
 
-        if(mobile_validated){
+        if(mobile_validated == 1){
             layer.open({
                 title:'请先绑定手机号！',
                 content:'<p style="text-align:center;color:red;">请先绑定手机号！</p>',

@@ -244,7 +244,7 @@ class Virtual extends Base
         $map['order_id'] = $order_id;
         $map['user_id'] = $this->user_id;
         $orderobj = $Order->where($map)->find();
-        if(!$orderobj) $this->error('没有获取到订单信息');
+        if(!$orderobj) $this->error('没有获取到订单信息3');
         // 添加属性  包括按钮显示属性 和 订单状态显示属性
         $order_info = $orderobj->append(['order_status_detail','virtual_order_button','order_goods'])->toArray();
         if($order_info['order_prom_type'] != 5){   //普通订单

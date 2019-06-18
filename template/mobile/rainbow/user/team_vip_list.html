@@ -259,12 +259,12 @@
                     for(let i = 0; i < data.length; i++){
                         var user_name = data[i].nickname ? data[i].nickname : data[i].mobile;
                         var head_pic = data[i].head_pic ? data[i].head_pic : '/public/images/user_default_icon.jpg';
-                        var url = '/Mobile/User/purchase_log';
+                        var url = '/Mobile/User/vip_purchase_log';
                         html += '<ul class="ul_liebiao"><li class="li1" style="margin:line-height;"><span><img src="' + head_pic
                              + '" style="border-radius:50%;" class="touxiang"><span class="nickname">' +user_name
                              + '</span></span></li><li class="li2" style="width:20%;">'+data[i].user_id
                              + '</li><li class="li2" style="width:30%;"><span>' + data[i].level_name
-                             + '</span></li><li class="li2"><span>' + data[i].distribut_money
+                             + '</span></li><li class="li2"><span>' + data[i].distribut_money_vip
                              + '</span></li><li class="li1" style="width:25%; margin:line-height;"><span><a href="' + url 
                              + '?id=' + data[i].user_id 
                              + '" style="color:dodgerblue">查看</a></span></li></ul>';

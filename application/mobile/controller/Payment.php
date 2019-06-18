@@ -181,10 +181,13 @@ class Payment extends MobileBase
 
     public function getvipPay()
     {
-        header("Content-type:text/html;charset=utf-8");
-        $order_id = I('order_id/d'); //订单id
+         header("Content-type:text/html;charset=utf-8");
+         $order_id = I('order_id/d'); //订单id
         if(is_ios()  && empty($order_id)){
             $order_id = session('pay_order_id');
+        }
+        if (!session('user')) {
+            $this->error('请先登录', U('User/login'));
         }
         $user = session('user');
         $data['account'] = I('account');
@@ -194,13 +197,13 @@ class Payment extends MobileBase
             $body = 'VIP购买';
         	$data['user_id']  = $user['user_id'];
             $data['nickname'] = $user['nickname'];
-            $data['account']  = 1;
+            $data['account']  = 0.01;
         	$data['order_sn'] = 'vip'.get_rand_str(10,0,1);
         	$data['ctime']    = time();
-        	$order_id = M('buy_vip')->add($data);
+            $order_id = M('buy_vip')->add($data);
         }
         if ($order_id) {
-            $order = M('recharge')->where("order_id", $order_id)->find();
+            $order = M('buy_vip')->where("order_id", $order_id)->find();
             if (is_array($order) && $order['pay_status'] == 0) {
                 $order['order_amount'] = $order['account'];
                 $pay_radio = $_REQUEST['pay_radio'];
@@ -215,6 +218,7 @@ class Payment extends MobileBase
                 } elseif ($this->pay_code == 'weixinH5') {
                     //微信H5支付
                     $return = $this->payment->get_code($order, $config_value);
+                   
                     if ($return['status'] != 1) {
                         $this->error($return['msg']);
                     }
@@ -230,7 +234,7 @@ class Payment extends MobileBase
         }
         $this->assign('code_str', $code_str);
         $this->assign('order_id', $order_id);
-        return $this->fetch('recharge'); //分跳转 和不 跳转
+        return $this->fetch('vip_recharge'); //分跳转 和不 跳转
     }
 
 

@@ -130,6 +130,9 @@ function get_comm_condition($type){
         case 6:
             $where['type'] = 4;
             break;
+        case 7:
+            $where['type'] = 1;
+            break;    
         default:
             break;
     }
@@ -1063,7 +1066,7 @@ function buy_vip_rebate($user_id = 8840,$order_sn = 0,$order_id=0){
          $my_user_money       = $my_prize + $user['user_money'];
          $my_distribut_money  = $my_prize + $user['distribut_money'];
          $distribut_money_vip = $my_prize + $user['distribut_money_vip'];
-         $bool = M('users')->where('user_id',$user_id)->update(['user_money'=>$my_user_money,'distribut_money'=>$my_distribut_money,'distribut_money_vip' => $distribut_money_vip]);
+         $bool = M('users')->where('user_id',$first_leader)->update(['user_money'=>$my_user_money,'distribut_money'=>$my_distribut_money,'distribut_money_vip' => $distribut_money_vip]);
          //记录用户余额变动
          setBalanceLog($first_leader,13,$my_prize,$my_user_money,'VIP返佣奖：'.$my_prize,$order_sn);
          //购买VIP返佣日志
@@ -1096,6 +1099,20 @@ function vip_commission_log($order_id,$user_id,$to_user_id,$order_sn,$money){
     $bool = M('vip_commission_log')->insert($data);
 }
 
+/***
+ * 叠加会员时间
+ */
+function vip_end_time($user_id){
+  $user     = M('users')->where('user_id',$user_id)->field('end_time')->find();
+  if($user['end_time'] == 0){
+    $end_time =  time() + 2592000;
+  }else{
+    $end_time =  $user['end_time'] + 2592000;
+  }
+  
+  $bool = M('users')->where('user_id',$user_id)->update(['end_time'=>$end_time]);
+}
+
 /**
  * 支付完成修改订单
  * @param $order_sn 订单号
@@ -1123,6 +1140,8 @@ function update_pay_status($order_sn,$ext=array())
         $order = M('buy_vip')->where(['order_sn' => $order_sn, 'pay_status' => 0])->find();
         if (!$order) return false;// 看看有没已经处理过这笔订单  支付宝返回不重复处理操作
         M('buy_vip')->where("order_sn",$order_sn)->save(array('pay_status'=>1,'pay_time'=>$time));
+        //叠加会员过期时间
+        vip_end_time($order['user_id']);
         buy_vip_rebate($order['user_id'],$order['order_sn'],$order['order_id']);
     }else{
          // 如果这笔订单已经处理过了

@@ -111,7 +111,7 @@ class Order extends Base {
         $map['user_id'] = $this->user_id;
         $order_info = M('order')->where($map)->find();
         if(!$order_info){
-            $this->error('没有获取到订单信息');
+            $this->error('没有获取到订单信息1');
             exit;
         }
         $order_info = set_btn_order_status($order_info);  // 添加属性  包括按钮显示属性 和 订单状态显示属性
@@ -224,7 +224,7 @@ class Order extends Base {
     	$map['order_id'] = $order_id;
     	$map['user_id'] = $this->user_id;
     	$orderobj = $Order->where($map)->find();
-        if(!$orderobj) $this->error('没有获取到订单信息');
+        if(!$orderobj) $this->error('没有获取到订单信息2');
         // 添加属性  包括按钮显示属性 和 订单状态显示属性
         $order_info = $orderobj->append(['order_status_detail','order_button','order_goods'])->toArray();
     	//获取订单操作记录

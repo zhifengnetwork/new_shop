@@ -204,7 +204,7 @@ class Order extends MobileBase
         $Order = new OrderModel();
         $order = $Order::get(['order_id' => $id, 'user_id' => $this->user_id]);
         if (!$order) {
-            $this->error('没有获取到订单信息');
+            $this->error('没有获取到订单信息4');
         }
         //获取订单
         if ($order['prom_type'] == 5) {   //虚拟订单
