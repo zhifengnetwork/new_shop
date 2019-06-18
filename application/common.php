@@ -1051,6 +1051,28 @@ function rechargevip_rebate($order) {
 }
 
 /**
+ * 购买VIP返利上级
+ * $user_id 用户ID
+ */
+function buy_vip_rebate($user_id = 0,$order_sn = 0){
+    $first_leader = M('users')->where(['user_id' => $user_id,'end_time' => ['lt',time()]])->value('first_leader');
+    if($first_leader != 0 && $first_leader > 0){
+         $num ++;
+         $my_prize = 0.1;
+         $user     = M('users')->where('user_id',$first_leader)->field('user_money,distribut_money,openid')->find();
+         $my_user_money       = $my_prize + $user['user_money'];
+         $my_distribut_money  = $my_prize + $user['distribut_money'];
+         $distribut_money_vip = $my_prize + $user['distribut_money_vip'];
+         $bool = M('users')->where('user_id',$user_id)->update(['user_money'=>$my_user_money,'distribut_money'=>$my_distribut_money,'distribut_money_vip' => $distribut_money_vip]);
+         //记录用户余额变动
+         setBalanceLog($first_leader,13,$my_prize,$my_user_money,'VIP奖：'.$my_prize,$order['order_sn']);
+         if($num < 6){
+             $this->buy_vip_rebate($first_leader); 
+         }
+    }
+}
+
+/**
  * 支付完成修改订单
  * @param $order_sn 订单号
  * @param array $ext 额外参数
@@ -1117,8 +1139,18 @@ function update_pay_status($order_sn,$ext=array())
         # 存入一条微信模板消息待发记录
         $tcmoney = $order['order_amount'] > 0 ? $order['order_amount'] : $order['total_amount'];
         Db::name('wx_temp_cache')->insert(['user_id'=>$order['user_id'],'type'=>'Purchase_Success','tid'=>$order['order_id'],'money'=>$tcmoney,'time'=>time()]);
+        if($order['is_vip']){
+            buy_vip_rebate($order['user_id'],$order['order_sn']);
+        }else{
+             //购买返佣
+            $sales = sales($order['order_id']);
+        }
         
-        $sales = sales($order['order_id']);  //购买返佣
+         
+
+       
+
+
         
         // 分销商升级, 根据order表查看消费id 达到条件就给他分销商等级升级
         // $Level =new \app\common\logic\LevelLogic();

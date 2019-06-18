@@ -85,6 +85,28 @@ class Sales extends Model
 		return $reward;
 	}
 
+    /***
+	 * vip分销
+     */
+	public function vip_sales($user_id = 0){
+		//前6个上级
+	   $first_leader = M('users')->where(['user_id' => $user_id,'end_time' => ['lt',time()]])->value('first_leader');
+	   if($first_leader != 0 && $first_leader > 0){
+			$num ++;
+		    $my_prize = 0.1;
+			$user     = M('users')->where('user_id',$first_leader)->field('user_money,distribut_money,openid')->find();
+			$my_user_money       = $my_prize + $user['user_money'];
+			$my_distribut_money  = $my_prize + $user['distribut_money'];
+			$distribut_money_vip = $my_prize + $user['distribut_money_vip'];
+			$bool = M('users')->where('user_id',$user_id)->update(['user_money'=>$my_user_money,'distribut_money'=>$my_distribut_money,'distribut_money_vip' => $distribut_money_vip]);
+            //记录用户余额变动
+			setBalanceLog($this->user_id,13,$my_prize,$my_user_money,'VIP奖：'.$my_prize,$order['order_sn']);
+			if($num < 6){
+				$this->vip_sales($first_leader); 
+			}
+	   }
+	}
+
 
 
 	// //是否重复购买
